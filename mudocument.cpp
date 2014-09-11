@@ -5,14 +5,22 @@ muDocument::muDocument()
     mu_ctx = nullptr;
 }
 
-status_t muDocument::Initialize()
+muDocument::~muDocument()
 {
     if (mu_ctx != nullptr)
-        return E_FAILURE;  //  already inited
+        CleanUp();
+}
+
+bool muDocument::Initialize()
+{
+    if (mu_ctx != nullptr)
+        return false;  //  already inited
 
     mu_ctx = new muctx();
     status_t result = mu_ctx->InitializeContext();
-    return result;
+    if (result == S_ISOK)
+        return true;
+    return false;
 }
 
 void muDocument::CleanUp()
@@ -25,9 +33,15 @@ void muDocument::CleanUp()
     }
 }
 
-status_t muDocument::OpenFile(std::string fileName)
+bool muDocument::OpenFile(const std::string fileName)
 {
     status_t result = mu_ctx->OpenDocument((char *)fileName.c_str());
-    return result;
+    if (result == S_ISOK)
+        return true;
+    return false;
 }
 
+bool muDocument::ProcessFile ()
+{
+    return false;
+}

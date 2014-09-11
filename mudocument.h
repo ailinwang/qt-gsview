@@ -10,15 +10,13 @@ class muDocument
 {
 public:
     muDocument();
-    status_t Initialize();
+    ~muDocument();
+
+    bool Initialize();
     void CleanUp();
-    status_t OpenFile(std::string fileName);
-    int RenderPage (int page_num,
-                    char * bmp_data,
-                    int bmp_width,
-                    int bmp_height,
-                    double scale,
-                    bool flipy);
+
+    bool OpenFile(const std::string fileName);
+    bool ProcessFile();
 
 private:
     muctx *mu_ctx;
