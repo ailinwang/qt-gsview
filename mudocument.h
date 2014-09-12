@@ -29,6 +29,12 @@ public:
 
     int GetPageCount();
 
+    void SetZoom(double theZoom) {m_scaleFactor = theZoom;}
+    double GetZoom() {return m_scaleFactor;}
+
+    void SetPageNumber(int thePage) {m_currentPage=thePage;}
+    int GetPageNumber() {return m_currentPage;}
+
 private:
     bool Setup ();
 
