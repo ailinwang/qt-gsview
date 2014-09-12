@@ -1,15 +1,17 @@
+#ifndef _QT
 #pragma once
+#endif
 
 #ifndef _QT
 #include "pch.h"
 #endif
 #include "muctx.h"
-#include "Cache.h"
+//#include "Cache.h"
 #include <mutex>
 
 /* This class interfaces to mupdf API with minimal windows objects
  * (other than the file streaming stuff) */
-static int textlen(fz_text_page *page);
+//static int textlen(fz_text_page *page);
 
 #ifdef _WINRT_DLL
 // Attempt to use t.wait()
@@ -409,7 +411,7 @@ unsigned int muctx::GetLinks(int page_num, sh_vector_link links_vec)
 {
 	fz_page *page = NULL;
 	fz_link *links = NULL;
-	int k = 0;
+//	int k = 0;
 	unsigned int num_links = 0;
 
 	fz_var(page);
@@ -828,7 +830,7 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
 	fz_display_list *dlist = NULL;
 	fz_display_list *annot_dlist = NULL;
 	fz_page *page = NULL;
-	bool valid = true;
+//	bool valid = true;
 	fz_pixmap *pix = NULL;
 	fz_irect ibounds;
 

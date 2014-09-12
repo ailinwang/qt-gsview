@@ -90,7 +90,9 @@ private:
 	CRITICAL_SECTION mu_criticalsec[FZ_LOCK_MAX];
 #endif
 
+#ifdef _WINRT_DLL
 	win_stream_struct win_stream;
+#endif
 	fz_locks_context mu_locks;
 	fz_context *mu_ctx;
 	fz_document *mu_doc;
@@ -98,8 +100,8 @@ private:
 	fz_rect mu_hit_bbox[MAX_SEARCH];
 	void FlattenOutline(fz_outline *outline, int level,
 						sh_vector_content contents_vec);
-	Cache *page_cache;
-	Cache *annot_cache;
+    Cache *page_cache;
+    Cache *annot_cache;
 
 public:
 	muctx(void);
