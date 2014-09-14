@@ -1,18 +1,18 @@
-#include "mudocument.h"
+#include "Document.h"
 
-muDocument::muDocument()
+Document::Document()
 {
     mu_ctx = nullptr;
     m_opened = false;
 }
 
-muDocument::~muDocument()
+Document::~Document()
 {
     if (mu_ctx != nullptr)
         CleanUp();
 }
 
-bool muDocument::Initialize()
+bool Document::Initialize()
 {
     if (mu_ctx != nullptr)
         return false;  //  already inited
@@ -24,7 +24,7 @@ bool muDocument::Initialize()
     return false;
 }
 
-void muDocument::CleanUp()
+void Document::CleanUp()
 {
     if (mu_ctx != NULL)
     {
@@ -34,7 +34,7 @@ void muDocument::CleanUp()
     }
 }
 
-bool muDocument::OpenFile(const std::string fileName)
+bool Document::OpenFile(const std::string fileName)
 {
     status_t result = mu_ctx->OpenDocument((char *)fileName.c_str());
     if (result == S_ISOK)
@@ -46,7 +46,7 @@ bool muDocument::OpenFile(const std::string fileName)
     return false;
 }
 
-bool muDocument::Setup ()
+bool Document::Setup ()
 {
     m_currentPage = 0;
     m_scaleFactor = 1.0;
@@ -54,12 +54,12 @@ bool muDocument::Setup ()
     return true;
 }
 
-bool muDocument::GetCurrentPageSize (point_t *render_size)
+bool Document::GetCurrentPageSize (point_t *render_size)
 {
     return GetPageSize(m_currentPage, render_size);
 }
 
-bool muDocument::GetPageSize (int page_num, point_t *render_size)
+bool Document::GetPageSize (int page_num, point_t *render_size)
 {
     int result = mu_ctx->MeasurePage(page_num, render_size);
     if (result != 0)
@@ -71,7 +71,7 @@ bool muDocument::GetPageSize (int page_num, point_t *render_size)
     return true;
 }
 
-bool muDocument::RenderCurrentPage (unsigned char *bmp_data, int bmp_width,
+bool Document::RenderCurrentPage (unsigned char *bmp_data, int bmp_width,
                     int bmp_height, bool flipy)
 {
     return RenderPage (m_currentPage, bmp_data, bmp_width,
@@ -79,7 +79,7 @@ bool muDocument::RenderCurrentPage (unsigned char *bmp_data, int bmp_width,
 }
 
 
-bool muDocument::RenderPage (int page_num, unsigned char *bmp_data, int bmp_width,
+bool Document::RenderPage (int page_num, unsigned char *bmp_data, int bmp_width,
                     int bmp_height, float scale, bool flipy)
 {
     mu_ctx->RenderPage (page_num, bmp_data, bmp_width,
@@ -87,7 +87,7 @@ bool muDocument::RenderPage (int page_num, unsigned char *bmp_data, int bmp_widt
     return true;
 }
 
-int muDocument::GetPageCount()
+int Document::GetPageCount()
 {
     return mu_ctx->GetPageCount();
 }

@@ -1,16 +1,16 @@
-#ifndef MUDOCUMENT_H
-#define MUDOCUMENT_H
+#ifndef DOCUMENT_H
+#define DOCUMENT_H
 
 #include "status.h"
 #include "muctx.h"
 
 typedef unsigned char Byte;
 
-class muDocument
+class Document
 {
 public:
-    muDocument();
-    ~muDocument();
+    Document();
+    ~Document();
 
     bool Initialize ();
     void CleanUp ();
@@ -44,4 +44,4 @@ private:
     bool m_opened;
 };
 
-#endif // MUDOCUMENT_H
+#endif // DOCUMENT_H

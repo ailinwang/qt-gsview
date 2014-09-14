@@ -6,7 +6,7 @@
 #include "pch.h"
 #endif
 #include "muctx.h"
-//#include "Cache.h"
+#include "Cache.h"
 #include <mutex>
 
 /* This class interfaces to mupdf API with minimal windows objects
