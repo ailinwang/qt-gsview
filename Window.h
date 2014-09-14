@@ -71,9 +71,9 @@ private:
 
     static int m_numWindows;
     Document *m_document = NULL;
-    QLabel *m_imageLabel;
-    QScrollArea *m_scrollArea;
 
+    //  this will become an array of pages
+    QLabel *m_imageLabel;
 };
 
 #endif  //  WINDOW_H

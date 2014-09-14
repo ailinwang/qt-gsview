@@ -1,5 +1,6 @@
 
 #include <QtWidgets>
+#include <QAbstractScrollArea>
 #ifndef QT_NO_PRINTER
 #include <QPrintDialog>
 #endif
@@ -57,16 +58,22 @@ bool Window::OpenFile (QString path)
     //  signal a resize
     resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
 
-    //  create a scrolling area
-    m_scrollArea = new QScrollArea;
-    m_scrollArea->setBackgroundRole(QPalette::Dark);
-    setCentralWidget(m_scrollArea);
+    //  create scrolling area
+    QScrollArea *scrollArea = new QScrollArea(this);
+    scrollArea->setBackgroundRole(QPalette::Dark);
+    scrollArea->setWidgetResizable(true);
+    setCentralWidget(scrollArea);
 
+    //  inside, create a box with a vertical layout
+    QWidget* contentWidget = new QWidget(this);
+    contentWidget->setObjectName("m_contentWidget");
+    contentWidget->setLayout(new QVBoxLayout(contentWidget));
+    scrollArea->setWidget(contentWidget);
+
+    //  add pages (only one for now)
     m_imageLabel = new QLabel;
     m_imageLabel->setBackgroundRole(QPalette::Dark);
-    m_imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    m_imageLabel->setScaledContents(true);
-    m_scrollArea->setWidget(m_imageLabel);
+    contentWidget->layout()->addWidget(m_imageLabel);
 
     //  draw
     drawCurrentPage();
@@ -279,6 +286,7 @@ void Window::print()
         //  copy to printer
         QImage *myImage = imageFromData(bitmap, (int)pageSize.X, (int)pageSize.Y);
         painter->drawImage(0, 0, *myImage);
+
         delete myImage;
         delete bitmap;
 
