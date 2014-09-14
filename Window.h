@@ -72,6 +72,9 @@ private:
     static int m_numWindows;
     Document *m_document = NULL;
 
+    QScrollArea *m_scrollArea = NULL;
+    QWidget *m_contentWidget = NULL;
+
     //  array of page images
     QLabel *m_pageImages = NULL;
 };

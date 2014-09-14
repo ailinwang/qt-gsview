@@ -70,12 +70,14 @@ bool Window::OpenFile (QString path)
     scrollArea->setBackgroundRole(QPalette::Dark);
     scrollArea->setWidgetResizable(true);
     setCentralWidget(scrollArea);
+    m_scrollArea = scrollArea;
 
     //  inside, create a box with a vertical layout
     QWidget* contentWidget = new QWidget(this);
     contentWidget->setObjectName("m_contentWidget");
     contentWidget->setLayout(new QVBoxLayout(contentWidget));
     scrollArea->setWidget(contentWidget);
+    m_contentWidget = contentWidget;
 
     //  create an array of page images
     int nPages = m_document->GetPageCount();
@@ -352,11 +354,36 @@ void Window::normalSize()
 void Window::pageUp()
 {
     qDebug("page up");
+
+    int curPage = m_document->GetPageNumber();
+    if (curPage>0)
+    {
+        curPage -= 1;
+        m_document->SetPageNumber(curPage);
+        drawPage(curPage);
+
+        //  TODO: a better way to scroll
+        qApp->processEvents();
+        m_scrollArea->ensureWidgetVisible(&(m_pageImages[curPage]));
+    }
 }
 
 void Window::pageDown()
 {
     qDebug("page down");
+
+    int curPage = m_document->GetPageNumber();
+    int numPages = m_document->GetPageCount();
+    if (curPage+1<numPages)
+    {
+        curPage += 1;
+        m_document->SetPageNumber(curPage);
+        drawPage(curPage);
+
+        //  TODO: a better way to scroll
+        qApp->processEvents();
+        m_scrollArea->ensureWidgetVisible(&(m_pageImages[curPage]));
+    }
 }
 
 void Window::helpAbout()
