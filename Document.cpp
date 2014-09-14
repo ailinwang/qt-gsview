@@ -4,6 +4,8 @@ Document::Document()
 {
     mu_ctx = nullptr;
     m_opened = false;
+    m_pageCount = 0;
+    m_pages = nullptr;
 }
 
 Document::~Document()
@@ -21,6 +23,7 @@ bool Document::Initialize()
     status_t result = mu_ctx->InitializeContext();
     if (result == S_ISOK)
         return true;
+
     return false;
 }
 
@@ -40,18 +43,16 @@ bool Document::OpenFile(const std::string fileName)
     if (result == S_ISOK)
     {
         m_opened = true;
-        Setup();
+        m_currentPage = 0;
+        m_scaleFactor = 1.0;
+        m_pageCount = mu_ctx->GetPageCount();
+
+        //  allocate an array of pages
+        m_pages = new Page[m_pageCount];
+
         return true;
     }
     return false;
-}
-
-bool Document::Setup ()
-{
-    m_currentPage = 0;
-    m_scaleFactor = 1.0;
-
-    return true;
 }
 
 bool Document::GetCurrentPageSize (point_t *render_size)
@@ -89,6 +90,6 @@ bool Document::RenderPage (int page_num, unsigned char *bmp_data, int bmp_width,
 
 int Document::GetPageCount()
 {
-    return mu_ctx->GetPageCount();
+    return m_pageCount;
 }
 

@@ -3,6 +3,7 @@
 
 #include "status.h"
 #include "muctx.h"
+#include "Page.h"
 
 typedef unsigned char Byte;
 
@@ -36,12 +37,13 @@ public:
     int GetPageNumber() {return m_currentPage;}
 
 private:
-    bool Setup ();
 
     muctx *mu_ctx;
     int m_currentPage;
     float m_scaleFactor;
     bool m_opened;
+    int m_pageCount;
+    Page *m_pages;
 };
 
 #endif // DOCUMENT_H
