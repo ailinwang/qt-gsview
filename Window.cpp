@@ -12,26 +12,17 @@ Window::Window()
     m_document = new Document();
     m_document->Initialize();
 
-    imageLabel = new QLabel;
-    imageLabel->setBackgroundRole(QPalette::Base);
-    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    imageLabel->setScaledContents(true);
-
-    scrollArea = new QScrollArea;
-    scrollArea->setBackgroundRole(QPalette::Dark);
-    scrollArea->setWidget(imageLabel);
-    setCentralWidget(scrollArea);
-
+    //  set up menus
     createActions();
     createMenus();
 
-    numWindows++;
+    m_numWindows++;
 }
 
 Window::~Window()
 {
-    if (numWindows>0)
-        numWindows--;
+    if (m_numWindows>0)
+        m_numWindows--;
 }
 
 void Window::keyPressEvent(QKeyEvent* event)
@@ -65,6 +56,34 @@ bool Window::OpenFile (QString path)
 
     //  signal a resize
     resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
+
+    //  create a scrolling area
+    m_scrollArea = new QScrollArea;
+    m_scrollArea->setBackgroundRole(QPalette::Dark);
+    setCentralWidget(m_scrollArea);
+
+#if 0
+
+    //  create an empty widget with a vertical layout
+    QWidget *vert = new QWidget;
+    m_scrollArea->setWidget( vert );
+    QVBoxLayout *vertLayout = new QVBoxLayout( );
+    vert->setLayout(vertLayout);
+
+    //  add one or more images to the layout
+    m_imageLabel = new QLabel;
+    m_imageLabel->setBackgroundRole(QPalette::Dark);
+    m_imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    m_imageLabel->setScaledContents(true);
+    vertLayout->addWidget( m_imageLabel );
+
+#else
+    m_imageLabel = new QLabel;
+    m_imageLabel->setBackgroundRole(QPalette::Dark);
+    m_imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    m_imageLabel->setScaledContents(true);
+    m_scrollArea->setWidget(m_imageLabel);
+#endif
 
     //  draw
     drawCurrentPage();
@@ -108,9 +127,8 @@ void Window::resizeEvent(QResizeEvent* event)
 
 void Window::drawCurrentPage()
 {
-    if (m_document == NULL)
-        return;
-    if (!m_document->isOpen())
+    //  doc must be valid and open
+    if (m_document == NULL || !m_document->isOpen())
         return;
 
     //  compute page size
@@ -124,10 +142,11 @@ void Window::drawCurrentPage()
 
     //  copy to window
     QImage *myImage = imageFromData(bitmap, (int)pageSize.X, (int)pageSize.Y);
-    imageLabel->setPixmap(QPixmap::fromImage(*myImage));
+    m_imageLabel->setPixmap(QPixmap::fromImage(*myImage));
+    m_imageLabel->adjustSize();
+
     delete myImage;
     delete bitmap;
-    imageLabel->adjustSize();
 }
 
 void Window::openAction()
@@ -199,7 +218,7 @@ void Window::open()
     }
 }
 
-int Window::numWindows = 0;
+int Window::m_numWindows = 0;
 
 void Window::print()
 {

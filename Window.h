@@ -52,9 +52,6 @@ private:
 
     static void errorMessage(const std::string theTitle, const std::string theMessage);
 
-	QLabel *imageLabel;
-	QScrollArea *scrollArea;
-
     QAction *openAct;
     QAction *closeAct;
     QAction *printAct;
@@ -72,9 +69,11 @@ private:
 	QMenu *viewMenu;
 	QMenu *helpMenu;
 
-    static int numWindows;
-
+    static int m_numWindows;
     Document *m_document = NULL;
+    QLabel *m_imageLabel;
+    QScrollArea *m_scrollArea;
+
 };
 
 #endif  //  WINDOW_H
