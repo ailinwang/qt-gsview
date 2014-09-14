@@ -48,7 +48,7 @@ private:
 	void createMenus();
 	void updateActions();
 	void adjustScrollBar(QScrollBar *scrollBar, double factor);
-    void drawCurrentPage();
+    void drawPage(int pageNumber);
 
     static void errorMessage(const std::string theTitle, const std::string theMessage);
 
@@ -72,8 +72,8 @@ private:
     static int m_numWindows;
     Document *m_document = NULL;
 
-    //  this will become an array of pages
-    QLabel *m_imageLabel;
+    //  array of page images
+    QLabel *m_pageImages = NULL;
 };
 
 #endif  //  WINDOW_H

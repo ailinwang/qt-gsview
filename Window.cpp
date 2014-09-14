@@ -28,11 +28,18 @@ Window::~Window()
 
 void Window::keyPressEvent(QKeyEvent* event)
 {
-    if (event->text().length() > 0)  // modifiers come thru as ""
+    switch (event->key())
     {
-//        QChar qc = event->text().at(0);
-//        int c = qc.toLatin1();
-//        //  TODO:  key input
+    case Qt::Key_PageDown:
+        pageDown();
+        break;
+
+    case Qt::Key_PageUp:
+        pageUp();
+        break;
+
+    default:
+        break;
     }
 }
 
@@ -70,13 +77,20 @@ bool Window::OpenFile (QString path)
     contentWidget->setLayout(new QVBoxLayout(contentWidget));
     scrollArea->setWidget(contentWidget);
 
-    //  add pages (only one for now)
-    m_imageLabel = new QLabel;
-    m_imageLabel->setBackgroundRole(QPalette::Dark);
-    contentWidget->layout()->addWidget(m_imageLabel);
+    //  create an array of page images
+    int nPages = m_document->GetPageCount();
+    m_pageImages = new QLabel[nPages]();
+    for (int i=0;i<nPages;i++)
+    {
+//        m_pageImages[i] = new QLabel();
+        m_pageImages[i].setBackgroundRole(QPalette::Dark);
+        contentWidget->layout()->addWidget(&(m_pageImages[i]));
+    }
 
-    //  draw
-    drawCurrentPage();
+    //  draw first page
+    drawPage(0);
+
+    updateActions();
 
     return true;
 }
@@ -115,7 +129,7 @@ void Window::resizeEvent(QResizeEvent* event)
     QMainWindow::resizeEvent(event);
 }
 
-void Window::drawCurrentPage()
+void Window::drawPage(int pageNumber)
 {
     //  doc must be valid and open
     if (m_document == NULL || !m_document->isOpen())
@@ -132,8 +146,8 @@ void Window::drawCurrentPage()
 
     //  copy to window
     QImage *myImage = imageFromData(bitmap, (int)pageSize.X, (int)pageSize.Y);
-    m_imageLabel->setPixmap(QPixmap::fromImage(*myImage));
-    m_imageLabel->adjustSize();
+    m_pageImages[pageNumber].setPixmap(QPixmap::fromImage(*myImage));
+    m_pageImages[pageNumber].adjustSize();
 
     delete myImage;
     delete bitmap;
@@ -317,32 +331,32 @@ void Window::print()
     m_document->SetPageNumber(oldPage);
 
     //  restore the original page
-    drawCurrentPage();
+    drawPage(oldPage);
 }
 
 void Window::zoomIn()
 {
-//    pdfapp_onkey (gapp , '+');
+    qDebug("zoom in");
 }
 
 void Window::zoomOut()
 {
-//    pdfapp_onkey (gapp , '-');
+    qDebug("zoom out");
 }
 
 void Window::normalSize()
 {
-//    pdfapp_zoom_normal (gapp);
+    qDebug("zoom normal");
 }
 
 void Window::pageUp()
 {
-//    pdfapp_onkey (gapp , ',');
+    qDebug("page up");
 }
 
 void Window::pageDown()
 {
-//    pdfapp_onkey (gapp , '.');
+    qDebug("page down");
 }
 
 void Window::helpAbout()
