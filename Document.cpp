@@ -2,21 +2,21 @@
 
 Document::Document()
 {
-    mu_ctx = nullptr;
+    mu_ctx = NULL;
     m_opened = false;
     m_pageCount = 0;
-    m_pages = nullptr;
+    m_pages = NULL;
 }
 
 Document::~Document()
 {
-    if (mu_ctx != nullptr)
+    if (mu_ctx != NULL)
         CleanUp();
 }
 
 bool Document::Initialize()
 {
-    if (mu_ctx != nullptr)
+    if (mu_ctx != NULL)
         return false;  //  already inited
 
     mu_ctx = new muctx();
@@ -33,7 +33,7 @@ void Document::CleanUp()
     {
         mu_ctx->CleanUp();
         delete mu_ctx;
-        mu_ctx = nullptr;
+        mu_ctx = NULL;
     }
 }
 

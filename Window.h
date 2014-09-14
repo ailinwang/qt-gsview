@@ -74,7 +74,7 @@ private:
 
     static int numWindows;
 
-    Document *m_document = nullptr;
+    Document *m_document = NULL;
 };
 
 #endif  //  WINDOW_H

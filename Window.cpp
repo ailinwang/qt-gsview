@@ -74,7 +74,7 @@ bool Window::OpenFile (QString path)
 
 void Window::errorMessage(const std::string theTitle, const std::string theMessage)
 {
-    QMessageBox::critical(nullptr, QString(theTitle.c_str()), QString(theMessage.c_str()));
+    QMessageBox::critical(NULL, QString(theTitle.c_str()), QString(theMessage.c_str()));
 }
 
 QImage * imageFromData(unsigned char *samples, int w, int h)
@@ -108,7 +108,7 @@ void Window::resizeEvent(QResizeEvent* event)
 
 void Window::drawCurrentPage()
 {
-    if (m_document == nullptr)
+    if (m_document == NULL)
         return;
     if (!m_document->isOpen())
         return;
