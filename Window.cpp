@@ -62,28 +62,11 @@ bool Window::OpenFile (QString path)
     m_scrollArea->setBackgroundRole(QPalette::Dark);
     setCentralWidget(m_scrollArea);
 
-#if 0
-
-    //  create an empty widget with a vertical layout
-    QWidget *vert = new QWidget;
-    m_scrollArea->setWidget( vert );
-    QVBoxLayout *vertLayout = new QVBoxLayout( );
-    vert->setLayout(vertLayout);
-
-    //  add one or more images to the layout
-    m_imageLabel = new QLabel;
-    m_imageLabel->setBackgroundRole(QPalette::Dark);
-    m_imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    m_imageLabel->setScaledContents(true);
-    vertLayout->addWidget( m_imageLabel );
-
-#else
     m_imageLabel = new QLabel;
     m_imageLabel->setBackgroundRole(QPalette::Dark);
     m_imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     m_imageLabel->setScaledContents(true);
     m_scrollArea->setWidget(m_imageLabel);
-#endif
 
     //  draw
     drawCurrentPage();
