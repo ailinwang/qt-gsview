@@ -21,16 +21,16 @@ public:
     bool GetCurrentPageSize (point_t *render_size);
     bool GetPageSize (int page_num, point_t *render_size);
 
-    bool RenderCurrentPage (unsigned char *bmp_data, int bmp_width,
-                        int bmp_height, bool flipy);
+//    bool RenderCurrentPage (unsigned char *bmp_data, int bmp_width,
+//                        int bmp_height, bool flipy);
     bool RenderPage (int page_num, unsigned char *bmp_data, int bmp_width,
-                        int bmp_height, float scale, bool flipy);
+                        int bmp_height, bool flipy);
 
     bool isOpen() {return m_opened;}
 
     int GetPageCount();
 
-    void SetZoom(double theZoom) {m_scaleFactor = theZoom;}
+    void SetZoom (double theZoom) {m_scaleFactor = theZoom;}
     double GetZoom() {return m_scaleFactor;}
 
     void SetPageNumber(int thePage) {m_currentPage=thePage;}

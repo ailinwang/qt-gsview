@@ -72,19 +72,19 @@ bool Document::GetPageSize (int page_num, point_t *render_size)
     return true;
 }
 
-bool Document::RenderCurrentPage (unsigned char *bmp_data, int bmp_width,
-                    int bmp_height, bool flipy)
-{
-    return RenderPage (m_currentPage, bmp_data, bmp_width,
-            bmp_height, m_scaleFactor, flipy);
-}
+//bool Document::RenderCurrentPage (unsigned char *bmp_data, int bmp_width,
+//                    int bmp_height, bool flipy)
+//{
+//    return RenderPage (m_currentPage, bmp_data, bmp_width,
+//            bmp_height, m_scaleFactor, flipy);
+//}
 
 
 bool Document::RenderPage (int page_num, unsigned char *bmp_data, int bmp_width,
-                    int bmp_height, float scale, bool flipy)
+                    int bmp_height, bool flipy)
 {
     mu_ctx->RenderPage (page_num, bmp_data, bmp_width,
-                       bmp_height, scale, flipy);
+                       bmp_height, m_scaleFactor, flipy);
     return true;
 }
 

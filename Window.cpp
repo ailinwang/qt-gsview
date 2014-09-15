@@ -84,7 +84,6 @@ bool Window::OpenFile (QString path)
     m_pageImages = new QLabel[nPages]();
     for (int i=0;i<nPages;i++)
     {
-//        m_pageImages[i] = new QLabel();
         m_pageImages[i].setBackgroundRole(QPalette::Dark);
         contentWidget->layout()->addWidget(&(m_pageImages[i]));
     }
@@ -144,7 +143,7 @@ void Window::drawPage(int pageNumber)
 
     //  render
     Byte *bitmap = new Byte[numBytes];
-    m_document->RenderCurrentPage(bitmap, pageSize.X, pageSize.Y, false);
+    m_document->RenderPage(pageNumber, bitmap, pageSize.X, pageSize.Y, false);
 
     //  copy to window
     QImage *myImage = imageFromData(bitmap, (int)pageSize.X, (int)pageSize.Y);
@@ -297,7 +296,7 @@ void Window::print()
         //  render a bitmap
         int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
         Byte *bitmap = new Byte[numBytes];
-        m_document->RenderCurrentPage(bitmap, pageSize.X, pageSize.Y, false);
+        m_document->RenderPage(page, bitmap, pageSize.X, pageSize.Y, false);
 
         //  copy to printer
         QImage *myImage = imageFromData(bitmap, (int)pageSize.X, (int)pageSize.Y);
@@ -353,25 +352,24 @@ void Window::normalSize()
 
 void Window::pageUp()
 {
-    qDebug("page up");
-
     int curPage = m_document->GetPageNumber();
     if (curPage>0)
     {
         curPage -= 1;
         m_document->SetPageNumber(curPage);
         drawPage(curPage);
+        while (qApp->hasPendingEvents())
+            qApp->processEvents();
 
-        //  TODO: a better way to scroll
-        qApp->processEvents();
-        m_scrollArea->ensureWidgetVisible(&(m_pageImages[curPage]));
+        //  scroll to top of page
+        QRect r = m_pageImages[curPage].geometry();
+        m_scrollArea->verticalScrollBar()->setValue(r.top());
+        qDebug ("page up %d %d", curPage, r.top());
     }
 }
 
 void Window::pageDown()
 {
-    qDebug("page down");
-
     int curPage = m_document->GetPageNumber();
     int numPages = m_document->GetPageCount();
     if (curPage+1<numPages)
@@ -379,10 +377,13 @@ void Window::pageDown()
         curPage += 1;
         m_document->SetPageNumber(curPage);
         drawPage(curPage);
+        while (qApp->hasPendingEvents())
+            qApp->processEvents();
 
-        //  TODO: a better way to scroll
-        qApp->processEvents();
-        m_scrollArea->ensureWidgetVisible(&(m_pageImages[curPage]));
+        //  scroll to top of page
+        QRect r = m_pageImages[curPage].geometry();
+        m_scrollArea->verticalScrollBar()->setValue(r.top());
+        qDebug ("page up %d %d", curPage, r.top());
     }
 }
 
