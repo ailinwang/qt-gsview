@@ -90,18 +90,16 @@ bool Window::OpenFile (QString path)
     }
 
     //  create scrolling area
-    QScrollArea *scrollArea = new QScrollArea(this);
-    scrollArea->setBackgroundRole(QPalette::Dark);
-    scrollArea->setWidgetResizable(true);
-    setCentralWidget(scrollArea);
-    m_scrollArea = scrollArea;
+    m_pageScrollArea = new QScrollArea(this);
+    m_pageScrollArea->setBackgroundRole(QPalette::Dark);
+    m_pageScrollArea->setWidgetResizable(true);
+    setCentralWidget(m_pageScrollArea);
 
     //  inside, create a box with a vertical layout
     QWidget* contentWidget = new QWidget(this);
     contentWidget->setObjectName("m_contentWidget");
     contentWidget->setLayout(new QVBoxLayout(contentWidget));
-    scrollArea->setWidget(contentWidget);
-    m_contentWidget = contentWidget;
+    m_pageScrollArea->setWidget(contentWidget);
 
     //  create an array of page images
     int nPages = m_document->GetPageCount();
@@ -384,7 +382,7 @@ void Window::pageUp()
         int scrollTo = r.top()-10;
         if (scrollTo<0)
             scrollTo = 0;
-        m_scrollArea->verticalScrollBar()->setValue(scrollTo);
+        m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
         qDebug ("page up %d %d", m_currentPage, scrollTo);
 
     }
@@ -405,7 +403,7 @@ void Window::pageDown()
         int scrollTo = r.top()-10;
         if (scrollTo<0)
             scrollTo = 0;
-        m_scrollArea->verticalScrollBar()->setValue(scrollTo);
+        m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
         qDebug ("page up %d %d", m_currentPage, scrollTo);
     }
 }

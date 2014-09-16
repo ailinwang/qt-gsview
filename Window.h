@@ -77,21 +77,19 @@ private:
 
     static int m_numWindows;
 
-    QScrollArea *m_scrollArea = NULL;
-    QWidget *m_contentWidget = NULL;
+    QScrollArea *m_pageScrollArea = NULL;
+    QScrollArea *m_thumbScrollArea = NULL;
 
     //  array of page images
+    double m_scalePage = 1.0;
     QLabel *m_pageImages = NULL;
 
     //  array of thumbnail images
+    double m_scaleThumbnail = 0.10;
     QLabel *m_thumbnailImages = NULL;
 
     //  current page
     int m_currentPage = 0;
-
-    //  zoom factor for pages and thumbnails
-    double m_scaleThumbnail = 0.05;
-    double m_scalePage = 1.0;
 
     Document *m_document = NULL;
 };
