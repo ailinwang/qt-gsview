@@ -75,7 +75,7 @@ bool Window::OpenFile (QString path)
         while (!pwdValid)
         {
             bool ok;
-            QString text = QInputDialog::getText(this, tr(""), tr("Password:"), QLineEdit::Password,
+            QString text = QInputDialog::getText(this, tr(""), tr("Enter password:"), QLineEdit::Password,
                                                  QDir::home().dirName(), &ok);
             if (ok && !text.isEmpty())
             {
@@ -84,7 +84,6 @@ bool Window::OpenFile (QString path)
             else
             {
                 //  user cancelled.
-                this->close();
                 return false;
             }
         }
@@ -220,10 +219,15 @@ void Window::open()
         newWindow->show();
         if (newWindow->OpenFile(dialog.selectedFiles().first()))
         {
-            //success
+            //  success
             return;
         }
         newWindow->hide();
+
+        //  if this was the 2nd (or higher) open file,
+        //  break out so we don't hit the dialog again.
+        if (m_numWindows >= 2)
+            break;
     }
 
     //  user gave up, so delete the window we created.
