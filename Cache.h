@@ -26,13 +26,13 @@ private:
 	int size;
 	cache_entry_t *head;
 	cache_entry_t *tail;
-	std::mutex cache_lock;
+    std::mutex cache_lock;
 
 public:
 	Cache(void);
 	~Cache(void);
 	void GetSize(int *width, int *height);
 	fz_display_list* Use(int value, int *width, int *height, fz_context *mu_ctx);
-	void Add(int value, int width, int height, fz_display_list *dlist, fz_context *mu_ctx);
+    void Add(int value, int width, int height, fz_display_list *dlist, fz_context *mu_ctx);
 	void Empty(fz_context *mu_ctx);
 };

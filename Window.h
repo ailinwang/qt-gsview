@@ -90,7 +90,7 @@ private:
     int m_currentPage = 0;
 
     //  zoom factor for pages and thumbnails
-    double m_scaleThumbnail = 0.1;
+    double m_scaleThumbnail = 0.05;
     double m_scalePage = 1.0;
 
     Document *m_document = NULL;

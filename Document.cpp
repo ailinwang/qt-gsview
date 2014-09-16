@@ -77,3 +77,15 @@ int Document::GetPageCount()
 {
     return m_pageCount;
 }
+
+bool Document::RequiresPassword()
+{
+    return mu_ctx->RequiresPassword();
+}
+
+bool Document::ApplyPassword(const std::string password)
+{
+    bool ok = mu_ctx->ApplyPassword((char *)password.c_str());
+    return ok;
+}
+

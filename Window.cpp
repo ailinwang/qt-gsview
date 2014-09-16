@@ -54,8 +54,6 @@ bool Window::OpenFile (QString path)
 
     //  TODO handle .PS and .EPS by running ghostscript first
 
-    //  TODO: handle password
-
     //  open the doc
     bool result = m_document->OpenFile(path.toStdString());
     if (!result)
@@ -69,6 +67,26 @@ bool Window::OpenFile (QString path)
 
     //  size and position
     setInitialSizeAndPosition();
+
+    //  ask for password
+    if (m_document->RequiresPassword())
+    {
+        bool pwdValid = false;
+        while (!pwdValid)
+        {
+            bool ok;
+            QString text = QInputDialog::getText(this, tr(""), tr("Password:"), QLineEdit::Password,
+                                                 QDir::home().dirName(), &ok);
+            if (ok && !text.isEmpty())
+            {
+                pwdValid = m_document->ApplyPassword(text.toStdString());
+            }
+            else
+            {
+                //  cancel?
+            }
+        }
+    }
 
     //  create scrolling area
     QScrollArea *scrollArea = new QScrollArea(this);

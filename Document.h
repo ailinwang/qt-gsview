@@ -23,6 +23,10 @@ public:
     bool GetPageSize (int page_num, double scale, point_t *render_size);
     bool RenderPage (int page_num, double scale, unsigned char *bmp_data, int bmp_width,
                         int bmp_height);
+
+    bool RequiresPassword();
+    bool ApplyPassword(const std::string password);
+
 private:
 
     muctx *mu_ctx;
