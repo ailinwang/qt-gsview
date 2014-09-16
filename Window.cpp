@@ -200,6 +200,9 @@ void Window::open()
     //  create a window that will show the file.
     Window *newWindow = new Window();
 
+    //  remember the currently active window
+    QWidget *priorWindow = qApp->activeWindow();
+
     while (true)
     {
         //  show and run the dialog
@@ -220,6 +223,7 @@ void Window::open()
         if (newWindow->OpenFile(dialog.selectedFiles().first()))
         {
             //  success
+            qApp->setActiveWindow(newWindow);
             return;
         }
         newWindow->hide();
@@ -232,6 +236,10 @@ void Window::open()
 
     //  user gave up, so delete the window we created.
     delete newWindow;
+
+    //  restore prior active window
+    if (NULL != priorWindow)
+        qApp->setActiveWindow(priorWindow);
 
     //  if no windows are open, quit.
     if (newWindow<=0)
