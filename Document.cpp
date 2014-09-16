@@ -66,10 +66,10 @@ bool Document::GetPageSize (int page_num, double scale, point_t *render_size)
 }
 
 bool Document::RenderPage (int page_num, double scale, unsigned char *bmp_data, int bmp_width,
-                    int bmp_height, bool flipy)
+                    int bmp_height)
 {
     mu_ctx->RenderPage (page_num, bmp_data, bmp_width,
-                       bmp_height, scale, flipy);
+                       bmp_height, scale, false);
     return true;
 }
 

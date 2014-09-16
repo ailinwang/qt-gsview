@@ -132,7 +132,7 @@ void Window::drawPage(int pageNumber)
 
     //  render
     Byte *bitmap = new Byte[numBytes];
-    m_document->RenderPage(pageNumber, m_scalePage, bitmap, pageSize.X, pageSize.Y, false);
+    m_document->RenderPage(pageNumber, m_scalePage, bitmap, pageSize.X, pageSize.Y);
 
     //  copy to window
     QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
@@ -220,7 +220,7 @@ int Window::m_numWindows = 0;
 
 void Window::print()
 {
-    //  get a high-res printer
+    //  get the printer
     QPrinter printer(QPrinter::HighResolution);
     QPrintDialog *dialog = new QPrintDialog(&printer, this);
     dialog->setWindowTitle(tr("Print Document"));
@@ -289,7 +289,7 @@ void Window::print()
         //  render a bitmap
         int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
         Byte *bitmap = new Byte[numBytes];
-        m_document->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y, false);
+        m_document->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y);
 
         //  copy to printer
         QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
