@@ -43,7 +43,7 @@ private slots:
 	void pageUp();
 	void pageDown();
 
-    void enterFullScreen();
+    void toggleFullScreen();
 
 private:
 	void createActions();

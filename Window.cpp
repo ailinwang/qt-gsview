@@ -478,10 +478,10 @@ void Window::createActions()
     pageDownAct->setShortcut(tr("Ctrl+D"));
     connect(pageDownAct, SIGNAL(triggered()), this, SLOT(pageDown()));
 
-    fullScreenAct = new QAction(tr("&Full Screen"), this);
+    fullScreenAct = new QAction(tr("Enter &Full Screen"), this);
     fullScreenAct->setEnabled(false);
     fullScreenAct->setShortcut(tr("Ctrl+F"));
-    connect(fullScreenAct, SIGNAL(triggered()), this, SLOT(enterFullScreen()));
+    connect(fullScreenAct, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
 }
 
 void Window::createMenus()
@@ -526,13 +526,23 @@ void Window::updateActions()
     fullScreenAct->setEnabled(true);
 }
 
-void Window::enterFullScreen()
+void Window::toggleFullScreen()
 {
-    setWindowState(Qt::WindowFullScreen);
+    if (windowState() != Qt::WindowFullScreen)
+    {
+        setWindowState(Qt::WindowFullScreen);
+        fullScreenAct->setText(tr("Exit &Full Screen"));
+    }
+    else
+    {
+        setWindowState(Qt::WindowNoState);
+        fullScreenAct->setText(tr("Enter &Full Screen"));
+    }
 }
 
 void Window::exitFullScreen()
 {
     setWindowState(Qt::WindowNoState);
+    fullScreenAct->setText(tr("Enter &Full Screen"));
 }
 
