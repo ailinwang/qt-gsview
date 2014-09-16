@@ -1,9 +1,7 @@
 
 #include <QtWidgets>
 #include <QAbstractScrollArea>
-#ifndef QT_NO_PRINTER
 #include <QPrintDialog>
-#endif
 
 #include "Window.h"
 
@@ -157,12 +155,12 @@ void Window::drawPage(int pageNumber)
 
     //  compute page size
     point_t pageSize;
-    m_document->GetPageSize(pageNumber,&pageSize);
+    m_document->GetPageSize(pageNumber,m_scalePage, &pageSize);
     int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
 
     //  render
     Byte *bitmap = new Byte[numBytes];
-    m_document->RenderPage(pageNumber, bitmap, pageSize.X, pageSize.Y, false);
+    m_document->RenderPage(pageNumber, m_scalePage, bitmap, pageSize.X, pageSize.Y, false);
 
     //  copy to window
     QImage *myImage = imageFromData(bitmap, (int)pageSize.X, (int)pageSize.Y);
@@ -258,15 +256,12 @@ void Window::print()
         return;
     dialog->hide();
 
-//    while(qApp->hasPendingEvents())
-//        qApp->processEvents();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    while(qApp->hasPendingEvents())
+        qApp->processEvents();
 
-    //  remember current zoom
-    double oldZoom = m_document->GetZoom();
-
-    //  set new zoom based on printer's resolution
-    double newZoom = printer.resolution() / 72;
-    m_document->SetZoom(newZoom);
+    //  get scale factor based on printer's resolution
+    double scalePrint = printer.resolution() / 72;
 
     //  figure out printing range
     int fromPage = 1;
@@ -278,16 +273,20 @@ void Window::print()
     if (toPage>m_document->GetPageCount())
         toPage = m_document->GetPageCount();
 
+    //  those were 1-based, so subtract
+    fromPage -= 1;
+    toPage -= 1;
+
     //  begin printing
     QPainter *painter = new QPainter();
     painter->begin(&printer);
 
-//    int numPages = toPage-fromPage+1;
-//    QProgressDialog progress("Printing", "Cancel", 0, numPages, this);
-//    progress.setWindowModality(Qt::WindowModal);
-//    progress.show();
-//    while(qApp->hasPendingEvents())
-//        qApp->processEvents();
+    int numPages = toPage-fromPage+1;
+    QProgressDialog progress("Printing", "Cancel", 0, numPages, this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.show();
+    while(qApp->hasPendingEvents())
+        qApp->processEvents();
 
     bool cancelled = false;
 
@@ -295,17 +294,17 @@ void Window::print()
     int page = fromPage;
     while (page <= toPage)
     {
-//        progress.setValue(page-fromPage+1);
-//        QString message; message.sprintf("Printing %d of %d ...", page, numPages);
-//        progress.setLabelText(message);
-//        while(qApp->hasPendingEvents())
-//            qApp->processEvents();
+        progress.setValue(page-fromPage+1);
+        QString message; message.sprintf("Printing %d of %d ...", page, numPages);
+        progress.setLabelText(message);
+        while(qApp->hasPendingEvents())
+            qApp->processEvents();
 
-//        if (progress.wasCanceled())
-//        {
-//            cancelled = true;
-//            break;
-//        }
+        if (progress.wasCanceled())
+        {
+            cancelled = true;
+            break;
+        }
 
         //  if not the first page, start a new page
         if (page != fromPage)
@@ -313,12 +312,12 @@ void Window::print()
 
         //  compute page size
         point_t pageSize;
-        m_document->GetPageSize(page, &pageSize);
+        m_document->GetPageSize(page, scalePrint, &pageSize);
 
         //  render a bitmap
         int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
         Byte *bitmap = new Byte[numBytes];
-        m_document->RenderPage(page, bitmap, pageSize.X, pageSize.Y, false);
+        m_document->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y, false);
 
         //  copy to printer
         QImage *myImage = imageFromData(bitmap, (int)pageSize.X, (int)pageSize.Y);
@@ -330,9 +329,13 @@ void Window::print()
         page++;
     }
 
-//    progress.hide();
-//    while(qApp->hasPendingEvents())
-//        qApp->processEvents();
+    progress.hide();
+    while(qApp->hasPendingEvents())
+        qApp->processEvents();
+
+    QApplication::restoreOverrideCursor();
+    while(qApp->hasPendingEvents())
+        qApp->processEvents();
 
     //  end printing
     if (cancelled)
@@ -348,9 +351,6 @@ void Window::print()
     //  don't need the painter any more
     delete painter;
     painter = NULL;
-
-    //  restore the original zoom
-    m_document->SetZoom(oldZoom);
 }
 
 void Window::zoomIn()
