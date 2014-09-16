@@ -242,10 +242,8 @@ void Window::open()
         qApp->setActiveWindow(priorWindow);
 
     //  if no windows are open, quit.
-    if (newWindow<=0)
-    {
+    if (m_numWindows<=0)
         exit(0);
-    }
 }
 
 int Window::m_numWindows = 0;
