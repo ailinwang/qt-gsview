@@ -83,7 +83,9 @@ bool Window::OpenFile (QString path)
             }
             else
             {
-                //  cancel?
+                //  user cancelled.
+                this->close();
+                return false;
             }
         }
     }
