@@ -62,8 +62,8 @@ bool Window::OpenFile (QString path)
     //  set the name in this window
     setWindowFilePath (path);
 
-    //  signal a resize
-    resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
+    //  size and position
+    setInitialSizeAndPosition();
 
     //  create scrolling area
     QScrollArea *scrollArea = new QScrollArea(this);
@@ -96,6 +96,19 @@ bool Window::OpenFile (QString path)
     return true;
 }
 
+void Window::setInitialSizeAndPosition()
+{
+    //  size and center
+    QDesktopWidget desktop;
+    int screenWidth  = desktop.screen()->width();
+    int screenHeight = desktop.screen()->height();
+    int width = screenWidth*4/5;
+    int height = screenHeight*4/5;
+    int top  = screenHeight/10;
+    int left = screenWidth/10;
+    setGeometry(left, top, width, height);
+}
+
 void Window::errorMessage(const std::string theTitle, const std::string theMessage)
 {
     QMessageBox::critical(NULL, QString(theTitle.c_str()), QString(theMessage.c_str()));
@@ -125,10 +138,10 @@ QImage * imageFromData(unsigned char *samples, int w, int h)
     return myImage;
 }
 
-void Window::resizeEvent(QResizeEvent* event)
-{
-    QMainWindow::resizeEvent(event);
-}
+//void Window::resizeEvent(QResizeEvent* event)
+//{
+//    QMainWindow::resizeEvent(event);
+//}
 
 void Window::drawPage(int pageNumber)
 {
@@ -181,7 +194,11 @@ void Window::open()
     QFileDialog dialog(NULL, tr("Open File"),
                        desktopLocations.isEmpty() ? QDir::currentPath() : desktopLocations.first());
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
+
+    //  It's hard to debug in the Qt IDE when we use the native
+    //  file dialog.  SO don't for now.
     dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz)"));
 
@@ -363,8 +380,12 @@ void Window::pageUp()
 
         //  scroll to top of page
         QRect r = m_pageImages[curPage].geometry();
-        m_scrollArea->verticalScrollBar()->setValue(r.top());
-        qDebug ("page up %d %d", curPage, r.top());
+        int scrollTo = r.top()-10;
+        if (scrollTo<0)
+            scrollTo = 0;
+        m_scrollArea->verticalScrollBar()->setValue(scrollTo);
+        qDebug ("page up %d %d", curPage, scrollTo);
+
     }
 }
 
@@ -382,8 +403,11 @@ void Window::pageDown()
 
         //  scroll to top of page
         QRect r = m_pageImages[curPage].geometry();
-        m_scrollArea->verticalScrollBar()->setValue(r.top());
-        qDebug ("page up %d %d", curPage, r.top());
+        int scrollTo = r.top()-10;
+        if (scrollTo<0)
+            scrollTo = 0;
+        m_scrollArea->verticalScrollBar()->setValue(scrollTo);
+        qDebug ("page up %d %d", curPage, scrollTo);
     }
 }
 

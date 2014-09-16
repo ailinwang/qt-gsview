@@ -28,7 +28,7 @@ public:
 
 protected:
 	void keyPressEvent(QKeyEvent* event);
-	void resizeEvent(QResizeEvent* event);
+//	void resizeEvent(QResizeEvent* event);
 
 private slots:
     void openAction();
@@ -49,6 +49,7 @@ private:
 	void updateActions();
 	void adjustScrollBar(QScrollBar *scrollBar, double factor);
     void drawPage(int pageNumber);
+    void setInitialSizeAndPosition();
 
     static void errorMessage(const std::string theTitle, const std::string theMessage);
 
