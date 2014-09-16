@@ -4,6 +4,7 @@
 #include <QPrintDialog>
 
 #include "Window.h"
+#include "QtUtil.h"
 
 Window::Window()
 {
@@ -118,35 +119,6 @@ void Window::errorMessage(const std::string theTitle, const std::string theMessa
     QMessageBox::critical(NULL, QString(theTitle.c_str()), QString(theMessage.c_str()));
 }
 
-QImage * imageFromData(unsigned char *samples, int w, int h)
-{
-    QImage *myImage = new QImage(w, h, QImage::Format_ARGB32);
-
-    int index = 0;
-    for (int row=0; row <h ;row++)
-    {
-        for (int col=0; col <w ;col++)
-        {
-            //  image comes in as RGBA
-            unsigned char red   = samples[index];
-            unsigned char green = samples[index+1];
-            unsigned char blue  = samples[index+2];
-            unsigned char alpha = samples[index+3];
-            index+= 4;
-            uint pixel = red + (green<<8) + (blue<<16) + (alpha<<24);
-
-            myImage->setPixel (col, row, pixel);
-        }
-    }
-
-    return myImage;
-}
-
-//void Window::resizeEvent(QResizeEvent* event)
-//{
-//    QMainWindow::resizeEvent(event);
-//}
-
 void Window::drawPage(int pageNumber)
 {
     //  doc must be valid and open
@@ -163,7 +135,7 @@ void Window::drawPage(int pageNumber)
     m_document->RenderPage(pageNumber, m_scalePage, bitmap, pageSize.X, pageSize.Y, false);
 
     //  copy to window
-    QImage *myImage = imageFromData(bitmap, (int)pageSize.X, (int)pageSize.Y);
+    QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
     m_pageImages[pageNumber].setPixmap(QPixmap::fromImage(*myImage));
     m_pageImages[pageNumber].adjustSize();
 
@@ -320,7 +292,7 @@ void Window::print()
         m_document->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y, false);
 
         //  copy to printer
-        QImage *myImage = imageFromData(bitmap, (int)pageSize.X, (int)pageSize.Y);
+        QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
         painter->drawImage(0, 0, *myImage);
 
         delete myImage;
