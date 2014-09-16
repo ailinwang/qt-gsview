@@ -38,6 +38,10 @@ void Window::keyPressEvent(QKeyEvent* event)
         pageUp();
         break;
 
+    case Qt::Key_Escape:
+        exitFullScreen();
+        break;
+
     default:
         break;
     }
@@ -473,6 +477,11 @@ void Window::createActions()
     pageDownAct->setEnabled(false);
     pageDownAct->setShortcut(tr("Ctrl+D"));
     connect(pageDownAct, SIGNAL(triggered()), this, SLOT(pageDown()));
+
+    fullScreenAct = new QAction(tr("&Full Screen"), this);
+    fullScreenAct->setEnabled(false);
+    fullScreenAct->setShortcut(tr("Ctrl+F"));
+    connect(fullScreenAct, SIGNAL(triggered()), this, SLOT(enterFullScreen()));
 }
 
 void Window::createMenus()
@@ -491,6 +500,8 @@ void Window::createMenus()
     viewMenu->addSeparator();
     viewMenu->addAction(pageUpAct);
     viewMenu->addAction(pageDownAct);
+    viewMenu->addSeparator();
+    viewMenu->addAction(fullScreenAct);
 
     helpMenu = new QMenu(tr("&Help"), this);
     helpMenu->addAction(aboutAct);
@@ -511,19 +522,17 @@ void Window::updateActions()
 
     pageUpAct->setEnabled(true);
     pageDownAct->setEnabled(true);
+
+    fullScreenAct->setEnabled(true);
 }
 
-//extern "C" void winfullscreen(pdfapp_t *gapp, int state)
-//{
-//    qDebug("called winfullscreen. %d", state);
-//    Window *Window = (Window *) gapp->userdata;
-//    if (state==1)
-//    {
-//        Window->setWindowState(Qt::WindowFullScreen);
-//    }
-//    else
-//    {
-//        Window->setWindowState(Qt::WindowNoState);
-//    }
-//}
+void Window::enterFullScreen()
+{
+    setWindowState(Qt::WindowFullScreen);
+}
+
+void Window::exitFullScreen()
+{
+    setWindowState(Qt::WindowNoState);
+}
 

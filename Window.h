@@ -38,20 +38,25 @@ private slots:
 	void zoomOut();
 	void normalSize();
 	void helpAbout();
-	void helpUsage();
+    void helpUsage();
 
 	void pageUp();
 	void pageDown();
+
+    void enterFullScreen();
 
 private:
 	void createActions();
 	void createMenus();
 	void updateActions();
+
 	void adjustScrollBar(QScrollBar *scrollBar, double factor);
     void drawPage(int pageNumber);
     void setInitialSizeAndPosition();
 
     static void errorMessage(const std::string theTitle, const std::string theMessage);
+
+    void exitFullScreen();
 
     QAction *openAct;
     QAction *closeAct;
@@ -61,7 +66,8 @@ private:
 	QAction *zoomOutAct;
 	QAction *normalSizeAct;
 	QAction *aboutAct;
-	QAction *usageAct;
+    QAction *usageAct;
+    QAction *fullScreenAct;
 
 	QAction *pageUpAct;
 	QAction *pageDownAct;
@@ -78,6 +84,9 @@ private:
 
     //  array of page images
     QLabel *m_pageImages = NULL;
+
+    //  array of thumbnail images
+    QLabel *m_thumbnailImages = NULL;
 };
 
 #endif  //  WINDOW_H
