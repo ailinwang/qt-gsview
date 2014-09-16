@@ -77,7 +77,6 @@ private:
 	QMenu *helpMenu;
 
     static int m_numWindows;
-    Document *m_document = NULL;
 
     QScrollArea *m_scrollArea = NULL;
     QWidget *m_contentWidget = NULL;
@@ -87,6 +86,11 @@ private:
 
     //  array of thumbnail images
     QLabel *m_thumbnailImages = NULL;
+
+    //  current page
+    int m_currentPage = 0;
+
+    Document *m_document = NULL;
 };
 
 #endif  //  WINDOW_H

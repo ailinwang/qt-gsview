@@ -17,6 +17,8 @@ Window::Window()
     createActions();
     createMenus();
 
+    m_currentPage = 0;
+
     m_numWindows++;
 }
 
@@ -155,7 +157,7 @@ void Window::drawPage(int pageNumber)
 
     //  compute page size
     point_t pageSize;
-    m_document->GetCurrentPageSize(&pageSize);
+    m_document->GetPageSize(pageNumber,&pageSize);
     int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
 
     //  render
@@ -259,9 +261,8 @@ void Window::print()
 //    while(qApp->hasPendingEvents())
 //        qApp->processEvents();
 
-    //  remember current page and zoom
+    //  remember current zoom
     double oldZoom = m_document->GetZoom();
-    int oldPage = m_document->GetPageNumber();
 
     //  set new zoom based on printer's resolution
     double newZoom = printer.resolution() / 72;
@@ -312,7 +313,7 @@ void Window::print()
 
         //  compute page size
         point_t pageSize;
-        m_document->GetCurrentPageSize(&pageSize);
+        m_document->GetPageSize(page, &pageSize);
 
         //  render a bitmap
         int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
@@ -348,12 +349,8 @@ void Window::print()
     delete painter;
     painter = NULL;
 
-    //  restore the original zoom and page
+    //  restore the original zoom
     m_document->SetZoom(oldZoom);
-    m_document->SetPageNumber(oldPage);
-
-    //  restore the original page
-    drawPage(oldPage);
 }
 
 void Window::zoomIn()
@@ -373,45 +370,41 @@ void Window::normalSize()
 
 void Window::pageUp()
 {
-    int curPage = m_document->GetPageNumber();
-    if (curPage>0)
+    if (m_currentPage>0)
     {
-        curPage -= 1;
-        m_document->SetPageNumber(curPage);
-        drawPage(curPage);
+        m_currentPage -= 1;
+        drawPage(m_currentPage);
         while (qApp->hasPendingEvents())
             qApp->processEvents();
 
         //  scroll to top of page
-        QRect r = m_pageImages[curPage].geometry();
+        QRect r = m_pageImages[m_currentPage].geometry();
         int scrollTo = r.top()-10;
         if (scrollTo<0)
             scrollTo = 0;
         m_scrollArea->verticalScrollBar()->setValue(scrollTo);
-        qDebug ("page up %d %d", curPage, scrollTo);
+        qDebug ("page up %d %d", m_currentPage, scrollTo);
 
     }
 }
 
 void Window::pageDown()
 {
-    int curPage = m_document->GetPageNumber();
     int numPages = m_document->GetPageCount();
-    if (curPage+1<numPages)
+    if (m_currentPage+1<numPages)
     {
-        curPage += 1;
-        m_document->SetPageNumber(curPage);
-        drawPage(curPage);
+        m_currentPage += 1;
+        drawPage(m_currentPage);
         while (qApp->hasPendingEvents())
             qApp->processEvents();
 
         //  scroll to top of page
-        QRect r = m_pageImages[curPage].geometry();
+        QRect r = m_pageImages[m_currentPage].geometry();
         int scrollTo = r.top()-10;
         if (scrollTo<0)
             scrollTo = 0;
         m_scrollArea->verticalScrollBar()->setValue(scrollTo);
-        qDebug ("page up %d %d", curPage, scrollTo);
+        qDebug ("page up %d %d", m_currentPage, scrollTo);
     }
 }
 

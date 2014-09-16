@@ -43,7 +43,6 @@ bool Document::OpenFile(const std::string fileName)
     if (result == S_ISOK)
     {
         m_opened = true;
-        m_currentPage = 0;
         m_scaleFactor = 1.0;
         m_pageCount = mu_ctx->GetPageCount();
 
@@ -53,11 +52,6 @@ bool Document::OpenFile(const std::string fileName)
         return true;
     }
     return false;
-}
-
-bool Document::GetCurrentPageSize (point_t *render_size)
-{
-    return GetPageSize(m_currentPage, render_size);
 }
 
 bool Document::GetPageSize (int page_num, point_t *render_size)
@@ -71,14 +65,6 @@ bool Document::GetPageSize (int page_num, point_t *render_size)
 
     return true;
 }
-
-//bool Document::RenderCurrentPage (unsigned char *bmp_data, int bmp_width,
-//                    int bmp_height, bool flipy)
-//{
-//    return RenderPage (m_currentPage, bmp_data, bmp_width,
-//            bmp_height, m_scaleFactor, flipy);
-//}
-
 
 bool Document::RenderPage (int page_num, unsigned char *bmp_data, int bmp_width,
                     int bmp_height, bool flipy)
