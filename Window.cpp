@@ -106,22 +106,29 @@ bool Window::OpenFile (QString path)
         return false;
 
     //  create scrolling area
-    m_pageScrollArea = new QScrollArea(this);
-    m_pageScrollArea->setBackgroundRole(QPalette::Dark);
-    m_pageScrollArea->setWidgetResizable(true);
-    setCentralWidget(m_pageScrollArea);
+    m_pageScrollArea = ui->rightScrollArea;
+//    m_pageScrollArea->setBackgroundRole(QPalette::Dark);
+//    m_pageScrollArea->setWidgetResizable(true);
+//    setCentralWidget(m_pageScrollArea);
 
     //  inside, create a box with a vertical layout
     QWidget* contentWidget = new QWidget(this);
     contentWidget->setObjectName("m_contentWidget");
     contentWidget->setLayout(new QVBoxLayout(contentWidget));
     m_pageScrollArea->setWidget(contentWidget);
+    contentWidget->layout()->setContentsMargins(0,0,0,0);
 
     //  create an array of page images
     int nPages = m_document->GetPageCount();
-    m_pageImages = new QLabel[nPages]();
+    m_pageImages = new QLabel[nPages]();    
+
     for (int i=0;i<nPages;i++)
     {
+        point_t pageSize;
+        m_document->GetPageSize(i,m_scalePage, &pageSize);
+        m_pageImages[i].setFixedWidth(pageSize.X);
+        m_pageImages[i].setFixedHeight(pageSize.Y);
+
         m_pageImages[i].setBackgroundRole(QPalette::Dark);
         contentWidget->layout()->addWidget(&(m_pageImages[i]));
     }
@@ -179,6 +186,11 @@ void Window::drawPage(int pageNumber)
 void Window::openAction()
 {
     Window::open();
+}
+
+void Window::quit()
+{
+    qApp->exit(0);
 }
 
 void Window::closeAction()
@@ -390,8 +402,6 @@ void Window::pageUp()
     {
         m_currentPage -= 1;
         drawPage(m_currentPage);
-        while (qApp->hasPendingEvents())
-            qApp->processEvents();
 
         //  scroll to top of page
         QRect r = m_pageImages[m_currentPage].geometry();
@@ -411,16 +421,14 @@ void Window::pageDown()
     {
         m_currentPage += 1;
         drawPage(m_currentPage);
-        while (qApp->hasPendingEvents())
-            qApp->processEvents();
 
         //  scroll to top of page
         QRect r = m_pageImages[m_currentPage].geometry();
         int scrollTo = r.top()-10;
         if (scrollTo<0)
-            scrollTo = 0;
+            scrollTo = 0;        
         m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
-        qDebug ("page up %d %d", m_currentPage, scrollTo);
+        qDebug ("page down %d %d", m_currentPage, scrollTo);
     }
 }
 
@@ -443,7 +451,7 @@ void Window::connectActions()
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openAction()));
     connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(closeAction()));
     connect(ui->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
-    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
 
     //  view menu
     connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));

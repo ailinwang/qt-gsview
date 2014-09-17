@@ -45,6 +45,7 @@ private slots:
 	void pageUp();
 	void pageDown();
     void toggleFullScreen();
+    void quit();
 
 private:
     Ui::Window *ui;
