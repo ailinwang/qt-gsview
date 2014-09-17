@@ -36,6 +36,7 @@ protected:
 private slots:
     void openAction();
     void closeAction();
+    void saveAction();
     void print();
 	void zoomIn();
 	void zoomOut();

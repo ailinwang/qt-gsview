@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/new/prefix1">
         <file>resources/open.png</file>
+        <file>resources/print.png</file>
+        <file>resources/save.png</file>
     </qresource>
 </RCC>

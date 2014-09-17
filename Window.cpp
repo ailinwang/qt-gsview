@@ -200,6 +200,11 @@ void Window::closeAction()
     this->close();
 }
 
+void Window::saveAction()
+{
+    QMessageBox::information (this, "", "saving is not yet implemented.");
+}
+
 // static
 void Window::open()
 {
@@ -376,17 +381,17 @@ void Window::print()
 
 void Window::zoomIn()
 {
-    qDebug("zoom in");
+    QMessageBox::information (this, "", "zooming is not yet implemented.");
 }
 
 void Window::zoomOut()
 {
-    qDebug("zoom out");
+    QMessageBox::information (this, "", "zooming is not yet implemented.");
 }
 
 void Window::normalSize()
 {
-    qDebug("zoom normal");
+    QMessageBox::information (this, "", "zooming is not yet implemented.");
 }
 
 void Window::pageUp()
@@ -443,6 +448,7 @@ void Window::connectActions()
     //  file menu
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openAction()));
     connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(closeAction()));
+    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveAction()));
     connect(ui->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
 
