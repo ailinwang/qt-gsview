@@ -199,6 +199,10 @@
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
    <addaction name="actionPrint"/>
+   <addaction name="separator"/>
+   <addaction name="actionPage_Up"/>
+   <addaction name="actionPage_Down"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionOpen">
    <property name="icon">
@@ -229,6 +233,10 @@
    </property>
   </action>
   <action name="actionPage_Down">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/Right.png</normaloff>:/new/prefix1/resources/Right.png</iconset>
+   </property>
    <property name="text">
     <string>Page Down</string>
    </property>
@@ -237,6 +245,10 @@
    </property>
   </action>
   <action name="actionPage_Up">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/Left.png</normaloff>:/new/prefix1/resources/Left.png</iconset>
+   </property>
    <property name="text">
     <string>Page Up</string>
    </property>

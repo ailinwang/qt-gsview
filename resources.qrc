@@ -3,5 +3,7 @@
         <file>resources/open.png</file>
         <file>resources/print.png</file>
         <file>resources/save.png</file>
+        <file>resources/Left.png</file>
+        <file>resources/Right.png</file>
     </qresource>
 </RCC>
