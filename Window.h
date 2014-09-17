@@ -3,6 +3,7 @@
 #define WINDOW_H
 
 #include <QMainWindow>
+#include <QPushButton>
 #include <QPrinter>
 
 namespace Ui {
@@ -48,6 +49,7 @@ private slots:
     void toggleFullScreen();
     void quit();
     void actionThumbnails();
+    void clickedThumbnail();
 
 private:
     Ui::Window *ui;
@@ -76,8 +78,7 @@ private:
 
     //  array of thumbnail images
     bool m_thumbnailsBuilt = false;
-    double m_scaleThumbnail = 0.10;
-    QLabel *m_thumbnailImages = NULL;
+    QPushButton *m_thumbnailImages = NULL;
 
     //  current page
     int m_currentPage = 0;

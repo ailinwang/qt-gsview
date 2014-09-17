@@ -494,31 +494,55 @@ void Window::buildThumbnails()
     {
         //  create an array of thumbnail images
         int nPages = m_document->GetPageCount();
-        m_thumbnailImages = new QLabel[nPages]();
+        m_thumbnailImages = new QPushButton[nPages]();
 
         //  set up scrolling area
         QWidget* contentWidget = ui->leftScrollAreaWidgetContents;
         contentWidget->setLayout(new QVBoxLayout(contentWidget));
         contentWidget->layout()->setContentsMargins(0,0,0,0);
 
+        //  find max width of the pages
+        int maxW = 0;
         for (int i=0; i<nPages; i++)
         {
             point_t pageSize;
-            m_document->GetPageSize(i, m_scaleThumbnail, &pageSize);
+            m_document->GetPageSize (i, 1.0, &pageSize);
+            int w = (int)pageSize.X;
+            if (w>maxW)
+                maxW = w;
+        }
+
+        //  calculate a scale factor based on the width of the left scroll area
+        double scaleThumbnail = 0.8 * double(ui->leftScrollArea->width())/double(maxW);
+
+        for (int i=0; i<nPages; i++)
+        {
+            connect(&m_thumbnailImages[i], SIGNAL(clicked()), this, SLOT(clickedThumbnail()));
+            //  TODO:  set some user data on the widget, or set the widget name
+            //  or some way to track when the widget is clicked.
+
+            point_t pageSize;
+            m_document->GetPageSize(i, scaleThumbnail, &pageSize);
             m_thumbnailImages[i].setFixedWidth(pageSize.X);
             m_thumbnailImages[i].setFixedHeight(pageSize.Y);
-            m_thumbnailImages[i].setBackgroundRole(QPalette::Dark);
+            m_thumbnailImages[i].setFlat(true);
+
             contentWidget->layout()->addWidget(&(m_thumbnailImages[i]));
 
             //  render
             int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
             Byte *bitmap = new Byte[numBytes];
-            m_document->RenderPage (i, m_scaleThumbnail, bitmap, pageSize.X, pageSize.Y);
+            m_document->RenderPage (i, scaleThumbnail, bitmap, pageSize.X, pageSize.Y);
 
             //  copy to widget
             QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
-            m_thumbnailImages[i].setPixmap(QPixmap::fromImage(*myImage));
-            m_thumbnailImages[i].adjustSize();
+//            m_thumbnailImages[i].setPixmap(QPixmap::fromImage(*myImage));
+//            m_thumbnailImages[i].adjustSize();
+
+            QPixmap pix = QPixmap::fromImage(*myImage);
+            QIcon icon(pix);
+            m_thumbnailImages[i].setIcon(icon);
+            m_thumbnailImages[i].setIconSize(pix.size());
 
             delete myImage;
             delete bitmap;
@@ -526,6 +550,11 @@ void Window::buildThumbnails()
 
         m_thumbnailsBuilt = true;
     }
+}
+
+void Window::clickedThumbnail()
+{
+    QMessageBox::information (this, "", "clickedThumbnail");
 }
 
 void Window::actionThumbnails()
