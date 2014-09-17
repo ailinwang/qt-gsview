@@ -19,7 +19,7 @@
    </property>
    <property name="maximumSize">
     <size>
-     <width>619</width>
+     <width>16777215</width>
      <height>16777215</height>
     </size>
    </property>
@@ -55,9 +55,50 @@
         <number>0</number>
        </property>
        <item>
+        <widget class="QScrollArea" name="leftScrollArea">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>98</width>
+            <height>331</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
         <widget class="QScrollArea" name="rightScrollArea">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -73,7 +114,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>617</width>
+            <width>507</width>
             <height>331</height>
            </rect>
           </property>
