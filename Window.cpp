@@ -23,8 +23,6 @@ Window::Window(QWidget *parent) :
     //  connect menus
     connectActions();
 
-    m_currentPage = 0;
-
     m_numWindows++;
 }
 
@@ -107,17 +105,10 @@ bool Window::OpenFile (QString path)
     if (!handlePassword())
         return false;
 
-    //  create scrolling area
+    //  set up scrolling area
     m_pageScrollArea = ui->rightScrollArea;
-//    m_pageScrollArea->setBackgroundRole(QPalette::Dark);
-//    m_pageScrollArea->setWidgetResizable(true);
-//    setCentralWidget(m_pageScrollArea);
-
-    //  inside, create a box with a vertical layout
-    QWidget* contentWidget = new QWidget(this);
-    contentWidget->setObjectName("m_contentWidget");
+    QWidget* contentWidget =ui->rightScrollAreaWidgetContents;
     contentWidget->setLayout(new QVBoxLayout(contentWidget));
-    m_pageScrollArea->setWidget(contentWidget);
     contentWidget->layout()->setContentsMargins(0,0,0,0);
 
     //  create an array of page images
@@ -403,7 +394,7 @@ void Window::pageUp()
     if (m_currentPage>0)
     {
         m_currentPage -= 1;
-        drawPage(m_currentPage);
+        drawPage (m_currentPage);
 
         //  scroll to top of page
         QRect r = m_pageImages[m_currentPage].geometry();
@@ -422,7 +413,7 @@ void Window::pageDown()
     if (m_currentPage+1<numPages)
     {
         m_currentPage += 1;
-        drawPage(m_currentPage);
+        drawPage (m_currentPage);
 
         //  scroll to top of page
         QRect r = m_pageImages[m_currentPage].geometry();
@@ -475,15 +466,58 @@ void Window::updateActions()
 {
 }
 
+void Window::buildThumbnails()
+{
+    if (!m_thumbnailsBuilt)
+    {
+        //  create an array of thumbnail images
+        int nPages = m_document->GetPageCount();
+        m_thumbnailImages = new QLabel[nPages]();
+
+        //  set up scrolling area
+        QWidget* contentWidget = ui->leftScrollAreaWidgetContents;
+        contentWidget->setLayout(new QVBoxLayout(contentWidget));
+        contentWidget->layout()->setContentsMargins(0,0,0,0);
+
+        for (int i=0; i<nPages; i++)
+        {
+            point_t pageSize;
+            m_document->GetPageSize(i, m_scaleThumbnail, &pageSize);
+            m_thumbnailImages[i].setFixedWidth(pageSize.X);
+            m_thumbnailImages[i].setFixedHeight(pageSize.Y);
+            m_thumbnailImages[i].setBackgroundRole(QPalette::Dark);
+            contentWidget->layout()->addWidget(&(m_thumbnailImages[i]));
+
+            //  render
+            int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
+            Byte *bitmap = new Byte[numBytes];
+            m_document->RenderPage (i, m_scaleThumbnail, bitmap, pageSize.X, pageSize.Y);
+
+            //  copy to widget
+            QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
+            m_thumbnailImages[i].setPixmap(QPixmap::fromImage(*myImage));
+            m_thumbnailImages[i].adjustSize();
+
+            delete myImage;
+            delete bitmap;
+        }
+
+        m_thumbnailsBuilt = true;
+    }
+}
+
 void Window::actionThumbnails()
 {
     if (ui->leftScrollArea->isVisible())
     {
         ui->leftScrollArea->hide();
+        ui->actionThumbnails->setChecked(false);
     }
     else
     {
         ui->leftScrollArea->show();
+        ui->actionThumbnails->setChecked(true);
+        buildThumbnails();
     }
 }
 

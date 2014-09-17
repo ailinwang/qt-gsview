@@ -62,6 +62,7 @@ private:
 
     void exitFullScreen();
     bool handlePassword();
+    void buildThumbnails();
 
     static int m_numWindows;
 
@@ -73,6 +74,7 @@ private:
     QLabel *m_pageImages = NULL;
 
     //  array of thumbnail images
+    bool m_thumbnailsBuilt = false;
     double m_scaleThumbnail = 0.10;
     QLabel *m_thumbnailImages = NULL;
 
