@@ -423,8 +423,9 @@ void Window::pageUp()
             scrollTo = 0;
         m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
         m_pageNumber->setText(QString::number(m_currentPage+1));
-        qDebug ("page up %d %d", m_currentPage, scrollTo);
 
+        //  hilight the thumb
+        hilightThumb(m_currentPage);
     }
 }
 
@@ -443,7 +444,9 @@ void Window::pageDown()
             scrollTo = 0;        
         m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
         m_pageNumber->setText(QString::number(m_currentPage+1));
-        qDebug ("page down %d %d", m_currentPage, scrollTo);
+
+        //  hilight the thumb
+        this->hilightThumb(m_currentPage);
     }
 }
 
@@ -519,8 +522,8 @@ void Window::buildThumbnails()
         {
             point_t pageSize;
             m_document->GetPageSize(i, scaleThumbnail, &pageSize);
-            m_thumbnailImages[i].setFixedWidth(pageSize.X);
-            m_thumbnailImages[i].setFixedHeight(pageSize.Y);
+            m_thumbnailImages[i].setFixedWidth(pageSize.X+10);
+            m_thumbnailImages[i].setFixedHeight(pageSize.Y+10);
             m_thumbnailImages[i].setFlat(true);
 
             m_thumbnailImages[i].setPage(i);
@@ -548,12 +551,31 @@ void Window::buildThumbnails()
         }
 
         m_thumbnailsBuilt = true;
+
+        //  hilight the current page
+        hilightThumb(m_currentPage);
+    }
+}
+
+void Window::hilightThumb(int nPage)
+{
+    if (!m_thumbnailsBuilt)
+        return;
+
+    int nPages = m_document->GetPageCount();
+    for (int i=0; i<nPages; i++)
+    {
+        Thumbnail *t = &(m_thumbnailImages[i]);
+        if (i==nPage)
+            t->setStyleSheet("border:3px solid #ff0000;");
+        else
+            t->setStyleSheet("border:0px");
     }
 }
 
 void Window::clickedThumb (int nPage)
-{
-    QMessageBox::information (this, "", "clickedThumbnail 3");
+{    
+    hilightThumb(nPage);
 }
 
 void Window::actionThumbnails()

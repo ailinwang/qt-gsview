@@ -68,6 +68,7 @@ private:
     void exitFullScreen();
     bool handlePassword();
     void buildThumbnails();
+    void hilightThumb(int nPage);
 
     static int m_numWindows;
 
