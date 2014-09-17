@@ -14,6 +14,15 @@ Window::Window(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    //  add some edit fields to the toolbar
+    QAction *sep = ui->toolBar->findChild<QAction *>(tr("separator1"));
+    m_pageNumber = new QLabel();
+    m_totalPages = new QLabel();
+    QLabel *slash = new QLabel();  slash->setText(tr("/"));
+    ui->toolBar->insertWidget(sep, m_pageNumber);
+    ui->toolBar->insertWidget(sep, slash);
+    ui->toolBar->insertWidget(sep, m_totalPages);
+
     ui->leftScrollArea->hide();
 
     //  create and initialize the Document
@@ -25,6 +34,8 @@ Window::Window(QWidget *parent) :
 
     m_numWindows++;
 }
+
+
 
 Window::~Window()
 {
@@ -115,7 +126,7 @@ bool Window::OpenFile (QString path)
     int nPages = m_document->GetPageCount();
     m_pageImages = new QLabel[nPages]();    
 
-    for (int i=0;i<nPages;i++)
+    for (int i=0; i<nPages; i++)
     {
         point_t pageSize;
         m_document->GetPageSize(i,m_scalePage, &pageSize);
@@ -130,6 +141,10 @@ bool Window::OpenFile (QString path)
     drawPage(0);
 
     updateActions();
+
+    //  set initial page number and count into the toolbar
+    m_pageNumber->setText(QString::number(1));
+    m_totalPages->setText(QString::number(nPages));
 
     return true;
 }
@@ -407,6 +422,7 @@ void Window::pageUp()
         if (scrollTo<0)
             scrollTo = 0;
         m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
+        m_pageNumber->setText(QString::number(m_currentPage+1));
         qDebug ("page up %d %d", m_currentPage, scrollTo);
 
     }
@@ -426,6 +442,7 @@ void Window::pageDown()
         if (scrollTo<0)
             scrollTo = 0;        
         m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
+        m_pageNumber->setText(QString::number(m_currentPage+1));
         qDebug ("page down %d %d", m_currentPage, scrollTo);
     }
 }

@@ -82,6 +82,11 @@ private:
     //  current page
     int m_currentPage = 0;
 
+    //  additional toolbar widgets
+    QLabel *m_pageNumber = NULL;
+    QLabel *m_totalPages = NULL;
+
+    //  document that contains all of the mupDF functionality
     Document *m_document = NULL;
 };
 
