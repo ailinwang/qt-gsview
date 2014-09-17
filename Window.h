@@ -5,6 +5,10 @@
 #include <QMainWindow>
 #include <QPrinter>
 
+namespace Ui {
+class Window;
+}
+
 #include "Document.h"
 
 QT_BEGIN_NAMESPACE
@@ -20,7 +24,7 @@ class Window : public QMainWindow
 	Q_OBJECT
 
 public:
-    Window();
+    explicit Window(QWidget *parent = 0);
     ~Window();
 
 	static void open();
@@ -37,16 +41,15 @@ private slots:
 	void zoomOut();
 	void normalSize();
 	void helpAbout();
-    void helpUsage();
-
+    void help();
 	void pageUp();
 	void pageDown();
-
     void toggleFullScreen();
 
 private:
-	void createActions();
-	void createMenus();
+    Ui::Window *ui;
+
+    void connectActions();
 	void updateActions();
 
 	void adjustScrollBar(QScrollBar *scrollBar, double factor);
@@ -56,24 +59,7 @@ private:
     static void errorMessage(const std::string theTitle, const std::string theMessage);
 
     void exitFullScreen();
-
-    QAction *openAct;
-    QAction *closeAct;
-    QAction *printAct;
-	QAction *exitAct;
-	QAction *zoomInAct;
-	QAction *zoomOutAct;
-	QAction *normalSizeAct;
-	QAction *aboutAct;
-    QAction *usageAct;
-    QAction *fullScreenAct;
-
-	QAction *pageUpAct;
-	QAction *pageDownAct;
-
-	QMenu *fileMenu;
-	QMenu *viewMenu;
-	QMenu *helpMenu;
+    bool handlePassword();
 
     static int m_numWindows;
 

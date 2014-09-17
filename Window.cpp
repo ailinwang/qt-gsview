@@ -4,17 +4,22 @@
 #include <QPrintDialog>
 
 #include "Window.h"
+#include "ui_Window.h"
+
 #include "QtUtil.h"
 
-Window::Window()
+Window::Window(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::Window)
 {
-    //  create and initialize the document
+    ui->setupUi(this);
+
+    //  create and initialize the Document
     m_document = new Document();
     m_document->Initialize();
 
-    //  set up menus
-    createActions();
-    createMenus();
+    //  connect menus
+    connectActions();
 
     m_currentPage = 0;
 
@@ -48,6 +53,35 @@ void Window::keyPressEvent(QKeyEvent* event)
     }
 }
 
+bool Window::handlePassword()
+{
+    if (!m_document->RequiresPassword())
+        return true;
+
+    //  ask for password.  This will loop until the user enters a correct
+    //  password, or the user cancels.
+
+    bool pwdValid = false;
+    while (!pwdValid)
+    {
+        bool ok;
+        QString text = QInputDialog::getText(this, tr(""), tr("Enter password:"), QLineEdit::Password,
+                                             QDir::home().dirName(), &ok);
+        if (ok && !text.isEmpty())
+        {
+            pwdValid = m_document->ApplyPassword(text.toStdString());
+        }
+        else
+        {
+            //  user cancelled.
+            return false;
+        }
+    }
+
+    return true;
+
+}
+
 bool Window::OpenFile (QString path)
 {
     //  load a file by path
@@ -68,26 +102,8 @@ bool Window::OpenFile (QString path)
     //  size and position
     setInitialSizeAndPosition();
 
-    //  ask for password
-    if (m_document->RequiresPassword())
-    {
-        bool pwdValid = false;
-        while (!pwdValid)
-        {
-            bool ok;
-            QString text = QInputDialog::getText(this, tr(""), tr("Enter password:"), QLineEdit::Password,
-                                                 QDir::home().dirName(), &ok);
-            if (ok && !text.isEmpty())
-            {
-                pwdValid = m_document->ApplyPassword(text.toStdString());
-            }
-            else
-            {
-                //  user cancelled.
-                return false;
-            }
-        }
-    }
+    if (!handlePassword())
+        return false;
 
     //  create scrolling area
     m_pageScrollArea = new QScrollArea(this);
@@ -414,109 +430,37 @@ void Window::helpAbout()
     QMessageBox::about(this, tr("About muPDF"), message);
 }
 
-void Window::helpUsage()
+void Window::help()
 {
     //  TODO
     QString message = "put something here.";//tr((pdfapp_usage(this->gapp)));
     QMessageBox::about(this, tr("How to use muPDF"), message);
 }
 
-void Window::createActions()
+void Window::connectActions()
 {
-    openAct = new QAction(tr("&Open..."), this);
-    openAct->setShortcut(tr("Ctrl+O"));
-    connect(openAct, SIGNAL(triggered()), this, SLOT(openAction()));
+    //  file menu
+    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openAction()));
+    connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(closeAction()));
+    connect(ui->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
+    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
 
-    closeAct = new QAction(tr("&Close..."), this);
-    closeAct->setShortcut(tr("Ctrl+W"));
-    connect(closeAct, SIGNAL(triggered()), this, SLOT(closeAction()));
+    //  view menu
+    connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
+    connect(ui->actionZoom_Out, SIGNAL(triggered()), this, SLOT(zoomOut()));
+    connect(ui->actionZoom_Normal, SIGNAL(triggered()), this, SLOT(normalSize()));
+    connect(ui->actionPage_Up, SIGNAL(triggered()), this, SLOT(pageUp()));
+    connect(ui->actionPage_Down, SIGNAL(triggered()), this, SLOT(pageDown()));
+    connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
 
-    printAct = new QAction(tr("&Print..."), this);
-    printAct->setShortcut(tr("Ctrl+P"));
-    printAct->setEnabled(true);
-    connect(printAct, SIGNAL(triggered()), this, SLOT(print()));
+    //  help menu
+    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
+    connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
 
-    exitAct = new QAction(tr("E&xit"), this);
-    exitAct->setShortcut(tr("Ctrl+Q"));
-    connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
-
-    zoomInAct = new QAction(tr("Zoom &In"), this);
-    zoomInAct->setShortcut(tr("Ctrl++"));
-    zoomInAct->setEnabled(false);
-    connect(zoomInAct, SIGNAL(triggered()), this, SLOT(zoomIn()));
-
-    zoomOutAct = new QAction(tr("Zoo"), this);
-    zoomOutAct->setShortcut(tr("Ctrl+-"));
-    zoomOutAct->setEnabled(false);
-    connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(zoomOut()));
-
-    normalSizeAct = new QAction(tr("&Normal Size"), this);
-    normalSizeAct->setShortcut(tr("Ctrl+S"));
-    normalSizeAct->setEnabled(false);
-    connect(normalSizeAct, SIGNAL(triggered()), this, SLOT(normalSize()));
-
-    aboutAct = new QAction(tr("&About"), this);
-    connect(aboutAct, SIGNAL(triggered()), this, SLOT(helpAbout()));
-
-    usageAct = new QAction(tr("&Usage"), this);
-    connect(usageAct, SIGNAL(triggered()), this, SLOT(helpUsage()));
-
-    pageUpAct = new QAction(tr("Page &Up"), this);
-    pageUpAct->setEnabled(false);
-    pageUpAct->setShortcut(tr("Ctrl+U"));
-    connect(pageUpAct, SIGNAL(triggered()), this, SLOT(pageUp()));
-
-    pageDownAct = new QAction(tr("Page &Down"), this);
-    pageDownAct->setEnabled(false);
-    pageDownAct->setShortcut(tr("Ctrl+D"));
-    connect(pageDownAct, SIGNAL(triggered()), this, SLOT(pageDown()));
-
-    fullScreenAct = new QAction(tr("Enter &Full Screen"), this);
-    fullScreenAct->setEnabled(false);
-    fullScreenAct->setShortcut(tr("Ctrl+F"));
-    connect(fullScreenAct, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
-}
-
-void Window::createMenus()
-{
-    fileMenu = new QMenu(tr("&File"), this);
-    fileMenu->addAction(openAct);
-    fileMenu->addAction(closeAct);
-    fileMenu->addAction(printAct);
-    fileMenu->addSeparator();
-    fileMenu->addAction(exitAct);
-
-    viewMenu = new QMenu(tr("&View"), this);
-    viewMenu->addAction(zoomInAct);
-    viewMenu->addAction(zoomOutAct);
-    viewMenu->addAction(normalSizeAct);
-    viewMenu->addSeparator();
-    viewMenu->addAction(pageUpAct);
-    viewMenu->addAction(pageDownAct);
-    viewMenu->addSeparator();
-    viewMenu->addAction(fullScreenAct);
-
-    helpMenu = new QMenu(tr("&Help"), this);
-    helpMenu->addAction(aboutAct);
-    helpMenu->addAction(usageAct);
-
-    menuBar()->addMenu(fileMenu);
-    menuBar()->addMenu(viewMenu);
-    menuBar()->addMenu(helpMenu);
 }
 
 void Window::updateActions()
 {
-    printAct->setEnabled(true);
-
-    zoomInAct->setEnabled(true);
-    zoomOutAct->setEnabled(true);
-    normalSizeAct->setEnabled(true);
-
-    pageUpAct->setEnabled(true);
-    pageDownAct->setEnabled(true);
-
-    fullScreenAct->setEnabled(true);
 }
 
 void Window::toggleFullScreen()
@@ -524,18 +468,18 @@ void Window::toggleFullScreen()
     if (windowState() != Qt::WindowFullScreen)
     {
         setWindowState(Qt::WindowFullScreen);
-        fullScreenAct->setText(tr("Exit &Full Screen"));
+        ui->actionFull_Screen->setText(tr("Exit &Full Screen"));
     }
     else
     {
         setWindowState(Qt::WindowNoState);
-        fullScreenAct->setText(tr("Enter &Full Screen"));
+        ui->actionFull_Screen->setText(tr("Enter &Full Screen"));
     }
 }
 
 void Window::exitFullScreen()
 {
     setWindowState(Qt::WindowNoState);
-    fullScreenAct->setText(tr("Enter &Full Screen"));
+    ui->actionFull_Screen->setText(tr("Enter &Full Screen"));
 }
 
