@@ -452,11 +452,10 @@ void Window::connectActions()
     connect(ui->actionZoom_Normal, SIGNAL(triggered()), this, SLOT(normalSize()));
 
     connect(ui->actionPage_Up, SIGNAL(triggered()), this, SLOT(pageUp()));
-    connect(ui->actionPage_Up, SIGNAL(triggered()), this, SLOT(pageUp()));
+    connect(ui->actionPage_Down, SIGNAL(triggered()), this, SLOT(pageDown()));
 
     connect(ui->actionThumbnails, SIGNAL(triggered()), this, SLOT(actionThumbnails()));
     connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
-
     //  help menu
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
