@@ -11,6 +11,7 @@ class Window;
 }
 
 #include "Document.h"
+#include "Thumbnail.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -31,6 +32,8 @@ public:
 	static void open();
     bool OpenFile (QString path);
 
+    void clickedThumb(int nPage);
+
 protected:
 	void keyPressEvent(QKeyEvent* event);
 
@@ -49,7 +52,6 @@ private slots:
     void toggleFullScreen();
     void quit();
     void actionThumbnails();
-    void clickedThumbnail();
 
 private:
     Ui::Window *ui;
@@ -78,7 +80,7 @@ private:
 
     //  array of thumbnail images
     bool m_thumbnailsBuilt = false;
-    QPushButton *m_thumbnailImages = NULL;
+    Thumbnail *m_thumbnailImages = NULL;
 
     //  current page
     int m_currentPage = 0;

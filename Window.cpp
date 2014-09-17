@@ -494,7 +494,7 @@ void Window::buildThumbnails()
     {
         //  create an array of thumbnail images
         int nPages = m_document->GetPageCount();
-        m_thumbnailImages = new QPushButton[nPages]();
+        m_thumbnailImages = new Thumbnail[nPages]();
 
         //  set up scrolling area
         QWidget* contentWidget = ui->leftScrollAreaWidgetContents;
@@ -517,15 +517,14 @@ void Window::buildThumbnails()
 
         for (int i=0; i<nPages; i++)
         {
-            connect(&m_thumbnailImages[i], SIGNAL(clicked()), this, SLOT(clickedThumbnail()));
-            //  TODO:  set some user data on the widget, or set the widget name
-            //  or some way to track when the widget is clicked.
-
             point_t pageSize;
             m_document->GetPageSize(i, scaleThumbnail, &pageSize);
             m_thumbnailImages[i].setFixedWidth(pageSize.X);
             m_thumbnailImages[i].setFixedHeight(pageSize.Y);
             m_thumbnailImages[i].setFlat(true);
+
+            m_thumbnailImages[i].setPage(i);
+            m_thumbnailImages[i].setWindow(this);
 
             contentWidget->layout()->addWidget(&(m_thumbnailImages[i]));
 
@@ -552,9 +551,9 @@ void Window::buildThumbnails()
     }
 }
 
-void Window::clickedThumbnail()
+void Window::clickedThumb (int nPage)
 {
-    QMessageBox::information (this, "", "clickedThumbnail");
+    QMessageBox::information (this, "", "clickedThumbnail 3");
 }
 
 void Window::actionThumbnails()
