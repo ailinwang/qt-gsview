@@ -14,6 +14,8 @@ Window::Window(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->leftScrollArea->hide();
+
     //  create and initialize the Document
     m_document = new Document();
     m_document->Initialize();
@@ -457,18 +459,32 @@ void Window::connectActions()
     connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
     connect(ui->actionZoom_Out, SIGNAL(triggered()), this, SLOT(zoomOut()));
     connect(ui->actionZoom_Normal, SIGNAL(triggered()), this, SLOT(normalSize()));
+
     connect(ui->actionPage_Up, SIGNAL(triggered()), this, SLOT(pageUp()));
-    connect(ui->actionPage_Down, SIGNAL(triggered()), this, SLOT(pageDown()));
+    connect(ui->actionPage_Up, SIGNAL(triggered()), this, SLOT(pageUp()));
+
+    connect(ui->actionThumbnails, SIGNAL(triggered()), this, SLOT(actionThumbnails()));
     connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
 
     //  help menu
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
-
 }
 
 void Window::updateActions()
 {
+}
+
+void Window::actionThumbnails()
+{
+    if (ui->leftScrollArea->isVisible())
+    {
+        ui->leftScrollArea->hide();
+    }
+    else
+    {
+        ui->leftScrollArea->show();
+    }
 }
 
 void Window::toggleFullScreen()

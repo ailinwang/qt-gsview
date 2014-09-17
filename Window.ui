@@ -154,10 +154,14 @@
     <addaction name="actionPage_Up"/>
     <addaction name="actionHome"/>
     <addaction name="actionEnd"/>
+    <addaction name="separator"/>
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
     <addaction name="actionZoom_Normal"/>
+    <addaction name="separator"/>
     <addaction name="actionFull_Screen"/>
+    <addaction name="actionThumbnails"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -273,6 +277,14 @@
   <action name="actionGSView_Help">
    <property name="text">
     <string>GSView Help...</string>
+   </property>
+  </action>
+  <action name="actionThumbnails">
+   <property name="text">
+    <string>Thumbnails</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>
