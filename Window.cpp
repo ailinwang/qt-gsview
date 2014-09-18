@@ -570,7 +570,7 @@ void Window::hilightThumb(int nPage)
     {
         Thumbnail *t = &(m_thumbnailImages[i]);
         if (i==nPage)
-            t->setStyleSheet("border:3px solid #ff0000;");
+            t->setStyleSheet("border:4px solid #149B44;");  //  forest green
         else
             t->setStyleSheet("border:0px");
     }
