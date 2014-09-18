@@ -1,6 +1,7 @@
 
 #include <QtWidgets>
 #include <QAbstractScrollArea>
+#include <QAction>
 #include <QPrintDialog>
 
 #include "Window.h"
@@ -13,19 +14,7 @@ Window::Window(QWidget *parent) :
     ui(new Ui::Window)
 {
     ui->setupUi(this);
-
-    //  show page number and total pages in the toolbar
-    QAction *sep = ui->toolBar->findChild<QAction *>(tr("separator1"));
-
-    m_pageNumber = new QLineEdit();
-    m_pageNumber->setMaximumWidth(30);
-    connect ( m_pageNumber, SIGNAL(returnPressed()), SLOT(pageEditReturnPressed()));
-
-    m_totalPages = new QLabel();
-    QLabel *slash = new QLabel();  slash->setText(tr("/"));
-    ui->toolBar->insertWidget(sep, m_pageNumber);
-    ui->toolBar->insertWidget(sep, slash);
-    ui->toolBar->insertWidget(sep, m_totalPages);
+    setupToolbar();
 
     //  hide the thumbnails to start
     ui->leftScrollArea->hide();
@@ -59,6 +48,37 @@ Window::Window(QWidget *parent) :
 
     //  count me
     m_numWindows++;
+}
+
+void Window::setupToolbar()
+{
+    ui->toolBar->addAction(ui->actionOpen);
+    ui->toolBar->addAction(ui->actionSave);
+    ui->toolBar->addAction(ui->actionPrint);
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->actionPage_Up);
+    ui->toolBar->addAction(ui->actionPage_Down);
+
+    m_pageNumber = new QLineEdit();
+    m_pageNumber->setMaximumWidth(30);
+    connect ( m_pageNumber, SIGNAL(returnPressed()), SLOT(pageEditReturnPressed()));
+
+    m_totalPages = new QLabel();
+    QLabel *slash = new QLabel();  slash->setText(tr("/"));
+    ui->toolBar->insertWidget(NULL, m_pageNumber);
+    ui->toolBar->insertWidget(NULL, slash);
+    ui->toolBar->insertWidget(NULL, m_totalPages);
+
+    ui->toolBar->addSeparator();
+
+    ui->toolBar->addAction(ui->actionZoom_In);
+    ui->toolBar->addAction(ui->actionZoom_Out);
+    ui->toolBar->addAction(ui->actionZoom_Normal);
+
+    ui->toolBar->addSeparator();
+
+    ui->toolBar->addAction(ui->actionThumbnails);
+
 }
 
 Window::~Window()

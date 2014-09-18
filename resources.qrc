@@ -5,5 +5,9 @@
         <file>resources/save.png</file>
         <file>resources/Left.png</file>
         <file>resources/Right.png</file>
+        <file>resources/ActualSize48.png</file>
+        <file>resources/zoom_in.png</file>
+        <file>resources/zoom_out.png</file>
+        <file>resources/thumb.png</file>
     </qresource>
 </RCC>

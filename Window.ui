@@ -89,7 +89,7 @@
             <x>0</x>
             <y>0</y>
             <width>78</width>
-            <height>295</height>
+            <height>318</height>
            </rect>
           </property>
          </widget>
@@ -115,7 +115,7 @@
             <x>0</x>
             <y>0</y>
             <width>527</width>
-            <height>295</height>
+            <height>318</height>
            </rect>
           </property>
          </widget>
@@ -196,13 +196,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionOpen"/>
-   <addaction name="actionSave"/>
-   <addaction name="actionPrint"/>
-   <addaction name="separator"/>
-   <addaction name="actionPage_Up"/>
-   <addaction name="actionPage_Down"/>
-   <addaction name="separator"/>
   </widget>
   <action name="actionOpen">
    <property name="icon">
@@ -267,14 +260,22 @@
    </property>
   </action>
   <action name="actionZoom_In">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/zoom_in.png</normaloff>:/new/prefix1/resources/zoom_in.png</iconset>
+   </property>
    <property name="text">
     <string>Zoom In</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+=</string>
+    <string/>
    </property>
   </action>
   <action name="actionZoom_Out">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/zoom_out.png</normaloff>:/new/prefix1/resources/zoom_out.png</iconset>
+   </property>
    <property name="text">
     <string>Zoom Out</string>
    </property>
@@ -283,6 +284,10 @@
    </property>
   </action>
   <action name="actionZoom_Normal">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/ActualSize48.png</normaloff>:/new/prefix1/resources/ActualSize48.png</iconset>
+   </property>
    <property name="text">
     <string>Zoom Normal</string>
    </property>
@@ -321,6 +326,10 @@
    </property>
   </action>
   <action name="actionThumbnails">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/thumb.png</normaloff>:/new/prefix1/resources/thumb.png</iconset>
+   </property>
    <property name="text">
     <string>Thumbnails</string>
    </property>

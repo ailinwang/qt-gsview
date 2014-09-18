@@ -59,6 +59,7 @@ private:
     Ui::Window *ui;
 
 	void updateActions();
+    void setupToolbar();
 
 	void adjustScrollBar(QScrollBar *scrollBar, double factor);
     void drawPage(int pageNumber);
