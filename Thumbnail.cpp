@@ -1,7 +1,7 @@
 #include <QtWidgets>
 
 #include "Thumbnail.h"
-#include "Window.h""
+#include "Window.h"
 
 Thumbnail::Thumbnail(QWidget *parent) :
     QPushButton(parent)

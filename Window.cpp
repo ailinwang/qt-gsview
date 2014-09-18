@@ -14,7 +14,7 @@ Window::Window(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //  add some edit fields to the toolbar
+    //  show page number and total pages in the toolbar
     QAction *sep = ui->toolBar->findChild<QAction *>(tr("separator1"));
     m_pageNumber = new QLabel();
     m_totalPages = new QLabel();
@@ -23,22 +23,43 @@ Window::Window(QWidget *parent) :
     ui->toolBar->insertWidget(sep, slash);
     ui->toolBar->insertWidget(sep, m_totalPages);
 
+    //  hide the thumbnails to start
     ui->leftScrollArea->hide();
 
-    //  create and initialize the Document
+    //  create and initialize the mu Document
     m_document = new Document();
     m_document->Initialize();
 
-    //  connect menus
-    connectActions();
+    //  connect actions to slots
+    //  file menu
+    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openAction()));
+    connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(closeAction()));
+    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveAction()));
+    connect(ui->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
+    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
 
+    //  view menu
+    connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
+    connect(ui->actionZoom_Out, SIGNAL(triggered()), this, SLOT(zoomOut()));
+    connect(ui->actionZoom_Normal, SIGNAL(triggered()), this, SLOT(normalSize()));
+
+    connect(ui->actionPage_Up, SIGNAL(triggered()), this, SLOT(pageUp()));
+    connect(ui->actionPage_Down, SIGNAL(triggered()), this, SLOT(pageDown()));
+
+    connect(ui->actionThumbnails, SIGNAL(triggered()), this, SLOT(actionThumbnails()));
+    connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
+
+    //  help menu
+    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
+    connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
+
+    //  count me
     m_numWindows++;
 }
 
-
-
 Window::~Window()
 {
+    //  un-count me
     if (m_numWindows>0)
         m_numWindows--;
 }
@@ -269,7 +290,7 @@ void Window::open()
 
         //  if this was the 2nd (or higher) open file,
         //  break out so we don't hit the dialog again.
-        if (m_numWindows >= 2)
+        if (numWindows() >= 2)
             break;
     }
 
@@ -281,11 +302,17 @@ void Window::open()
         qApp->setActiveWindow(priorWindow);
 
     //  if no windows are open, quit.
-    if (m_numWindows<=0)
+    if (numWindows()<=0)
         exit(0);
 }
 
 int Window::m_numWindows = 0;
+
+int Window::numWindows()
+{
+    //  i was hoping Qt would keep track of open windows.
+    return m_numWindows;
+}
 
 void Window::print()
 {
@@ -461,30 +488,6 @@ void Window::help()
     //  TODO
     QString message = "put something here.";//tr((pdfapp_usage(this->gapp)));
     QMessageBox::about(this, tr("How to use muPDF"), message);
-}
-
-void Window::connectActions()
-{
-    //  file menu
-    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openAction()));
-    connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(closeAction()));
-    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveAction()));
-    connect(ui->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
-    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
-
-    //  view menu
-    connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
-    connect(ui->actionZoom_Out, SIGNAL(triggered()), this, SLOT(zoomOut()));
-    connect(ui->actionZoom_Normal, SIGNAL(triggered()), this, SLOT(normalSize()));
-
-    connect(ui->actionPage_Up, SIGNAL(triggered()), this, SLOT(pageUp()));
-    connect(ui->actionPage_Down, SIGNAL(triggered()), this, SLOT(pageDown()));
-
-    connect(ui->actionThumbnails, SIGNAL(triggered()), this, SLOT(actionThumbnails()));
-    connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
-    //  help menu
-    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
-    connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
 }
 
 void Window::updateActions()

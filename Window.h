@@ -56,7 +56,6 @@ private slots:
 private:
     Ui::Window *ui;
 
-    void connectActions();
 	void updateActions();
 
 	void adjustScrollBar(QScrollBar *scrollBar, double factor);
@@ -70,7 +69,7 @@ private:
     void buildThumbnails();
     void hilightThumb(int nPage);
 
-    static int m_numWindows;
+    static int numWindows();
 
     QScrollArea *m_pageScrollArea = NULL;
     QScrollArea *m_thumbScrollArea = NULL;
@@ -92,6 +91,9 @@ private:
 
     //  document that contains all of the mupDF functionality
     Document *m_document = NULL;
+
+    //  counting open windows
+    static int m_numWindows;
 };
 
 #endif  //  WINDOW_H
