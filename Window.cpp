@@ -441,18 +441,7 @@ void Window::pageUp()
     if (m_currentPage>0)
     {
         m_currentPage -= 1;
-        drawPage (m_currentPage);
-
-        //  scroll to top of page
-        QRect r = m_pageImages[m_currentPage].geometry();
-        int scrollTo = r.top()-10;
-        if (scrollTo<0)
-            scrollTo = 0;
-        m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
-        m_pageNumber->setText(QString::number(m_currentPage+1));
-
-        //  hilight the thumb
-        hilightThumb(m_currentPage);
+        goToPage(m_currentPage, true);
     }
 }
 
@@ -462,18 +451,7 @@ void Window::pageDown()
     if (m_currentPage+1<numPages)
     {
         m_currentPage += 1;
-        drawPage (m_currentPage);
-
-        //  scroll to top of page
-        QRect r = m_pageImages[m_currentPage].geometry();
-        int scrollTo = r.top()-10;
-        if (scrollTo<0)
-            scrollTo = 0;        
-        m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
-        m_pageNumber->setText(QString::number(m_currentPage+1));
-
-        //  hilight the thumb
-        this->hilightThumb(m_currentPage);
+        goToPage(m_currentPage, true);
     }
 }
 
@@ -579,6 +557,25 @@ void Window::hilightThumb(int nPage)
 void Window::clickedThumb (int nPage)
 {    
     hilightThumb(nPage);
+    goToPage(nPage, false);
+}
+
+void Window::goToPage(int nPage, bool hilight)
+{
+    m_currentPage = nPage;
+    drawPage (m_currentPage);
+
+    //  scroll to top of page
+    QRect r = m_pageImages[m_currentPage].geometry();
+    int scrollTo = r.top()-10;
+    if (scrollTo<0)
+        scrollTo = 0;
+    m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
+    m_pageNumber->setText(QString::number(m_currentPage+1));
+
+    //  hilight the thumb
+    if (hilight)
+        hilightThumb(m_currentPage);
 }
 
 void Window::actionThumbnails()

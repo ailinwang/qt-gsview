@@ -68,6 +68,7 @@ private:
     bool handlePassword();
     void buildThumbnails();
     void hilightThumb(int nPage);
+    void goToPage(int nPage, bool hilight);
 
     static int numWindows();
 
