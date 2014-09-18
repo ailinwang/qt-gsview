@@ -4,6 +4,7 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include <QLineEdit>
 #include <QPrinter>
 
 namespace Ui {
@@ -52,6 +53,7 @@ private slots:
     void toggleFullScreen();
     void quit();
     void actionThumbnails();
+    void pageEditReturnPressed();
 
 private:
     Ui::Window *ui;
@@ -87,7 +89,7 @@ private:
     int m_currentPage = 0;
 
     //  additional toolbar widgets
-    QLabel *m_pageNumber = NULL;
+    QLineEdit *m_pageNumber = NULL;
     QLabel *m_totalPages = NULL;
 
     //  document that contains all of the mupDF functionality

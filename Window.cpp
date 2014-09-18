@@ -16,7 +16,11 @@ Window::Window(QWidget *parent) :
 
     //  show page number and total pages in the toolbar
     QAction *sep = ui->toolBar->findChild<QAction *>(tr("separator1"));
-    m_pageNumber = new QLabel();
+
+    m_pageNumber = new QLineEdit();
+    m_pageNumber->setMaximumWidth(30);
+    connect ( m_pageNumber, SIGNAL(returnPressed()), SLOT(pageEditReturnPressed()));
+
     m_totalPages = new QLabel();
     QLabel *slash = new QLabel();  slash->setText(tr("/"));
     ui->toolBar->insertWidget(sep, m_pageNumber);
@@ -62,6 +66,23 @@ Window::~Window()
     //  un-count me
     if (m_numWindows>0)
         m_numWindows--;
+}
+
+void Window::pageEditReturnPressed()
+{
+    QString s = m_pageNumber->text();
+    if (s.length()>0)
+    {
+        bool ok;
+        int n = s.toInt(&ok);
+        if (ok)
+        {
+            if (n>=1 && n<=m_document->GetPageCount())
+            {
+                goToPage(n-1, true);
+            }
+        }
+    }
 }
 
 void Window::keyPressEvent(QKeyEvent* event)
