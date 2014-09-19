@@ -1,5 +1,6 @@
 #include "QtUtil.h"
 
+#if 0
 QImage * QtUtil::QImageFromData(unsigned char *samples, int w, int h)
 {
     QImage *myImage = new QImage(w, h, QImage::Format_ARGB32);
@@ -23,3 +24,5 @@ QImage * QtUtil::QImageFromData(unsigned char *samples, int w, int h)
 
     return myImage;
 }
+#endif
+

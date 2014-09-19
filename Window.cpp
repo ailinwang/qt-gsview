@@ -16,6 +16,9 @@ Window::Window(QWidget *parent) :
     ui->setupUi(this);
     setupToolbar();
 
+    QAbstractSlider *leftSlider= ui->leftScrollArea->verticalScrollBar();
+    connect(leftSlider,SIGNAL(sliderReleased()), this, SLOT(leftSliderReleased()));
+
     //  hide the thumbnails to start
     ui->leftScrollArea->hide();
 
@@ -99,7 +102,7 @@ void Window::pageEditReturnPressed()
         {
             if (n>=1 && n<=m_document->GetPageCount())
             {
-                goToPage(n-1, true);
+                goToPage(n-1);
             }
         }
     }
@@ -186,7 +189,7 @@ bool Window::OpenFile (QString path)
 
     //  create an array of page images
     int nPages = m_document->GetPageCount();
-    m_pageImages = new QLabel[nPages]();    
+    m_pageImages = new QLabel[nPages]();
 
     for (int i=0; i<nPages; i++)
     {
@@ -245,7 +248,7 @@ void Window::drawPage(int pageNumber)
     m_document->RenderPage(pageNumber, m_scalePage, bitmap, pageSize.X, pageSize.Y);
 
     //  copy to window
-    QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
+    QImage *myImage = new QImage (bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
     m_pageImages[pageNumber].setPixmap(QPixmap::fromImage(*myImage));
     m_pageImages[pageNumber].adjustSize();
 
@@ -366,8 +369,7 @@ void Window::print()
     dialog->hide();
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    while(qApp->hasPendingEvents())
-        qApp->processEvents();
+    QApplication::sendPostedEvents();
 
     //  get scale factor based on printer's resolution
     double scalePrint = printer.resolution() / 72;
@@ -394,8 +396,7 @@ void Window::print()
     QProgressDialog progress("Printing", "Cancel", 0, numPages, this);
     progress.setWindowModality(Qt::WindowModal);
     progress.show();
-    while(qApp->hasPendingEvents())
-        qApp->processEvents();
+    QApplication::sendPostedEvents();
 
     bool cancelled = false;
 
@@ -406,8 +407,7 @@ void Window::print()
         progress.setValue(page-fromPage+1);
         QString message; message.sprintf("Printing %d of %d ...", page, numPages);
         progress.setLabelText(message);
-        while(qApp->hasPendingEvents())
-            qApp->processEvents();
+        QApplication::sendPostedEvents();
 
         if (progress.wasCanceled())
         {
@@ -429,7 +429,7 @@ void Window::print()
         m_document->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y);
 
         //  copy to printer
-        QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
+        QImage *myImage = new QImage (bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
         painter->drawImage(0, 0, *myImage);
 
         delete myImage;
@@ -439,12 +439,10 @@ void Window::print()
     }
 
     progress.hide();
-    while(qApp->hasPendingEvents())
-        qApp->processEvents();
+    QApplication::sendPostedEvents();
 
     QApplication::restoreOverrideCursor();
-    while(qApp->hasPendingEvents())
-        qApp->processEvents();
+    QApplication::sendPostedEvents();
 
     //  end printing
     if (cancelled)
@@ -482,7 +480,7 @@ void Window::pageUp()
     if (m_currentPage>0)
     {
         m_currentPage -= 1;
-        goToPage(m_currentPage, true);
+        goToPage(m_currentPage);
     }
 }
 
@@ -492,7 +490,7 @@ void Window::pageDown()
     if (m_currentPage+1<numPages)
     {
         m_currentPage += 1;
-        goToPage(m_currentPage, true);
+        goToPage(m_currentPage);
     }
 }
 
@@ -511,6 +509,59 @@ void Window::help()
 
 void Window::updateActions()
 {
+}
+
+void Window::renderVisibleThumbnailsSlot()
+{
+    renderVisibleThumbnails();
+}
+
+void Window::leftSliderReleased()
+{
+    renderVisibleThumbnails();
+}
+
+void Window::renderVisibleThumbnails()
+{
+    int nPages = m_document->GetPageCount();
+
+    for (int i=0; i<nPages; i++)
+    {
+//        if (!m_thumbnailImages[i].rendered())
+        {
+            bool visible = !(m_thumbnailImages[i].visibleRegion().isEmpty());
+
+            if (visible)
+            {
+                if (!m_thumbnailImages[i].rendered())
+                {
+                    qDebug("rendering thumb %d", i);
+                    point_t pageSize = m_thumbnailImages[i].pageSize();
+
+                    //  render
+                    int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
+                    Byte *bitmap = new Byte[numBytes];
+                    m_document->RenderPage (i, m_thumbnailImages[i].scale(), bitmap, pageSize.X, pageSize.Y);
+
+                    //  copy to widget
+                    QImage *myImage = new QImage (bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
+                    QPixmap pix = QPixmap::fromImage(*myImage);
+                    QIcon icon(pix);
+                    m_thumbnailImages[i].setIcon(icon);
+                    m_thumbnailImages[i].setIconSize(pix.size());
+
+                    m_thumbnailImages[i].setRendered(true);
+
+                    delete myImage;
+                    delete bitmap;
+                }
+                else
+                {
+                    m_thumbnailImages[i].repaint();
+                }
+            }
+        }
+    }
 }
 
 void Window::buildThumbnails()
@@ -544,33 +595,25 @@ void Window::buildThumbnails()
         {
             point_t pageSize;
             m_document->GetPageSize(i, scaleThumbnail, &pageSize);
-            m_thumbnailImages[i].setFixedWidth(pageSize.X+10);
-            m_thumbnailImages[i].setFixedHeight(pageSize.Y+10);
+
+            m_thumbnailImages[i].setFixedWidth(pageSize.X);
+            m_thumbnailImages[i].setFixedHeight(pageSize.Y);
             m_thumbnailImages[i].setFlat(true);
 
             m_thumbnailImages[i].setPage(i);
             m_thumbnailImages[i].setWindow(this);
+            m_thumbnailImages[i].setScale(scaleThumbnail);
+
+            m_thumbnailImages[i].setPageSize(pageSize);
 
             contentWidget->layout()->addWidget(&(m_thumbnailImages[i]));
-
-            //  render
-            int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
-            Byte *bitmap = new Byte[numBytes];
-            m_document->RenderPage (i, scaleThumbnail, bitmap, pageSize.X, pageSize.Y);
-
-            //  copy to widget
-            QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
-//            m_thumbnailImages[i].setPixmap(QPixmap::fromImage(*myImage));
-//            m_thumbnailImages[i].adjustSize();
-
-            QPixmap pix = QPixmap::fromImage(*myImage);
-            QIcon icon(pix);
-            m_thumbnailImages[i].setIcon(icon);
-            m_thumbnailImages[i].setIconSize(pix.size());
-
-            delete myImage;
-            delete bitmap;
         }
+
+        //  I don't like this because 200 msec seems arbitrary.
+        //  10 msec is too small.  There shuld be some sort of state
+        //  I can monitor, or event I can receive.
+        QTimer::singleShot(200, this, SLOT(renderVisibleThumbnailsSlot()));
+//        renderVisibleThumbnails();
 
         m_thumbnailsBuilt = true;
 
@@ -588,20 +631,16 @@ void Window::hilightThumb(int nPage)
     for (int i=0; i<nPages; i++)
     {
         Thumbnail *t = &(m_thumbnailImages[i]);
-        if (i==nPage)
-            t->setStyleSheet("border:4px solid #149B44;");  //  forest green
-        else
-            t->setStyleSheet("border:0px");
+        t->setSelected(i==nPage);
     }
 }
 
 void Window::clickedThumb (int nPage)
-{    
-    hilightThumb(nPage);
-    goToPage(nPage, false);
+{
+    goToPage (nPage);
 }
 
-void Window::goToPage(int nPage, bool hilight)
+void Window::goToPage(int nPage)
 {
     m_currentPage = nPage;
     drawPage (m_currentPage);
@@ -614,9 +653,7 @@ void Window::goToPage(int nPage, bool hilight)
     m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
     m_pageNumber->setText(QString::number(m_currentPage+1));
 
-    //  hilight the thumb
-    if (hilight)
-        hilightThumb(m_currentPage);
+    hilightThumb(m_currentPage);
 }
 
 void Window::actionThumbnails()
@@ -630,6 +667,7 @@ void Window::actionThumbnails()
     {
         ui->leftScrollArea->show();
         ui->actionThumbnails->setChecked(true);
+
         buildThumbnails();
     }
 }

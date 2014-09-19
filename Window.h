@@ -54,6 +54,9 @@ private slots:
     void quit();
     void actionThumbnails();
     void pageEditReturnPressed();
+    void renderVisibleThumbnailsSlot();
+
+    void leftSliderReleased();
 
 private:
     Ui::Window *ui;
@@ -71,7 +74,8 @@ private:
     bool handlePassword();
     void buildThumbnails();
     void hilightThumb(int nPage);
-    void goToPage(int nPage, bool hilight);
+    void goToPage(int nPage);
+    void renderVisibleThumbnails();
 
     static int numWindows();
 

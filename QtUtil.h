@@ -6,7 +6,10 @@
 class QtUtil
 {
 public:
+
+#if 0
     static QImage * QImageFromData(unsigned char *samples, int w, int h);
+#endif
 };
 
 #endif // QTUTIL_H
