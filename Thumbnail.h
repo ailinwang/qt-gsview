@@ -2,8 +2,20 @@
 #define THUMBNAIL_H
 
 #include <QPushButton>
+#include <QEvent>
 
 #include "muctx.h"
+
+//  custom event that's sent when we are clicked
+class ThumbClickedEvent : public QEvent
+{
+public:
+    ThumbClickedEvent (const int pageNumber): QEvent(THUMB_CLICKED_EVENT), m_pageNumber(pageNumber) {}
+    int getPageNumber() const {return m_pageNumber;}
+    static const QEvent::Type THUMB_CLICKED_EVENT = static_cast<QEvent::Type>(QEvent::User + 1);
+private:
+    int m_pageNumber;
+};
 
 class Thumbnail : public QPushButton
 {

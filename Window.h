@@ -34,10 +34,9 @@ public:
 	static void open();
     bool OpenFile (QString path);
 
-    void clickedThumb (int nPage);
-
 protected:
 	void keyPressEvent(QKeyEvent* event);
+    void customEvent(QEvent *event);
 
 private slots:
     void openAction();
@@ -55,9 +54,6 @@ private slots:
     void quit();
     void actionThumbnails();
     void pageEditReturnPressed();
-
-//    void renderVisibleThumbnailsSlot();
-//    void leftSliderReleased();
 
 private:
     Ui::Window *ui;
@@ -77,10 +73,8 @@ private:
 
     static int numWindows();
 
+    //  pages
     QScrollArea *m_pageScrollArea = NULL;
-
-
-    //  array of page images
     double m_scalePage = 1.0;
     QLabel *m_pageImages = NULL;
 

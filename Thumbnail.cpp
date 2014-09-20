@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include <QEvent>
 
 #include "Thumbnail.h"
 #include "Window.h"
@@ -33,10 +34,8 @@ void Thumbnail::paintEvent(QPaintEvent *event)
 
 void Thumbnail::clicked()
 {
-    //  this needs to be Window-agnostic.
-    //  can we send messages without knowing the receiver?
-    Window *w = (Window *) this->window();
-    w->clickedThumb(m_pageNumber);
+    //  post our custom event to the main window
+    QApplication::postEvent(this->window(), new ThumbClickedEvent(m_pageNumber));
 }
 
 bool Thumbnail::selected() const
