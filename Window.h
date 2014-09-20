@@ -63,6 +63,7 @@ private:
     void drawPage(int pageNumber);
     void setInitialSizeAndPosition();
 
+    void enterFullScreen();
     void exitFullScreen();
     bool handlePassword();
     void goToPage(int nPage);
@@ -88,6 +89,8 @@ private:
     //  counting open windows
     static int m_numWindows;
     static int numWindows() {return m_numWindows;}
+    static void countWindowUp() {m_numWindows++;}
+    static void countWindowDown() {if (m_numWindows>0) m_numWindows--;}
 };
 
 #endif  //  WINDOW_H

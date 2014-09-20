@@ -50,23 +50,25 @@ Window::Window(QWidget *parent) :
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
 
-    //  count me
-    m_numWindows++;
+    countWindowUp();
 }
 
 void Window::setupToolbar()
 {
+    //  we do this in code, rather than relying on Qt designer, because
+    //  we need to insert non-actions (widgets)
+
     ui->toolBar->addAction(ui->actionOpen);
     ui->toolBar->addAction(ui->actionSave);
     ui->toolBar->addAction(ui->actionPrint);
+
     ui->toolBar->addSeparator();
+
     ui->toolBar->addAction(ui->actionPage_Up);
     ui->toolBar->addAction(ui->actionPage_Down);
-
     m_pageNumber = new QLineEdit();
     m_pageNumber->setMaximumWidth(30);
     connect ( m_pageNumber, SIGNAL(returnPressed()), SLOT(pageEditReturnPressed()));
-
     m_totalPages = new QLabel();
     QLabel *slash = new QLabel();  slash->setText(tr("/"));
     ui->toolBar->insertWidget(NULL, m_pageNumber);
@@ -86,13 +88,14 @@ void Window::setupToolbar()
 
 Window::~Window()
 {
-    //  un-count me
-    if (m_numWindows>0)
-        m_numWindows--;
+    countWindowDown();
 }
 
 void Window::pageEditReturnPressed()
 {
+    //  user typed Enter while in the page number field.
+    //  go to the page.
+
     QString s = m_pageNumber->text();
     if (s.length()>0)
     {
@@ -102,10 +105,16 @@ void Window::pageEditReturnPressed()
         {
             if (n>=1 && n<=m_document->GetPageCount())
             {
+                //  edit field has a value, and it's an integer, and it's
+                //  within limits.  Go ahead and change the page.
                 goToPage(n-1);
+                return;
             }
         }
     }
+
+    //  something went wrong, so restore the correct value
+    m_pageNumber->setText(QString::number(m_currentPage+1));
 }
 
 void Window::keyPressEvent(QKeyEvent* event)
@@ -199,6 +208,7 @@ bool Window::OpenFile (QString path)
 
         m_pageImages[i].setBackgroundRole(QPalette::Dark);
         contentWidget->layout()->addWidget(&(m_pageImages[i]));
+        contentWidget->layout()->setContentsMargins(0,0,0,0);
     }
 
     //  draw first page
@@ -246,7 +256,7 @@ void Window::drawPage(int pageNumber)
     m_document->RenderPage(pageNumber, m_scalePage, bitmap, pageSize.X, pageSize.Y);
 
     //  copy to window
-    QImage *myImage = new QImage (bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
+    QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
     m_pageImages[pageNumber].setPixmap(QPixmap::fromImage(*myImage));
     m_pageImages[pageNumber].adjustSize();
 
@@ -421,7 +431,7 @@ void Window::print()
         m_document->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y);
 
         //  copy to printer
-        QImage *myImage = new QImage (bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
+        QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
         painter->drawImage(0, 0, *myImage);
 
         delete myImage;
@@ -505,14 +515,18 @@ void Window::updateActions()
 
 void Window::customEvent (QEvent *event)
 {
-    if (event->type() == (ThumbClickedEvent::THUMB_CLICKED_EVENT))
+    switch (event->type())
     {
-        int nPage = static_cast<ThumbClickedEvent *>(event)->getPageNumber();
-        goToPage (nPage);
-    }
-    else
-    {
+    case ThumbClickedEvent::THUMB_CLICKED_EVENT:
+        {
+            int nPage = static_cast<ThumbClickedEvent *>(event)->getPageNumber();
+            goToPage (nPage);
+        }
+        break;
+
+    default:
         QMainWindow::customEvent(event);
+        break;
     }
 }
 
@@ -529,7 +543,7 @@ void Window::goToPage(int nPage)
 
     //  scroll to top of page
     QRect r = m_pageImages[m_currentPage].geometry();
-    int scrollTo = r.top()-10;
+    int scrollTo = r.top()-10;  //  so we see a little margin above
     if (scrollTo<0)
         scrollTo = 0;
     m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
@@ -549,7 +563,6 @@ void Window::actionThumbnails()
     {
         ui->leftScrollArea->show();
         ui->actionThumbnails->setChecked(true);
-
         m_thumbnails->buildImages();
     }
 }
@@ -557,19 +570,19 @@ void Window::actionThumbnails()
 void Window::toggleFullScreen()
 {
     if (windowState() != Qt::WindowFullScreen)
-    {
-        setWindowState(Qt::WindowFullScreen);
-        ui->actionFull_Screen->setText(tr("Exit &Full Screen"));
-    }
+        enterFullScreen();
     else
-    {
-        setWindowState(Qt::WindowNoState);
-        ui->actionFull_Screen->setText(tr("Enter &Full Screen"));
-    }
+        exitFullScreen();
 }
 
 void Window::exitFullScreen()
 {
     setWindowState(Qt::WindowNoState);
     ui->actionFull_Screen->setText(tr("Enter &Full Screen"));
+}
+
+void Window::enterFullScreen()
+{
+    setWindowState(Qt::WindowFullScreen);
+    ui->actionFull_Screen->setText(tr("Exit &Full Screen"));
 }

@@ -2,10 +2,6 @@
 
 Document::Document()
 {
-    mu_ctx = NULL;
-    m_opened = false;
-    m_pageCount = 0;
-    m_pages = NULL;
 }
 
 Document::~Document()
@@ -45,8 +41,8 @@ bool Document::OpenFile(const std::string fileName)
         m_opened = true;
         m_pageCount = mu_ctx->GetPageCount();
 
-        //  allocate an array of pages
-        m_pages = new Page[m_pageCount];
+//        //  allocate an array of pages
+//        m_pages = new Page[m_pageCount];
 
         return true;
     }

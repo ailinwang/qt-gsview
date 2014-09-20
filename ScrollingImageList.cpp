@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "ScrollingImageList.h"
+#include "QtUtil.h"
 
 #include <QAbstractSlider>
 #include <QVBoxLayout>
@@ -87,7 +88,7 @@ void ScrollingImageList::buildImages()
         }
 
         //  I don't like this because 200 msec seems arbitrary.
-        //  10 msec is too small.  There shuld be some sort of state
+        //  10 msec is too small.  There should be some sort of state
         //  I can monitor, or event I can receive.
         QTimer::singleShot(200, this, SLOT(imagesBuiltSlot()));
         setImagesBuilt(true);
@@ -129,7 +130,7 @@ void ScrollingImageList::renderVisibleImages()
                 m_document->RenderPage (i, m_images[i].scale(), bitmap, pageSize.X, pageSize.Y);
 
                 //  copy to widget
-                QImage *myImage = new QImage (bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
+                QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
                 QPixmap pix = QPixmap::fromImage(*myImage);
                 QIcon icon(pix);
                 m_images[i].setIcon(icon);

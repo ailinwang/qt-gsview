@@ -29,12 +29,12 @@ public:
 
 private:
 
-    muctx *mu_ctx;
-    bool m_opened;
-    int m_pageCount;
+    muctx *mu_ctx = NULL;
+    bool m_opened = false;
+    int m_pageCount = 0;
 
-    Page *m_pages;
-    Page *m_thumbnails;
+//    Page *m_pages = NULL;
+//    Page *m_thumbnails = NULL;
 };
 
 #endif // DOCUMENT_H
