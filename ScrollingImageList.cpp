@@ -78,12 +78,9 @@ void ScrollingImageList::buildImages()
 
             m_images[i].setFixedWidth(pageSize.X);
             m_images[i].setFixedHeight(pageSize.Y);
-            m_images[i].setFlat(true);
-
+            m_images[i].setFlat(true);  //  because it's a button/  don't like
             m_images[i].setPage(i);
-//            m_images[i].setWindow(this);
             m_images[i].setScale(scaleThumbnail);
-
             m_images[i].setPageSize(pageSize);
 
             contentWidget->layout()->addWidget(&(m_images[i]));
@@ -92,19 +89,18 @@ void ScrollingImageList::buildImages()
         //  I don't like this because 200 msec seems arbitrary.
         //  10 msec is too small.  There shuld be some sort of state
         //  I can monitor, or event I can receive.
-        QTimer::singleShot(200, this, SLOT(renderVisibleImagesSlot()));
-//        renderVisibleImagess();
-
+        QTimer::singleShot(200, this, SLOT(imagesBuiltSlot()));
         setImagesBuilt(true);
-
-//        //  hilight the current page
-//        hilightThumb(m_currentPage);
     }
 }
 
-void ScrollingImageList::renderVisibleImagesSlot()
+void ScrollingImageList::imagesBuiltSlot()
 {
+    //  draw the images that can be seen
     renderVisibleImages();
+
+    //  notify that we're ready
+    emit imagesReady();
 }
 
 void ScrollingImageList::sliderReleasedSlot()

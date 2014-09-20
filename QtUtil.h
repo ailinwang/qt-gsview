@@ -1,15 +1,13 @@
 #ifndef QTUTIL_H
 #define QTUTIL_H
 
-#include <qimage.h>
+#include <QImage>
 
 class QtUtil
 {
 public:
-
-#if 0
     static QImage * QImageFromData(unsigned char *samples, int w, int h);
-#endif
+    static void errorMessage(const std::string theTitle, const std::string theMessage);
 };
 
 #endif // QTUTIL_H

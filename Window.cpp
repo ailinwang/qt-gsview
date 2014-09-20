@@ -21,6 +21,7 @@ Window::Window(QWidget *parent) :
     m_thumbnails = new ScrollingImageList();
     m_thumbnails->setScrollArea(ui->leftScrollArea);
     m_thumbnails->hide();  //  initially hidden
+    connect(m_thumbnails, SIGNAL(imagesReady()), this, SLOT(thumbnailsReady()));
 
     //  create and initialize the mu Document
     m_document = new Document();
@@ -166,7 +167,7 @@ bool Window::OpenFile (QString path)
     bool result = m_document->OpenFile(path.toStdString());
     if (!result)
     {
-        Window::errorMessage("Error opening file", "");
+        QtUtil::errorMessage("Error opening file", "");
         return false;
     }
 
@@ -216,6 +217,8 @@ bool Window::OpenFile (QString path)
 
 void Window::setInitialSizeAndPosition()
 {
+    //  TODO: stagger windows when they open
+
     //  size and center
     QDesktopWidget desktop;
     int screenWidth  = desktop.screen()->width();
@@ -225,11 +228,6 @@ void Window::setInitialSizeAndPosition()
     int top  = screenHeight/10;
     int left = screenWidth/10;
     setGeometry(left, top, width, height);
-}
-
-void Window::errorMessage(const std::string theTitle, const std::string theMessage)
-{
-    QMessageBox::critical(NULL, QString(theTitle.c_str()), QString(theMessage.c_str()));
 }
 
 void Window::drawPage(int pageNumber)
@@ -351,12 +349,6 @@ void Window::open()
 }
 
 int Window::m_numWindows = 0;
-
-int Window::numWindows()
-{
-    //  i was hoping Qt would keep track of open windows.
-    return m_numWindows;
-}
 
 void Window::print()
 {
@@ -522,6 +514,12 @@ void Window::customEvent (QEvent *event)
     {
         QMainWindow::customEvent(event);
     }
+}
+
+void Window::thumbnailsReady()
+{
+    //  hilight the current page
+    m_thumbnails->hilightImage(m_currentPage);
 }
 
 void Window::goToPage(int nPage)

@@ -1,9 +1,7 @@
-
 #ifndef WINDOW_H
 #define WINDOW_H
 
 #include <QMainWindow>
-#include <QPushButton>
 #include <QLineEdit>
 #include <QPrinter>
 
@@ -54,6 +52,7 @@ private slots:
     void quit();
     void actionThumbnails();
     void pageEditReturnPressed();
+    void thumbnailsReady();
 
 private:
     Ui::Window *ui;
@@ -61,17 +60,12 @@ private:
 	void updateActions();
     void setupToolbar();
 
-	void adjustScrollBar(QScrollBar *scrollBar, double factor);
     void drawPage(int pageNumber);
     void setInitialSizeAndPosition();
-
-    static void errorMessage(const std::string theTitle, const std::string theMessage);
 
     void exitFullScreen();
     bool handlePassword();
     void goToPage(int nPage);
-
-    static int numWindows();
 
     //  pages
     QScrollArea *m_pageScrollArea = NULL;
@@ -93,6 +87,7 @@ private:
 
     //  counting open windows
     static int m_numWindows;
+    static int numWindows() {return m_numWindows;}
 };
 
 #endif  //  WINDOW_H

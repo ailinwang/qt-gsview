@@ -1,6 +1,7 @@
 #include "QtUtil.h"
 
-#if 0
+#include <QMessageBox>
+
 QImage * QtUtil::QImageFromData(unsigned char *samples, int w, int h)
 {
     QImage *myImage = new QImage(w, h, QImage::Format_ARGB32);
@@ -24,5 +25,8 @@ QImage * QtUtil::QImageFromData(unsigned char *samples, int w, int h)
 
     return myImage;
 }
-#endif
 
+void QtUtil::errorMessage(const std::string theTitle, const std::string theMessage)
+{
+    QMessageBox::critical(NULL, QString(theTitle.c_str()), QString(theMessage.c_str()));
+}

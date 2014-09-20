@@ -9,7 +9,6 @@
 #include "Thumbnail.h"
 #include "Document.h"
 
-
 class ScrollingImageList : public QObject
 {
     Q_OBJECT
@@ -34,8 +33,11 @@ public:
     void hilightImage(int nImage);
 
 public slots:
-    void renderVisibleImagesSlot();
+    void imagesBuiltSlot();
     void sliderReleasedSlot();
+
+signals:
+    void imagesReady();
 
 private:
     void renderVisibleImages();
