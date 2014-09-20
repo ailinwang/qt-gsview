@@ -11,7 +11,7 @@ class Window;
 
 #include "Document.h"
 #include "ScrollingImageList.h"
-#include "Thumbnail.h"
+#include "ImageWidget.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;

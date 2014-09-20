@@ -517,9 +517,9 @@ void Window::customEvent (QEvent *event)
 {
     switch (event->type())
     {
-    case ThumbClickedEvent::THUMB_CLICKED_EVENT:
+    case ImageClickedEvent::IMAGE_CLICKED_EVENT:
         {
-            int nPage = static_cast<ThumbClickedEvent *>(event)->getPageNumber();
+            int nPage = static_cast<ImageClickedEvent *>(event)->getPageNumber();
             goToPage (nPage);
         }
         break;

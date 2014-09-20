@@ -6,7 +6,7 @@
 #include <QScrollArea>
 
 #include "ui_Window.h"
-#include "Thumbnail.h"
+#include "ImageWidget.h"
 #include "Document.h"
 
 class ScrollingImageList : public QObject
@@ -43,7 +43,7 @@ private:
     void renderVisibleImages();
 
     QScrollArea *m_scrollArea = NULL;
-    Thumbnail *m_images = NULL;
+    ImageWidget *m_images = NULL;
     bool m_imagesBuilt = false;
     Document *m_document = NULL;
 };

@@ -49,9 +49,9 @@ void ScrollingImageList::buildImages()
 {
     if (!imagesBuilt())
     {
-        //  create an array of thumbnail images
+        //  create an array of images
         int nPages = m_document->GetPageCount();
-        m_images = new Thumbnail[nPages]();
+        m_images = new ImageWidget[nPages]();
 
         //  set up scrolling area
         QWidget* contentWidget = m_scrollArea->widget();
@@ -70,18 +70,18 @@ void ScrollingImageList::buildImages()
         }
 
         //  calculate a scale factor based on the width of the left scroll area
-        double scaleThumbnail = 0.8 * double(m_scrollArea->width())/double(maxW);
+        double theScale = 0.8 * double(m_scrollArea->width())/double(maxW);
 
         for (int i=0; i<nPages; i++)
         {
             point_t pageSize;
-            m_document->GetPageSize(i, scaleThumbnail, &pageSize);
+            m_document->GetPageSize(i, theScale, &pageSize);
 
             m_images[i].setFixedWidth(pageSize.X);
             m_images[i].setFixedHeight(pageSize.Y);
-            m_images[i].setFlat(true);  //  because it's a button/  don't like
+//            m_images[i].setFlat(true);  //  because it's a button/  don't like
             m_images[i].setPage(i);
-            m_images[i].setScale(scaleThumbnail);
+            m_images[i].setScale(theScale);
             m_images[i].setPageSize(pageSize);
 
             contentWidget->layout()->addWidget(&(m_images[i]));
@@ -121,7 +121,6 @@ void ScrollingImageList::renderVisibleImages()
         {
             if (!m_images[i].rendered())
             {
-                qDebug("rendering thumb %d", i);
                 point_t pageSize = m_images[i].pageSize();
 
                 //  render
@@ -132,10 +131,7 @@ void ScrollingImageList::renderVisibleImages()
                 //  copy to widget
                 QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
                 QPixmap pix = QPixmap::fromImage(*myImage);
-                QIcon icon(pix);
-                m_images[i].setIcon(icon);
-                m_images[i].setIconSize(pix.size());
-
+                m_images[i].setPixmap(pix);
                 m_images[i].setRendered(true);
 
                 delete myImage;
@@ -167,7 +163,7 @@ void ScrollingImageList::hilightImage(int nImage)
     int nPages = m_document->GetPageCount();
     for (int i=0; i<nPages; i++)
     {
-        Thumbnail *t = &(m_images[i]);
+        ImageWidget *t = &(m_images[i]);
         t->setSelected(i==nImage);
     }
 }
