@@ -34,7 +34,7 @@ public:
 	static void open();
     bool OpenFile (QString path);
 
-    void clickedThumb(int nPage);
+    void clickedThumb (int nPage);
 
 protected:
 	void keyPressEvent(QKeyEvent* event);

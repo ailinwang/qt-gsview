@@ -49,6 +49,9 @@ Window::Window(QWidget *parent) :
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
 
+//    //  clicking thumbs
+//    connect(this, SIGNAL(onImageClicked (int)), this, SLOT(clickedThumb(int)));
+
     //  count me
     m_numWindows++;
 }

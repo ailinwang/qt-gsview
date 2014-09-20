@@ -33,6 +33,8 @@ void Thumbnail::paintEvent(QPaintEvent *event)
 
 void Thumbnail::clicked()
 {
+    //  this needs to be Window-agnostic.
+    //  can we send messages without knowing the receiver?
     Window *w = (Window *) this->window();
     w->clickedThumb(m_pageNumber);
 }
