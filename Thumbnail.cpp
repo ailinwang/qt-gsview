@@ -33,9 +33,10 @@ void Thumbnail::paintEvent(QPaintEvent *event)
 
 void Thumbnail::clicked()
 {
-    Window *w = (Window *) m_window;
+    Window *w = (Window *) this->window();
     w->clickedThumb(m_pageNumber);
 }
+
 bool Thumbnail::selected() const
 {
     return m_selected;

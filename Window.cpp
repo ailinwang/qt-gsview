@@ -13,14 +13,14 @@ Window::Window(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Window)
 {
+    //  set up the UI
     ui->setupUi(this);
     setupToolbar();
 
-    QAbstractSlider *leftSlider= ui->leftScrollArea->verticalScrollBar();
-    connect(leftSlider,SIGNAL(sliderReleased()), this, SLOT(leftSliderReleased()));
-
-    //  hide the thumbnails to start
-    ui->leftScrollArea->hide();
+    //  create and set up he left-side scrolling area
+    m_thumbnails = new ScrollingImageList();
+    m_thumbnails->setScrollArea(ui->leftScrollArea);
+    m_thumbnails->hide();  //  initially hidden
 
     //  create and initialize the mu Document
     m_document = new Document();
@@ -81,7 +81,6 @@ void Window::setupToolbar()
     ui->toolBar->addSeparator();
 
     ui->toolBar->addAction(ui->actionThumbnails);
-
 }
 
 Window::~Window()
@@ -155,7 +154,6 @@ bool Window::handlePassword()
     }
 
     return true;
-
 }
 
 bool Window::OpenFile (QString path)
@@ -210,6 +208,8 @@ bool Window::OpenFile (QString path)
     //  set initial page number and count into the toolbar
     m_pageNumber->setText(QString::number(1));
     m_totalPages->setText(QString::number(nPages));
+
+    m_thumbnails->setDocument(m_document);
 
     return true;
 }
@@ -511,129 +511,18 @@ void Window::updateActions()
 {
 }
 
-void Window::renderVisibleThumbnailsSlot()
-{
-    renderVisibleThumbnails();
-}
+//void Window::hilightThumb (int nPage)
+//{
+////    if (!m_thumbnailsBuilt)
+////        return;
 
-void Window::leftSliderReleased()
-{
-    renderVisibleThumbnails();
-}
-
-void Window::renderVisibleThumbnails()
-{
-    int nPages = m_document->GetPageCount();
-
-    for (int i=0; i<nPages; i++)
-    {
-//        if (!m_thumbnailImages[i].rendered())
-        {
-            bool visible = !(m_thumbnailImages[i].visibleRegion().isEmpty());
-
-            if (visible)
-            {
-                if (!m_thumbnailImages[i].rendered())
-                {
-                    qDebug("rendering thumb %d", i);
-                    point_t pageSize = m_thumbnailImages[i].pageSize();
-
-                    //  render
-                    int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
-                    Byte *bitmap = new Byte[numBytes];
-                    m_document->RenderPage (i, m_thumbnailImages[i].scale(), bitmap, pageSize.X, pageSize.Y);
-
-                    //  copy to widget
-                    QImage *myImage = new QImage (bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
-                    QPixmap pix = QPixmap::fromImage(*myImage);
-                    QIcon icon(pix);
-                    m_thumbnailImages[i].setIcon(icon);
-                    m_thumbnailImages[i].setIconSize(pix.size());
-
-                    m_thumbnailImages[i].setRendered(true);
-
-                    delete myImage;
-                    delete bitmap;
-                }
-                else
-                {
-                    m_thumbnailImages[i].repaint();
-                }
-            }
-        }
-    }
-}
-
-void Window::buildThumbnails()
-{
-    if (!m_thumbnailsBuilt)
-    {
-        //  create an array of thumbnail images
-        int nPages = m_document->GetPageCount();
-        m_thumbnailImages = new Thumbnail[nPages]();
-
-        //  set up scrolling area
-        QWidget* contentWidget = ui->leftScrollAreaWidgetContents;
-        contentWidget->setLayout(new QVBoxLayout(contentWidget));
-        contentWidget->layout()->setContentsMargins(0,0,0,0);
-
-        //  find max width of the pages
-        int maxW = 0;
-        for (int i=0; i<nPages; i++)
-        {
-            point_t pageSize;
-            m_document->GetPageSize (i, 1.0, &pageSize);
-            int w = (int)pageSize.X;
-            if (w>maxW)
-                maxW = w;
-        }
-
-        //  calculate a scale factor based on the width of the left scroll area
-        double scaleThumbnail = 0.8 * double(ui->leftScrollArea->width())/double(maxW);
-
-        for (int i=0; i<nPages; i++)
-        {
-            point_t pageSize;
-            m_document->GetPageSize(i, scaleThumbnail, &pageSize);
-
-            m_thumbnailImages[i].setFixedWidth(pageSize.X);
-            m_thumbnailImages[i].setFixedHeight(pageSize.Y);
-            m_thumbnailImages[i].setFlat(true);
-
-            m_thumbnailImages[i].setPage(i);
-            m_thumbnailImages[i].setWindow(this);
-            m_thumbnailImages[i].setScale(scaleThumbnail);
-
-            m_thumbnailImages[i].setPageSize(pageSize);
-
-            contentWidget->layout()->addWidget(&(m_thumbnailImages[i]));
-        }
-
-        //  I don't like this because 200 msec seems arbitrary.
-        //  10 msec is too small.  There shuld be some sort of state
-        //  I can monitor, or event I can receive.
-        QTimer::singleShot(200, this, SLOT(renderVisibleThumbnailsSlot()));
-//        renderVisibleThumbnails();
-
-        m_thumbnailsBuilt = true;
-
-        //  hilight the current page
-        hilightThumb(m_currentPage);
-    }
-}
-
-void Window::hilightThumb(int nPage)
-{
-    if (!m_thumbnailsBuilt)
-        return;
-
-    int nPages = m_document->GetPageCount();
-    for (int i=0; i<nPages; i++)
-    {
-        Thumbnail *t = &(m_thumbnailImages[i]);
-        t->setSelected(i==nPage);
-    }
-}
+////    int nPages = m_document->GetPageCount();
+////    for (int i=0; i<nPages; i++)
+////    {
+////        Thumbnail *t = &(m_thumbnailImages[i]);
+////        t->setSelected(i==nPage);
+////    }
+//}
 
 void Window::clickedThumb (int nPage)
 {
@@ -653,7 +542,7 @@ void Window::goToPage(int nPage)
     m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
     m_pageNumber->setText(QString::number(m_currentPage+1));
 
-    hilightThumb(m_currentPage);
+    m_thumbnails->hilightImage(m_currentPage);
 }
 
 void Window::actionThumbnails()
@@ -668,7 +557,7 @@ void Window::actionThumbnails()
         ui->leftScrollArea->show();
         ui->actionThumbnails->setChecked(true);
 
-        buildThumbnails();
+        m_thumbnails->buildImages();
     }
 }
 
@@ -691,4 +580,3 @@ void Window::exitFullScreen()
     setWindowState(Qt::WindowNoState);
     ui->actionFull_Screen->setText(tr("Enter &Full Screen"));
 }
-

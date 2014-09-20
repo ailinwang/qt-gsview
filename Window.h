@@ -12,6 +12,7 @@ class Window;
 }
 
 #include "Document.h"
+#include "ScrollingImageList.h"
 #include "Thumbnail.h"
 
 QT_BEGIN_NAMESPACE
@@ -54,9 +55,9 @@ private slots:
     void quit();
     void actionThumbnails();
     void pageEditReturnPressed();
-    void renderVisibleThumbnailsSlot();
 
-    void leftSliderReleased();
+//    void renderVisibleThumbnailsSlot();
+//    void leftSliderReleased();
 
 private:
     Ui::Window *ui;
@@ -72,23 +73,19 @@ private:
 
     void exitFullScreen();
     bool handlePassword();
-    void buildThumbnails();
-    void hilightThumb(int nPage);
     void goToPage(int nPage);
-    void renderVisibleThumbnails();
 
     static int numWindows();
 
     QScrollArea *m_pageScrollArea = NULL;
-    QScrollArea *m_thumbScrollArea = NULL;
+
 
     //  array of page images
     double m_scalePage = 1.0;
     QLabel *m_pageImages = NULL;
 
-    //  array of thumbnail images
-    bool m_thumbnailsBuilt = false;
-    Thumbnail *m_thumbnailImages = NULL;
+    //  thumbnails
+    ScrollingImageList *m_thumbnails = NULL;
 
     //  current page
     int m_currentPage = 0;
