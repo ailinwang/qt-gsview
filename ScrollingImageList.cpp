@@ -5,6 +5,7 @@
 #include <QAbstractSlider>
 #include <QVBoxLayout>
 #include <QTimer>
+#include <QScrollBar>
 
 ScrollingImageList::ScrollingImageList(QObject *parent) :
     QObject(parent)
@@ -22,6 +23,7 @@ void ScrollingImageList::setScrollArea(QScrollArea *scrollArea)
 
     QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
     connect (slider, SIGNAL(sliderReleased()), this, SLOT(sliderReleasedSlot()));
+    connect (slider, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSlot(int)));
 }
 
 void ScrollingImageList::show()
@@ -35,6 +37,7 @@ void ScrollingImageList::hide()
     if (NULL != m_scrollArea)
         m_scrollArea->hide();
 }
+
 bool ScrollingImageList::imagesBuilt() const
 {
     return m_imagesBuilt;
@@ -58,19 +61,24 @@ void ScrollingImageList::buildImages()
         contentWidget->setLayout(new QVBoxLayout(contentWidget));
         contentWidget->layout()->setContentsMargins(0,0,0,0);
 
-        //  find max width of the pages
-        int maxW = 0;
-        for (int i=0; i<nPages; i++)
+        double theScale = m_scale;
+        if (theScale<0)
         {
-            point_t pageSize;
-            m_document->GetPageSize (i, 1.0, &pageSize);
-            int w = (int)pageSize.X;
-            if (w>maxW)
-                maxW = w;
-        }
+            //  calculate a scale factor based on the width of the left scroll area
 
-        //  calculate a scale factor based on the width of the left scroll area
-        double theScale = 0.8 * double(m_scrollArea->width())/double(maxW);
+            //  find max width of the pages
+            int maxW = 0;
+            for (int i=0; i<nPages; i++)
+            {
+                point_t pageSize;
+                m_document->GetPageSize (i, 1.0, &pageSize);
+                int w = (int)pageSize.X;
+                if (w>maxW)
+                    maxW = w;
+            }
+
+            theScale = 0.8 * double(m_scrollArea->width())/double(maxW);
+        }
 
         for (int i=0; i<nPages; i++)
         {
@@ -79,7 +87,6 @@ void ScrollingImageList::buildImages()
 
             m_images[i].setFixedWidth(pageSize.X);
             m_images[i].setFixedHeight(pageSize.Y);
-//            m_images[i].setFlat(true);  //  because it's a button/  don't like
             m_images[i].setPage(i);
             m_images[i].setScale(theScale);
             m_images[i].setPageSize(pageSize);
@@ -95,6 +102,35 @@ void ScrollingImageList::buildImages()
     }
 }
 
+void ScrollingImageList::zoom (double theScale, int nPage)
+{
+    if (theScale != m_scale)
+    {
+        //  set the new value
+        m_scale = theScale;
+
+        //  resize and clear  all the images and mark as not rendered
+        int nPages = m_document->GetPageCount();
+        for (int i=0; i<nPages; i++)
+        {
+            point_t pageSize;
+            m_document->GetPageSize(i, theScale, &pageSize);
+
+            m_images[i].setFixedWidth(pageSize.X);
+            m_images[i].setFixedHeight(pageSize.Y);
+            m_images[i].setScale(m_scale);
+            m_images[i].setPageSize(pageSize);
+            m_images[i].clear();
+            m_images[i].setRendered(false);
+        }
+
+        //  go to the given page and render visible.
+        goToPage(nPage);
+        QTimer::singleShot(200, this, SLOT(imagesBuiltSlot()));
+    }
+}
+
+
 void ScrollingImageList::imagesBuiltSlot()
 {
     //  draw the images that can be seen
@@ -107,6 +143,13 @@ void ScrollingImageList::imagesBuiltSlot()
 void ScrollingImageList::sliderReleasedSlot()
 {
     renderVisibleImages();
+}
+
+void ScrollingImageList::valueChangedSlot(int val)
+{
+    QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
+    if (!slider->isSliderDown())
+        renderVisibleImages();
 }
 
 void ScrollingImageList::renderVisibleImages()
@@ -132,6 +175,7 @@ void ScrollingImageList::renderVisibleImages()
                 QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
                 QPixmap pix = QPixmap::fromImage(*myImage);
                 m_images[i].setPixmap(pix);
+
                 m_images[i].setRendered(true);
 
                 delete myImage;
@@ -166,6 +210,16 @@ void ScrollingImageList::hilightImage(int nImage)
         ImageWidget *t = &(m_images[i]);
         t->setSelected(i==nImage);
     }
+}
+
+void ScrollingImageList::goToPage (int nPage)
+{
+    //  scroll to top of page
+    QRect r = m_images[nPage].geometry();
+    int scrollTo = r.top()-10;  //  so we see a little margin above
+    if (scrollTo<0)
+        scrollTo = 0;
+    m_scrollArea->verticalScrollBar()->setValue(scrollTo);
 }
 
 

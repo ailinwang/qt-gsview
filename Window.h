@@ -53,6 +53,7 @@ private slots:
     void actionThumbnails();
     void pageEditReturnPressed();
     void thumbnailsReady();
+    void pagesReady();
 
 private:
     Ui::Window *ui;
@@ -60,7 +61,6 @@ private:
 	void updateActions();
     void setupToolbar();
 
-    void drawPage(int pageNumber);
     void setInitialSizeAndPosition();
 
     void enterFullScreen();
@@ -69,9 +69,8 @@ private:
     void goToPage(int nPage);
 
     //  pages
-    QScrollArea *m_pageScrollArea = NULL;
     double m_scalePage = 1.0;
-    QLabel *m_pageImages = NULL;
+    ScrollingImageList *m_pages = NULL;
 
     //  thumbnails
     ScrollingImageList *m_thumbnails = NULL;

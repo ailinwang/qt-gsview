@@ -17,11 +17,16 @@ Window::Window(QWidget *parent) :
     ui->setupUi(this);
     setupToolbar();
 
-    //  create and set up he left-side scrolling area
+    //  create and set up the left-side scrolling area
     m_thumbnails = new ScrollingImageList();
     m_thumbnails->setScrollArea(ui->leftScrollArea);
     m_thumbnails->hide();  //  initially hidden
     connect(m_thumbnails, SIGNAL(imagesReady()), this, SLOT(thumbnailsReady()));
+
+    //  create and set up the right-side scrolling area
+    m_pages = new ScrollingImageList();
+    m_pages->setScrollArea(ui->rightScrollArea);
+    connect(m_pages, SIGNAL(imagesReady()), this, SLOT(pagesReady()));
 
     //  create and initialize the mu Document
     m_document = new Document();
@@ -181,46 +186,30 @@ bool Window::OpenFile (QString path)
     }
 
     //  set the name in this window
+    //  TODO: window title??
     setWindowFilePath (path);
 
     //  size and position
     setInitialSizeAndPosition();
 
+    //  ask for password if required
     if (!handlePassword())
         return false;
-
-    //  set up scrolling area
-    m_pageScrollArea = ui->rightScrollArea;
-    QWidget* contentWidget =ui->rightScrollAreaWidgetContents;
-    contentWidget->setLayout(new QVBoxLayout(contentWidget));
-    contentWidget->layout()->setContentsMargins(0,0,0,0);
-
-    //  create an array of page images
-    int nPages = m_document->GetPageCount();
-    m_pageImages = new QLabel[nPages]();
-
-    for (int i=0; i<nPages; i++)
-    {
-        point_t pageSize;
-        m_document->GetPageSize(i,m_scalePage, &pageSize);
-        m_pageImages[i].setFixedWidth(pageSize.X);
-        m_pageImages[i].setFixedHeight(pageSize.Y);
-
-        m_pageImages[i].setBackgroundRole(QPalette::Dark);
-        contentWidget->layout()->addWidget(&(m_pageImages[i]));
-        contentWidget->layout()->setContentsMargins(0,0,0,0);
-    }
-
-    //  draw first page
-    drawPage(0);
 
     updateActions();
 
     //  set initial page number and count into the toolbar
+    int nPages = m_document->GetPageCount();
     m_pageNumber->setText(QString::number(1));
     m_totalPages->setText(QString::number(nPages));
 
+    //  prepare thumbnails
     m_thumbnails->setDocument(m_document);
+
+    //  prepare pages
+    m_pages->setDocument(m_document);
+    m_pages->setScale(m_scalePage);
+    m_pages->buildImages();
 
     return true;
 }
@@ -238,30 +227,6 @@ void Window::setInitialSizeAndPosition()
     int top  = screenHeight/10;
     int left = screenWidth/10;
     setGeometry(left, top, width, height);
-}
-
-void Window::drawPage(int pageNumber)
-{
-    //  doc must be valid and open
-    if (m_document == NULL || !m_document->isOpen())
-        return;
-
-    //  compute page size
-    point_t pageSize;
-    m_document->GetPageSize(pageNumber,m_scalePage, &pageSize);
-    int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
-
-    //  render
-    Byte *bitmap = new Byte[numBytes];
-    m_document->RenderPage(pageNumber, m_scalePage, bitmap, pageSize.X, pageSize.Y);
-
-    //  copy to window
-    QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
-    m_pageImages[pageNumber].setPixmap(QPixmap::fromImage(*myImage));
-    m_pageImages[pageNumber].adjustSize();
-
-    delete myImage;
-    delete bitmap;
 }
 
 void Window::openAction()
@@ -464,17 +429,25 @@ void Window::print()
 
 void Window::zoomIn()
 {
-    QMessageBox::information (this, "", "zooming is not yet implemented.");
+    m_scalePage += 0.20;
+    if (m_scalePage>16)
+        m_scalePage = 16;
+    m_pages->zoom (m_scalePage, m_currentPage);
 }
 
 void Window::zoomOut()
 {
-    QMessageBox::information (this, "", "zooming is not yet implemented.");
+    m_scalePage -= 0.20;
+    if (m_scalePage<0.2)
+        m_scalePage = 0.2;
+
+    m_pages->zoom (m_scalePage, m_currentPage);
 }
 
 void Window::normalSize()
 {
-    QMessageBox::information (this, "", "zooming is not yet implemented.");
+    m_scalePage = 1.0;
+    m_pages->zoom (m_scalePage, m_currentPage);
 }
 
 void Window::pageUp()
@@ -536,19 +509,15 @@ void Window::thumbnailsReady()
     m_thumbnails->hilightImage(m_currentPage);
 }
 
+void Window::pagesReady()
+{
+}
+
 void Window::goToPage(int nPage)
 {
     m_currentPage = nPage;
-    drawPage (m_currentPage);
-
-    //  scroll to top of page
-    QRect r = m_pageImages[m_currentPage].geometry();
-    int scrollTo = r.top()-10;  //  so we see a little margin above
-    if (scrollTo<0)
-        scrollTo = 0;
-    m_pageScrollArea->verticalScrollBar()->setValue(scrollTo);
+    m_pages->goToPage (nPage);
     m_pageNumber->setText(QString::number(m_currentPage+1));
-
     m_thumbnails->hilightImage(m_currentPage);
 }
 

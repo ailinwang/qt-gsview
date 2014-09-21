@@ -31,10 +31,15 @@ public:
     void setDocument(Document *document);
 
     void hilightImage(int nImage);
+    void goToPage (int nPage);
+
+    void setScale(double scale) {m_scale=scale;}
+    void zoom(double scale, int nPage);
 
 public slots:
     void imagesBuiltSlot();
     void sliderReleasedSlot();
+    void valueChangedSlot(int val);
 
 signals:
     void imagesReady();
@@ -46,6 +51,7 @@ private:
     ImageWidget *m_images = NULL;
     bool m_imagesBuilt = false;
     Document *m_document = NULL;
+    double m_scale = -1;
 };
 
 #endif  //  SCROLLINGIMAGELIST_H
