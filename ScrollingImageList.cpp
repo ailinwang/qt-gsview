@@ -91,6 +91,8 @@ void ScrollingImageList::buildImages()
             m_images[i].setScale(theScale);
             m_images[i].setPageSize(pageSize);
 
+            m_images[i].setBackgroundRole(QPalette::Dark);
+
             contentWidget->layout()->addWidget(&(m_images[i]));
         }
 
@@ -122,6 +124,7 @@ void ScrollingImageList::zoom (double theScale, int nPage)
             m_images[i].setPageSize(pageSize);
             m_images[i].clear();
             m_images[i].setRendered(false);
+            m_images[i].setBackgroundRole(QPalette::Dark);
         }
 
         //  go to the given page and render visible.
