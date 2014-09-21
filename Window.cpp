@@ -519,8 +519,11 @@ void Window::goToPage(int nPage)
 {
     m_currentPage = nPage;
     m_pages->goToPage (nPage);
+
+    m_thumbnails->hilightImage(nPage);
+    m_thumbnails->goToPage(nPage);
+
     m_pageNumber->setText(QString::number(m_currentPage+1));
-    m_thumbnails->hilightImage(m_currentPage);
 }
 
 void Window::actionThumbnails()

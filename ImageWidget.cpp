@@ -43,8 +43,17 @@ void ImageWidget::setSelected(bool isSelected)
     m_selected = isSelected;
 }
 
+QString eventTypeName(QEvent *event)
+{
+    static int eventEnumIndex = QEvent::staticMetaObject.indexOfEnumerator("Type");
+    QString name = QEvent::staticMetaObject.enumerator(eventEnumIndex).valueToKey(event->type());
+    return name;
+}
+
 bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
 {
+//    qDebug("ImageWidget event %s page %d", eventTypeName(event).toStdString().c_str(), m_pageNumber);
+
     switch( event->type() )
     {
         case QEvent::MouseButtonRelease:
@@ -59,6 +68,11 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
             }
             break;
 
+        case QEvent::Resize:
+        {
+
+        }
+
         default:
             break;
     }
@@ -66,4 +80,3 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
     // pass the event on to the parent class
     return QLabel::eventFilter(obj, event);
 }
-

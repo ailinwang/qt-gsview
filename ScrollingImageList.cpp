@@ -215,6 +215,11 @@ void ScrollingImageList::hilightImage(int nImage)
 
 void ScrollingImageList::goToPage (int nPage)
 {
+    //  if the current page is in view, do nothing.
+    bool visible = !(m_images[nPage].visibleRegion().isEmpty());
+    if (visible)
+        return;
+
     //  scroll to top of page
     QRect r = m_images[nPage].geometry();
     int scrollTo = r.top()-10;  //  so we see a little margin above
