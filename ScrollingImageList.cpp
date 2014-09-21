@@ -30,6 +30,14 @@ void ScrollingImageList::show()
 {
     if (NULL != m_scrollArea)
         m_scrollArea->show();
+
+    bool wasShown = m_shown;
+    m_shown = true;
+
+    if (wasShown)
+    {
+        delayedRender();
+    }
 }
 
 void ScrollingImageList::hide()
@@ -97,7 +105,7 @@ void ScrollingImageList::buildImages()
         }
 
         setImagesBuilt(true);
-        firstRender();
+        delayedRender();
     }
 }
 
@@ -126,7 +134,7 @@ void ScrollingImageList::zoom (double theScale, int nPage)
 
         //  go to the given page and render visible.
         goToPage(nPage);
-        firstRender();
+        delayedRender();
     }
 }
 
@@ -172,7 +180,7 @@ void ScrollingImageList::renderImage(int i)
     delete bitmap;
 }
 
-void ScrollingImageList::firstRender()
+void ScrollingImageList::delayedRender()
 {
     //  TODO:  something smarter
     QTimer::singleShot(200, this, SLOT(imagesBuiltSlot()));
@@ -228,6 +236,9 @@ bool ScrollingImageList::isImageVisible(int nPage)
 
 void ScrollingImageList::goToPage (int nPage, bool evenIfVisible)
 {
+    if (!imagesBuilt())
+        return;
+
     //  if the current page is in view, do nothing.
     if (!evenIfVisible && isImageVisible(nPage))
         return;

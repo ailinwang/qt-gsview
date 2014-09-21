@@ -509,6 +509,7 @@ void Window::thumbnailsReady()
 {
     //  hilight the current page
     m_thumbnails->hilightImage(m_currentPage);
+    m_thumbnails->goToPage(m_currentPage);
 }
 
 void Window::pagesReady()
@@ -530,12 +531,12 @@ void Window::actionThumbnails()
 {
     if (ui->leftScrollArea->isVisible())
     {
-        ui->leftScrollArea->hide();
+        m_thumbnails->hide();
         ui->actionThumbnails->setChecked(false);
     }
     else
     {
-        ui->leftScrollArea->show();
+        m_thumbnails->show();
         ui->actionThumbnails->setChecked(true);
         m_thumbnails->buildImages();
     }

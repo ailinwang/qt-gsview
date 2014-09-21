@@ -52,26 +52,18 @@ QString eventTypeName(QEvent *event)
 
 bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
 {
-//    qDebug("ImageWidget event %s page %d", eventTypeName(event).toStdString().c_str(), m_pageNumber);
-
     switch( event->type() )
     {
         case QEvent::MouseButtonRelease:
             if (clickable())
             {
-                qDebug("clicked page %d", m_pageNumber);
                 QApplication::postEvent(this->window(), new ImageClickedEvent(m_pageNumber));
             }
             else
             {
-                qDebug("not clickable  page %d", m_pageNumber);
+
             }
             break;
-
-        case QEvent::Resize:
-        {
-
-        }
 
         default:
             break;

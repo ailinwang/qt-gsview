@@ -50,7 +50,7 @@ signals:
 private:
     void renderVisibleImages();
     void renderImage(int index);
-    void firstRender();
+    void delayedRender();
     bool isImageVisible(int nPage);
 
     QScrollArea *m_scrollArea = NULL;
@@ -59,6 +59,7 @@ private:
     Document *m_document = NULL;
     double m_scale = -1;
     bool m_clickable = false;
+    bool m_shown = false;
 };
 
 #endif  //  SCROLLINGIMAGELIST_H
