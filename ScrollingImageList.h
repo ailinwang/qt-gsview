@@ -25,16 +25,19 @@ public:
     bool imagesBuilt() const;
     void setImagesBuilt(bool imagesBuilt);
 
-    void buildImages();
-
-    Document *document() const;
-    void setDocument(Document *document);
+    Document *document() const {return m_document;}
+    void setDocument(Document *document) {m_document = document;}
 
     void hilightImage(int nImage);
     void goToPage (int nPage);
 
     void setScale(double scale) {m_scale=scale;}
     void zoom(double scale, int nPage);
+
+    bool clickable() const {return m_clickable;}
+    void setClickable(bool val) {m_clickable = val;}
+
+    void buildImages();
 
 public slots:
     void imagesBuiltSlot();
@@ -46,12 +49,15 @@ signals:
 
 private:
     void renderVisibleImages();
+    void renderImage(int index);
+    void firstRender();
 
     QScrollArea *m_scrollArea = NULL;
     ImageWidget *m_images = NULL;
     bool m_imagesBuilt = false;
     Document *m_document = NULL;
     double m_scale = -1;
+    bool m_clickable = false;
 };
 
 #endif  //  SCROLLINGIMAGELIST_H

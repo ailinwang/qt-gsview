@@ -90,17 +90,14 @@ void ScrollingImageList::buildImages()
             m_images[i].setPage(i);
             m_images[i].setScale(theScale);
             m_images[i].setPageSize(pageSize);
-
             m_images[i].setBackgroundRole(QPalette::Dark);
+            m_images[i].setClickable(clickable());
 
             contentWidget->layout()->addWidget(&(m_images[i]));
         }
 
-        //  I don't like this because 200 msec seems arbitrary.
-        //  10 msec is too small.  There should be some sort of state
-        //  I can monitor, or event I can receive.
-        QTimer::singleShot(200, this, SLOT(imagesBuiltSlot()));
         setImagesBuilt(true);
+        firstRender();
     }
 }
 
@@ -129,7 +126,7 @@ void ScrollingImageList::zoom (double theScale, int nPage)
 
         //  go to the given page and render visible.
         goToPage(nPage);
-        QTimer::singleShot(200, this, SLOT(imagesBuiltSlot()));
+        firstRender();
     }
 }
 
@@ -155,6 +152,32 @@ void ScrollingImageList::valueChangedSlot(int val)
         renderVisibleImages();
 }
 
+void ScrollingImageList::renderImage(int i)
+{
+    point_t pageSize = m_images[i].pageSize();
+
+    //  render
+    int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
+    Byte *bitmap = new Byte[numBytes];
+    m_document->RenderPage (i, m_images[i].scale(), bitmap, pageSize.X, pageSize.Y);
+
+    //  copy to widget
+    QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
+    QPixmap pix = QPixmap::fromImage(*myImage);
+    m_images[i].setPixmap(pix);
+
+    m_images[i].setRendered(true);
+
+    delete myImage;
+    delete bitmap;
+}
+
+void ScrollingImageList::firstRender()
+{
+    //  TODO:  something smarter
+    QTimer::singleShot(200, this, SLOT(imagesBuiltSlot()));
+}
+
 void ScrollingImageList::renderVisibleImages()
 {
     int nPages = m_document->GetPageCount();
@@ -167,22 +190,7 @@ void ScrollingImageList::renderVisibleImages()
         {
             if (!m_images[i].rendered())
             {
-                point_t pageSize = m_images[i].pageSize();
-
-                //  render
-                int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
-                Byte *bitmap = new Byte[numBytes];
-                m_document->RenderPage (i, m_images[i].scale(), bitmap, pageSize.X, pageSize.Y);
-
-                //  copy to widget
-                QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
-                QPixmap pix = QPixmap::fromImage(*myImage);
-                m_images[i].setPixmap(pix);
-
-                m_images[i].setRendered(true);
-
-                delete myImage;
-                delete bitmap;
+                renderImage(i);
             }
             else
             {
@@ -190,16 +198,6 @@ void ScrollingImageList::renderVisibleImages()
             }
         }
     }
-}
-
-Document *ScrollingImageList::document() const
-{
-    return m_document;
-}
-
-void ScrollingImageList::setDocument(Document *document)
-{
-    m_document = document;
 }
 
 void ScrollingImageList::hilightImage(int nImage)

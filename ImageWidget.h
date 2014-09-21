@@ -40,6 +40,9 @@ public:
     bool selected() const {return m_selected;}
     void setSelected(bool selected);
 
+    bool clickable() const {return m_clickable;}
+    void setClickable(bool val) {m_clickable = val;}
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -50,6 +53,7 @@ private:
     double m_scale = 1.0;
     point_t m_pageSize;
     bool m_selected = false;
+    bool m_clickable = false;
 };
 
 #endif // IMAGEWIDGET_H

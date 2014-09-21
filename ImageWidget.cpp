@@ -48,7 +48,15 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
     switch( event->type() )
     {
         case QEvent::MouseButtonRelease:
-            QApplication::postEvent(this->window(), new ImageClickedEvent(m_pageNumber));
+            if (clickable())
+            {
+                qDebug("clicked page %d", m_pageNumber);
+                QApplication::postEvent(this->window(), new ImageClickedEvent(m_pageNumber));
+            }
+            else
+            {
+                qDebug("not clickable  page %d", m_pageNumber);
+            }
             break;
 
         default:
