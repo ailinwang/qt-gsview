@@ -184,9 +184,7 @@ void ScrollingImageList::renderVisibleImages()
 
     for (int i=0; i<nPages; i++)
     {
-        bool visible = !(m_images[i].visibleRegion().isEmpty());
-
-        if (visible)
+        if (isImageVisible(i))
         {
             if (!m_images[i].rendered())
             {
@@ -213,11 +211,25 @@ void ScrollingImageList::hilightImage(int nImage)
     }
 }
 
-void ScrollingImageList::goToPage (int nPage)
+bool ScrollingImageList::isImageVisible(int nPage)
+{
+    QRegion visibleRegion = m_images[nPage].visibleRegion();
+
+    if (visibleRegion.isEmpty())
+        return false;
+
+    QRect rect = visibleRegion.boundingRect();
+
+    if (rect.height() < m_images[nPage].height()*0.20)
+        return false;
+
+    return true;
+}
+
+void ScrollingImageList::goToPage (int nPage, bool evenIfVisible)
 {
     //  if the current page is in view, do nothing.
-    bool visible = !(m_images[nPage].visibleRegion().isEmpty());
-    if (visible)
+    if (!evenIfVisible && isImageVisible(nPage))
         return;
 
     //  scroll to top of page

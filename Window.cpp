@@ -271,7 +271,7 @@ void Window::open()
 
     //  INFO: It's hard to debug in the Qt IDE when we use the native
     //  file dialog.
-    dialog.setOption(QFileDialog::DontUseNativeDialog, false);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
 
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz)"));
@@ -518,7 +518,7 @@ void Window::pagesReady()
 void Window::goToPage(int nPage)
 {
     m_currentPage = nPage;
-    m_pages->goToPage (nPage);
+    m_pages->goToPage (nPage, true);
 
     m_thumbnails->hilightImage(nPage);
     m_thumbnails->goToPage(nPage);

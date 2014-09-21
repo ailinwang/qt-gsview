@@ -29,7 +29,7 @@ public:
     void setDocument(Document *document) {m_document = document;}
 
     void hilightImage(int nImage);
-    void goToPage (int nPage);
+    void goToPage (int nPage, bool evenIfVisible=false);
 
     void setScale(double scale) {m_scale=scale;}
     void zoom(double scale, int nPage);
@@ -51,6 +51,7 @@ private:
     void renderVisibleImages();
     void renderImage(int index);
     void firstRender();
+    bool isImageVisible(int nPage);
 
     QScrollArea *m_scrollArea = NULL;
     ImageWidget *m_images = NULL;
