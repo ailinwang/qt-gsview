@@ -87,6 +87,7 @@ void Window::setupToolbar()
     ui->toolBar->addAction(ui->actionZoom_In);
     ui->toolBar->addAction(ui->actionZoom_Out);
     ui->toolBar->addAction(ui->actionZoom_Normal);
+    ui->toolBar->addAction(ui->actionFull_Screen);
 
     ui->toolBar->addSeparator();
 
