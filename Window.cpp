@@ -535,16 +535,16 @@ void Window::toggleAnnotations()
     if (m_showAnnotations)
     {
         m_showAnnotations = false;
-        m_pages->annot (m_showAnnotations, m_currentPage);
+        m_pages->annot (m_showAnnotations);
         if (ui->leftScrollArea->isVisible())
-            m_thumbnails->annot (m_showAnnotations, m_currentPage);
+            m_thumbnails->annot (m_showAnnotations);
     }
     else
     {
         m_showAnnotations = true;
-        m_pages->annot (m_showAnnotations, m_currentPage);
+        m_pages->annot (m_showAnnotations);
         if (ui->leftScrollArea->isVisible())
-            m_thumbnails->annot (m_showAnnotations, m_currentPage);
+            m_thumbnails->annot (m_showAnnotations);
     }
 }
 

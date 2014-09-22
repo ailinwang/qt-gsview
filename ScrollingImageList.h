@@ -33,7 +33,7 @@ public:
 
     void setScale(double scale) {m_scale=scale;}
     void zoom (double scale, int nPage);
-    void annot (bool showAnnotations, int nPage);
+    void annot (bool showAnnotations);
 
     bool clickable() const {return m_clickable;}
     void setClickable(bool val) {m_clickable = val;}

@@ -109,11 +109,17 @@ void ScrollingImageList::buildImages()
     }
 }
 
-void ScrollingImageList::annot (bool showAnnotations, int nPage)
+void ScrollingImageList::annot (bool showAnnotations)
 {
     m_showAnnotations = showAnnotations;
 
-    rebuild (nPage);
+    //  just re-render any images that are currently rendered
+    int nPages = m_document->GetPageCount();
+    for (int i=0; i<nPages; i++)
+    {
+        if (m_images[i].rendered())
+            renderImage(i);
+    }
 }
 
 void ScrollingImageList::rebuild (int nPage)
