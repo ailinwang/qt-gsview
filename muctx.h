@@ -109,9 +109,14 @@ public:
 	void CleanUp(void);
 	int GetPageCount();
 	status_t InitializeContext();
-	status_t RenderPage(int page_num, unsigned char *bmp_data, int bmp_width, 
-						int bmp_height, float scale, bool flipy);
-	status_t RenderPageMT(void *dlist, void *a_dlist, int page_width, int page_height,
+
+    status_t RenderPage(int page_num, unsigned char *bmp_data, int bmp_width,
+                        int bmp_height, float scale, bool flipy);
+
+    status_t RenderPage(int page_num, unsigned char *bmp_data, int bmp_width,
+                        int bmp_height, float scale, bool flipy, bool includeAnnotations);
+
+    status_t RenderPageMT(void *dlist, void *a_dlist, int page_width, int page_height,
 							unsigned char *bmp_data, int bmp_width, int bmp_height,
 							float scale, bool flipy, bool tile, point_t top_left,
 							point_t bottom_right);

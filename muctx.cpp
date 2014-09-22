@@ -697,8 +697,14 @@ status_t muctx::RenderPageMT(void *dlist, void *a_dlist, int page_width, int pag
 }
 
 /* Render page_num to size width by height into bmp_data buffer.  Lock needed. */
-status_t muctx::RenderPage(int page_num, unsigned char *bmp_data, int bmp_width, 
-						   int bmp_height, float scale, bool flipy)
+status_t muctx::RenderPage(int page_num, unsigned char *bmp_data, int bmp_width,
+                           int bmp_height, float scale, bool flipy)
+{
+    return RenderPage(page_num, bmp_data, bmp_width, bmp_height, scale, flipy, true);
+}
+
+status_t muctx::RenderPage(int page_num, unsigned char *bmp_data, int bmp_width,
+                           int bmp_height, float scale, bool flipy, bool includeAnnotations)
 {
 	fz_device *dev = NULL;
 	fz_pixmap *pix = NULL;
@@ -725,11 +731,16 @@ status_t muctx::RenderPage(int page_num, unsigned char *bmp_data, int bmp_width,
 										bmp_height, bmp_data);
 		fz_clear_pixmap_with_value(mu_ctx, pix, 255);
 		dev = fz_new_draw_device(mu_ctx, pix);
-		fz_run_page(mu_doc, page, dev, pctm, NULL);
+//		fz_run_page(mu_doc, page, dev, pctm, NULL);
+        fz_run_page_contents(mu_doc, page, dev, pctm, NULL);
 
-		fz_annot *annot;
-		for (annot = fz_first_annot(mu_doc, page); annot; annot = fz_next_annot(mu_doc, annot))
-			fz_run_annot(mu_doc, page, annot, dev, &fz_identity, NULL);
+        if (includeAnnotations)
+        {
+            fz_annot *annot;
+            for (annot = fz_first_annot(mu_doc, page); annot; annot = fz_next_annot(mu_doc, annot))
+//                fz_run_annot(mu_doc, page, annot, dev, &fz_identity, NULL);
+                  fz_run_annot(mu_doc, page, annot, dev, pctm, NULL);
+        }
 	}
 	fz_always(mu_ctx)
 	{

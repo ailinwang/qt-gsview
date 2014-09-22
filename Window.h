@@ -54,6 +54,7 @@ private slots:
     void pageEditReturnPressed();
     void thumbnailsReady();
     void pagesReady();
+    void toggleAnnotations();
 
 private:
     Ui::Window *ui;
@@ -90,6 +91,8 @@ private:
     static int numWindows() {return m_numWindows;}
     static void countWindowUp() {m_numWindows++;}
     static void countWindowDown() {if (m_numWindows>0) m_numWindows--;}
+
+    bool m_showAnnotations = true;
 };
 
 #endif  //  WINDOW_H

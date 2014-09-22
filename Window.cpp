@@ -52,6 +52,7 @@ Window::Window(QWidget *parent) :
 
     connect(ui->actionThumbnails, SIGNAL(triggered()), this, SLOT(actionThumbnails()));
     connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
+    connect(ui->actionAnnotations, SIGNAL(triggered()), this, SLOT(toggleAnnotations()));
 
     //  help menu
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
@@ -92,6 +93,7 @@ void Window::setupToolbar()
     ui->toolBar->addSeparator();
 
     ui->toolBar->addAction(ui->actionThumbnails);
+    ui->toolBar->addAction(ui->actionAnnotations);
 }
 
 Window::~Window()
@@ -396,7 +398,7 @@ void Window::print()
         //  render a bitmap
         int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
         Byte *bitmap = new Byte[numBytes];
-        m_document->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y);
+        m_document->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y, m_showAnnotations);
 
         //  copy to printer
         QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
@@ -526,6 +528,24 @@ void Window::goToPage(int nPage)
     m_thumbnails->goToPage(nPage);
 
     m_pageNumber->setText(QString::number(m_currentPage+1));
+}
+
+void Window::toggleAnnotations()
+{
+    if (m_showAnnotations)
+    {
+        m_showAnnotations = false;
+        m_pages->annot (m_showAnnotations, m_currentPage);
+        if (ui->leftScrollArea->isVisible())
+            m_thumbnails->annot (m_showAnnotations, m_currentPage);
+    }
+    else
+    {
+        m_showAnnotations = true;
+        m_pages->annot (m_showAnnotations, m_currentPage);
+        if (ui->leftScrollArea->isVisible())
+            m_thumbnails->annot (m_showAnnotations, m_currentPage);
+    }
 }
 
 void Window::actionThumbnails()

@@ -109,6 +109,36 @@ void ScrollingImageList::buildImages()
     }
 }
 
+void ScrollingImageList::annot (bool showAnnotations, int nPage)
+{
+    m_showAnnotations = showAnnotations;
+
+    rebuild (nPage);
+}
+
+void ScrollingImageList::rebuild (int nPage)
+{
+    //  resize and clear  all the images and mark as not rendered
+    int nPages = m_document->GetPageCount();
+    for (int i=0; i<nPages; i++)
+    {
+        point_t pageSize;
+        m_document->GetPageSize(i, m_scale, &pageSize);
+
+        m_images[i].setFixedWidth(pageSize.X);
+        m_images[i].setFixedHeight(pageSize.Y);
+        m_images[i].setScale(m_scale);
+        m_images[i].setPageSize(pageSize);
+        m_images[i].clear();
+        m_images[i].setRendered(false);
+        m_images[i].setBackgroundRole(QPalette::Dark);
+    }
+
+    //  go to the given page and render visible.
+    goToPage(nPage);
+    delayedRender();
+}
+
 void ScrollingImageList::zoom (double theScale, int nPage)
 {
     if (theScale != m_scale)
@@ -116,25 +146,8 @@ void ScrollingImageList::zoom (double theScale, int nPage)
         //  set the new value
         m_scale = theScale;
 
-        //  resize and clear  all the images and mark as not rendered
-        int nPages = m_document->GetPageCount();
-        for (int i=0; i<nPages; i++)
-        {
-            point_t pageSize;
-            m_document->GetPageSize(i, theScale, &pageSize);
-
-            m_images[i].setFixedWidth(pageSize.X);
-            m_images[i].setFixedHeight(pageSize.Y);
-            m_images[i].setScale(m_scale);
-            m_images[i].setPageSize(pageSize);
-            m_images[i].clear();
-            m_images[i].setRendered(false);
-            m_images[i].setBackgroundRole(QPalette::Dark);
-        }
-
-        //  go to the given page and render visible.
-        goToPage(nPage);
-        delayedRender();
+        //  do the rebuild
+        rebuild (nPage);
     }
 }
 
@@ -167,7 +180,7 @@ void ScrollingImageList::renderImage(int i)
     //  render
     int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
     Byte *bitmap = new Byte[numBytes];
-    m_document->RenderPage (i, m_images[i].scale(), bitmap, pageSize.X, pageSize.Y);
+    m_document->RenderPage (i, m_images[i].scale(), bitmap, pageSize.X, pageSize.Y, m_showAnnotations);
 
     //  copy to widget
     QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);

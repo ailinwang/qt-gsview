@@ -32,7 +32,8 @@ public:
     void goToPage (int nPage, bool evenIfVisible=false);
 
     void setScale(double scale) {m_scale=scale;}
-    void zoom(double scale, int nPage);
+    void zoom (double scale, int nPage);
+    void annot (bool showAnnotations, int nPage);
 
     bool clickable() const {return m_clickable;}
     void setClickable(bool val) {m_clickable = val;}
@@ -52,6 +53,7 @@ private:
     void renderImage(int index);
     void delayedRender();
     bool isImageVisible(int nPage);
+    void rebuild (int nPage);
 
     QScrollArea *m_scrollArea = NULL;
     ImageWidget *m_images = NULL;
@@ -60,6 +62,7 @@ private:
     double m_scale = -1;
     bool m_clickable = false;
     bool m_shown = false;
+    bool m_showAnnotations = true;
 };
 
 #endif  //  SCROLLINGIMAGELIST_H

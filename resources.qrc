@@ -10,5 +10,6 @@
         <file>resources/zoom_out.png</file>
         <file>resources/thumb.png</file>
         <file>resources/ExpandFill48.png</file>
+        <file>resources/pencil.png</file>
     </qresource>
 </RCC>
