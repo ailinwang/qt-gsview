@@ -10,8 +10,9 @@ class Window;
 }
 
 #include "Document.h"
-#include "ScrollingImageList.h"
 #include "ImageWidget.h"
+#include "PageList.h"
+#include "ThumbnailList.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -71,13 +72,14 @@ private:
     void exitFullScreen();
     bool handlePassword();
     void goToPage(int nPage);
+    void zoom(double scale);
 
     //  pages
     double m_scalePage = 1.0;
-    ScrollingImageList *m_pages = NULL;
+    PageList *m_pages = NULL;
 
     //  thumbnails
-    ScrollingImageList *m_thumbnails = NULL;
+    ThumbnailList *m_thumbnails = NULL;
 
     //  current page
     int m_currentPage = 0;
@@ -99,7 +101,7 @@ private:
     bool m_showAnnotations = true;
 
     const double m_minScale = 0.05;
-    const double m_maxScale = 16;
+    const double m_maxScale = 5;
     const double m_zoomInc  = 0.25;
 };
 

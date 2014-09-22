@@ -56,6 +56,11 @@ void ScrollingImageList::setImagesBuilt(bool imagesBuilt)
     m_imagesBuilt = imagesBuilt;
 }
 
+double ScrollingImageList::getScale()
+{
+    return m_scale;
+}
+
 void ScrollingImageList::buildImages()
 {
     if (!imagesBuilt())
@@ -69,24 +74,8 @@ void ScrollingImageList::buildImages()
         contentWidget->setLayout(new QVBoxLayout(contentWidget));
         contentWidget->layout()->setContentsMargins(0,0,0,0);
 
-        double theScale = m_scale;
-        if (theScale<0)
-        {
-            //  calculate a scale factor based on the width of the left scroll area
-
-            //  find max width of the pages
-            int maxW = 0;
-            for (int i=0; i<nPages; i++)
-            {
-                point_t pageSize;
-                m_document->GetPageSize (i, 1.0, &pageSize);
-                int w = (int)pageSize.X;
-                if (w>maxW)
-                    maxW = w;
-            }
-
-            theScale = 0.8 * double(m_scrollArea->width())/double(maxW);
-        }
+        double theScale = getScale();
+        setScale(theScale);
 
         for (int i=0; i<nPages; i++)
         {

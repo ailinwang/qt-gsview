@@ -18,14 +18,14 @@ Window::Window(QWidget *parent) :
     setupToolbar();
 
     //  create and set up the left-side scrolling area
-    m_thumbnails = new ScrollingImageList();
+    m_thumbnails = new ThumbnailList();
     m_thumbnails->setScrollArea(ui->leftScrollArea);
     m_thumbnails->setClickable(true);
     m_thumbnails->hide();  //  initially hidden
     connect(m_thumbnails, SIGNAL(imagesReady()), this, SLOT(thumbnailsReady()));
 
     //  create and set up the right-side scrolling area
-    m_pages = new ScrollingImageList();
+    m_pages = new PageList();
     m_pages->setScrollArea(ui->rightScrollArea);
     m_pages->setClickable(false);
     connect(m_pages, SIGNAL(imagesReady()), this, SLOT(pagesReady()));
@@ -485,30 +485,31 @@ void Window::print()
 
 void Window::zoomIn()
 {
-    m_scalePage += m_zoomInc;
-    if (m_scalePage > m_maxScale)
-        m_scalePage = m_maxScale;
-
-    m_pages->zoom (m_scalePage, m_currentPage);
-    m_percentage->setText(QString::number((int)(100*m_scalePage)));
+    zoom(m_scalePage+m_zoomInc);
 }
 
 void Window::zoomOut()
 {
-    m_scalePage -= m_zoomInc;
+    zoom(m_scalePage-m_zoomInc);
+}
+
+void Window::normalSize()
+{
+    zoom (1.0);
+}
+
+void Window::zoom (double newScale)
+{
+    m_scalePage = newScale;
+
+    if (m_scalePage > m_maxScale)
+        m_scalePage = m_maxScale;
+
     if (m_scalePage < m_minScale)
         m_scalePage = m_minScale;
 
     m_pages->zoom (m_scalePage, m_currentPage);
     m_percentage->setText(QString::number((int)(100*m_scalePage)));
-}
-
-void Window::normalSize()
-{
-    m_scalePage = 1.0;
-    m_pages->zoom (m_scalePage, m_currentPage);
-    m_percentage->setText(QString::number((int)(100*m_scalePage)));
-
 }
 
 void Window::pageUp()
