@@ -24,7 +24,7 @@ void Printer::printFinish()
     //  release options
     cupsFreeOptions(num_options, options);
 
-    QMessageBox::information(m_window, "", "Printing is done!.");
+    QMessageBox::information(m_window, "", "Printing is complete.");
 }
 
 void Printer::monitor()
