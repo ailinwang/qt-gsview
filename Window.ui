@@ -212,6 +212,10 @@
    </property>
   </action>
   <action name="actionClose">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/Close.png</normaloff>:/new/prefix1/resources/Close.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Close</string>
    </property>

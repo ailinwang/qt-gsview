@@ -15,5 +15,7 @@
         <file>resources/end.png</file>
         <file>resources/home.png</file>
         <file>resources/forward.png</file>
+        <file>resources/Close.png</file>
+        <file>resources/gsview_app.icns</file>
     </qresource>
 </RCC>
