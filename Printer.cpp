@@ -3,7 +3,6 @@
 #include "Document.h"
 #include "QtUtil.h"
 
-#include <QtWidgets>
 #include <QApplication>
 #include <QPrinter>
 #include <QPrintDialog>
