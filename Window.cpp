@@ -75,8 +75,10 @@ void Window::setupToolbar()
 
     ui->toolBar->addSeparator();
 
+    ui->toolBar->addAction(ui->actionHome);
     ui->toolBar->addAction(ui->actionPage_Up);
     ui->toolBar->addAction(ui->actionPage_Down);
+    ui->toolBar->addAction(ui->actionEnd);
     m_pageNumber = new QLineEdit();
     m_pageNumber->setMaximumWidth(30);
     connect ( m_pageNumber, SIGNAL(returnPressed()), SLOT(pageEditReturnPressed()));
@@ -193,9 +195,8 @@ bool Window::OpenFile (QString path)
         return false;
     }
 
-    //  set the name in this window
-    //  TODO: window title??
-    setWindowFilePath (path);
+    //  set the window title
+    this->setWindowTitle(path);
 
     //  size and position
     setInitialSizeAndPosition();
@@ -224,9 +225,7 @@ bool Window::OpenFile (QString path)
 
 void Window::setInitialSizeAndPosition()
 {
-    //  TODO: stagger windows when they open
-
-    //  size and center
+    //  calculate size and center
     QDesktopWidget desktop;
     int screenWidth  = desktop.screen()->width();
     int screenHeight = desktop.screen()->height();
@@ -234,6 +233,18 @@ void Window::setInitialSizeAndPosition()
     int height = screenHeight*4/5;
     int top  = screenHeight/10;
     int left = screenWidth/10;
+
+    //  add/subtract random amounts to left and top
+
+    int high = left+50;
+    int low = left-50;
+    left = qrand() % ((high + 1) - low) + low;
+
+    high = top+50;
+    low = top-50;
+    top = qrand() % ((high + 1) - low) + low;
+
+    //  move it!
     setGeometry(left, top, width, height);
 }
 

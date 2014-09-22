@@ -11,5 +11,9 @@
         <file>resources/thumb.png</file>
         <file>resources/ExpandFill48.png</file>
         <file>resources/pencil.png</file>
+        <file>resources/back.png</file>
+        <file>resources/end.png</file>
+        <file>resources/home.png</file>
+        <file>resources/forward.png</file>
     </qresource>
 </RCC>

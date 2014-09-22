@@ -230,7 +230,7 @@
   <action name="actionPage_Down">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/new/prefix1/resources/Right.png</normaloff>:/new/prefix1/resources/Right.png</iconset>
+     <normaloff>:/new/prefix1/resources/forward.png</normaloff>:/new/prefix1/resources/forward.png</iconset>
    </property>
    <property name="text">
     <string>Page Down</string>
@@ -242,7 +242,7 @@
   <action name="actionPage_Up">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/new/prefix1/resources/Left.png</normaloff>:/new/prefix1/resources/Left.png</iconset>
+     <normaloff>:/new/prefix1/resources/back.png</normaloff>:/new/prefix1/resources/back.png</iconset>
    </property>
    <property name="text">
     <string>Page Up</string>
@@ -252,11 +252,19 @@
    </property>
   </action>
   <action name="actionHome">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/home.png</normaloff>:/new/prefix1/resources/home.png</iconset>
+   </property>
    <property name="text">
     <string>Home</string>
    </property>
   </action>
   <action name="actionEnd">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/end.png</normaloff>:/new/prefix1/resources/end.png</iconset>
+   </property>
    <property name="text">
     <string>End</string>
    </property>
