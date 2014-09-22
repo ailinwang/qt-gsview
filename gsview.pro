@@ -54,7 +54,7 @@ SOURCES       = \
 
 unix: LIBS += -L$$PWD/../../build/debug/
 #  the order of the libraries here is very important.
-unix: LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
+unix: LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs -lcups
 
 macx: LIBS += -lssl -lcrypto
 

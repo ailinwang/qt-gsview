@@ -2,7 +2,6 @@
 #include <QtWidgets>
 #include <QAbstractScrollArea>
 #include <QAction>
-//#include <QPrintDialog>
 
 #include "Window.h"
 #include "Printer.h"
@@ -169,6 +168,14 @@ void Window::keyPressEvent(QKeyEvent* event)
 {
     switch (event->key())
     {
+    case Qt::Key_Home:
+        homeSlot();
+        break;
+
+    case Qt::Key_End:
+        endSlot();
+        break;
+
     case Qt::Key_PageDown:
         pageDown();
         break;
@@ -230,6 +237,7 @@ bool Window::OpenFile (QString path)
 
     //  set the window title
     this->setWindowTitle(path);
+    m_path = path;
 
     //  size and position
     setInitialSizeAndPosition();
@@ -382,8 +390,9 @@ int Window::m_numWindows = 0;
 
 void Window::print()
 {
-    Printer p(this);
-    p.print();
+    Printer *p = new Printer();
+    p->setWindow(this);
+    p->print();
 }
 
 void Window::zoomIn()

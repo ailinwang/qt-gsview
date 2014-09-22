@@ -9,10 +9,61 @@
 #include <QPainter>
 #include <QProgressDialog>
 #include <QMessageBox>
+#include <QElapsedTimer>
+#include <QTimer>
+#include <QFileInfo>
 
-Printer::Printer(Window *win)
+#include <cups/cups.h>
+
+Printer::Printer(QObject *parent) : QObject(parent)
 {
-    m_window = win;
+}
+
+void Printer::printFinish()
+{
+    //  release options
+    cupsFreeOptions(num_options, options);
+
+    QMessageBox::information(m_window, "", "Printing is done!.");
+}
+
+void Printer::monitor()
+{
+    int num_jobs;
+    cups_job_t *jobs;
+    ipp_jstate_t job_state = IPP_JOB_PENDING;
+
+    num_jobs = cupsGetJobs(&jobs, NULL, 1, -1);
+
+    //  Loop to find my job
+    job_state = IPP_JOB_COMPLETED;
+
+    for (int i = 0; i < num_jobs; i ++)
+    {
+        if (jobs[i].id == m_jobID)
+        {
+            //  this is me
+            qDebug("I am found = %d", m_jobID);
+            job_state = jobs[i].state;
+            break;
+        }
+    }
+
+    //  Free the job array
+    cupsFreeJobs(num_jobs, jobs);
+
+    if (job_state == IPP_JOB_COMPLETED)
+    {
+        qDebug("print finished = %d", m_jobID);
+        printFinish();
+        m_monitor->stop();
+        delete m_monitor;
+        m_monitor = NULL;
+    }
+    else
+    {
+        qDebug("still printing = %d", m_jobID);
+    }
 }
 
 void Printer::print()
@@ -25,12 +76,6 @@ void Printer::print()
         return;
     dialog->hide();
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    QApplication::sendPostedEvents();
-
-    //  get scale factor based on printer's resolution
-    double scalePrint = printer.resolution() / 72;
-
     //  figure out printing range
     int fromPage = 1;
     int toPage = m_window->document()->GetPageCount();
@@ -41,44 +86,97 @@ void Printer::print()
     if (toPage>m_window->document()->GetPageCount())
         toPage = m_window->document()->GetPageCount();
 
+    QFileInfo fileInfo (m_window->getPath());
+
+    if (fileInfo.suffix().toLower() == QString("pdf"))
+    {
+        //  print it as is
+        pdfPrint (&printer, m_window->getPath(), fromPage, toPage);
+    }
+
+    else
+    {
+        //  TODO: convert to PDF.  But for now,
+        //  do it with bitmaps.
+        bitmapPrint (&printer, fromPage, toPage);
+    }
+}
+
+void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPage)
+{
+    //  set up options
+    num_options = 0;
+    options = NULL;
+
+    //  construct an option for the page range.
+    QString range = QString::number(fromPage) + "-" + QString::number(toPage);
+    num_options = cupsAddOption("page-ranges", range.toStdString().c_str(), num_options, &options);
+
+    //  start it
+    m_jobID = cupsPrintFile (printer->printerName().toStdString().c_str(), path.toStdString().c_str(),
+                                     path.toStdString().c_str(),
+                               num_options, options);
+
+    //  start the monitor
+    qDebug("job started = %d", m_jobID);
+    m_monitor = new QTimer(this);
+    connect (m_monitor, SIGNAL(timeout()), this, SLOT(monitor()));
+    m_monitor->start(2000);
+}
+
+void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
+{
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QApplication::sendPostedEvents();
+
+    //  get scale factor based on printer's resolution
+    double scalePrint = printer->resolution() / 72;
+
     //  those were 1-based, so subtract
     fromPage -= 1;
     toPage -= 1;
 
     //  begin printing
     QPainter *painter = new QPainter();
-    painter->begin(&printer);
+    painter->begin(printer);
 
     int numPages = toPage-fromPage+1;
-    QProgressDialog progress("Printing", "Cancel", 0, numPages, m_window);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.show();
-    QApplication::sendPostedEvents();
+//    QProgressDialog progress("Printing", "Cancel", 0, numPages, m_window);
+//    progress.setWindowModality(Qt::WindowModal);
+//    progress.show();
+//    QApplication::sendPostedEvents();
 
     bool cancelled = false;
+
+    //  for timing
+//    QElapsedTimer timer;
+//    qint64 nanoSec;
+//    timer.start();
 
     //  for each page
     int page = fromPage;
     while (page <= toPage)
     {
-        progress.setValue(page-fromPage+1);
-        QString message; message.sprintf("Printing %d of %d ...", page, numPages);
-        progress.setLabelText(message);
-        QApplication::sendPostedEvents();
+//        progress.setValue(page-fromPage+1);
+//        QString message; message.sprintf("Printing %d of %d ...", page, numPages);
+//        progress.setLabelText(message);
+//        QApplication::sendPostedEvents();
 
-        if (progress.wasCanceled())
-        {
-            cancelled = true;
-            break;
-        }
+//        if (progress.wasCanceled())
+//        {
+//            cancelled = true;
+//            break;
+//        }
 
         //  if not the first page, start a new page
         if (page != fromPage)
-            printer.newPage();
+            printer->newPage();
 
         //  compute page size
         point_t pageSize;
         m_window->document()->GetPageSize(page, scalePrint, &pageSize);
+
+//        timer.restart();  //  restart timer
 
         //  render a bitmap
         int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
@@ -92,11 +190,15 @@ void Printer::print()
         delete myImage;
         delete bitmap;
 
+//        nanoSec = timer.nsecsElapsed();  //  get elapsed
+//        double elapsed = double(nanoSec)/1000000000;  //  seconds
+//        qDebug("printed page %d in %f", page, elapsed);
+
         page++;
     }
 
-    progress.hide();
-    QApplication::sendPostedEvents();
+//    progress.hide();
+//    QApplication::sendPostedEvents();
 
     QApplication::restoreOverrideCursor();
     QApplication::sendPostedEvents();
@@ -115,5 +217,5 @@ void Printer::print()
     //  don't need the painter any more
     delete painter;
     painter = NULL;
-}
 
+}

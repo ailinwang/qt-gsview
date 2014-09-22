@@ -35,6 +35,7 @@ public:
 
     Document *document() {return m_document;}
     bool getShowAnnotations() {return m_showAnnotations;}
+    QString getPath() {return m_path;}
 
 protected:
 	void keyPressEvent(QKeyEvent* event);
@@ -106,6 +107,8 @@ private:
     const double m_minScale = 0.05;
     const double m_maxScale = 5;
     const double m_zoomInc  = 0.25;
+
+    QString m_path = NULL;
 };
 
 #endif  //  WINDOW_H
