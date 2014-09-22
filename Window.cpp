@@ -49,6 +49,8 @@ Window::Window(QWidget *parent) :
 
     connect(ui->actionPage_Up, SIGNAL(triggered()), this, SLOT(pageUp()));
     connect(ui->actionPage_Down, SIGNAL(triggered()), this, SLOT(pageDown()));
+    connect(ui->actionHome, SIGNAL(triggered()), this, SLOT(homeSlot()));
+    connect(ui->actionEnd, SIGNAL(triggered()), this, SLOT(endSlot()));
 
     connect(ui->actionThumbnails, SIGNAL(triggered()), this, SLOT(actionThumbnails()));
     connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
@@ -549,6 +551,17 @@ void Window::toggleAnnotations()
             m_thumbnails->annot (m_showAnnotations);
         ui->actionAnnotations->setText(tr("Hide &Annotations"));
     }
+}
+
+void Window::homeSlot()
+{
+    goToPage(0);
+}
+
+void Window::endSlot()
+{
+    int numPages = m_document->GetPageCount();
+    goToPage(numPages-1);
 }
 
 void Window::actionThumbnails()

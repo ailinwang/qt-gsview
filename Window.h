@@ -55,6 +55,8 @@ private slots:
     void thumbnailsReady();
     void pagesReady();
     void toggleAnnotations();
+    void homeSlot();
+    void endSlot();
 
 private:
     Ui::Window *ui;
