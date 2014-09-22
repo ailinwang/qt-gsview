@@ -135,7 +135,22 @@ void ScrollingImageList::rebuild (int nPage)
         m_images[i].setFixedHeight(pageSize.Y);
         m_images[i].setScale(m_scale);
         m_images[i].setPageSize(pageSize);
-        m_images[i].clear();
+
+//        m_images[i].clear();
+
+        //  when we get here, it's probably because we're zooming.
+        //  so, first just substitute a scaled version of the old pixmap.
+        //  then later, when the rendering tkes place, it will be replaced
+        //  with a better version.  But in the meantime, the zooming
+        //  will appear instantaneously.
+
+        const QPixmap *pm = m_images[i].pixmap();
+        if (pm)
+        {
+            QPixmap scaledPixmap = pm->scaled(m_images[i].size(), Qt::KeepAspectRatio);
+            m_images[i].setPixmap(scaledPixmap);
+        }
+
         m_images[i].setRendered(false);
         m_images[i].setBackgroundRole(QPalette::Dark);
     }
