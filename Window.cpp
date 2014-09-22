@@ -92,6 +92,14 @@ void Window::setupToolbar()
 
     ui->toolBar->addAction(ui->actionZoom_In);
     ui->toolBar->addAction(ui->actionZoom_Out);
+
+    m_percentage = new QLineEdit();
+    m_percentage->setMaximumWidth(30);
+    connect ( m_percentage, SIGNAL(returnPressed()), SLOT(percentageEditReturnPressed()));
+    QLabel *pct = new QLabel();  pct->setText(tr("%"));
+    ui->toolBar->insertWidget(NULL, m_percentage);
+    ui->toolBar->insertWidget(NULL, pct);
+
     ui->toolBar->addAction(ui->actionZoom_Normal);
     ui->toolBar->addAction(ui->actionFull_Screen);
 
@@ -130,6 +138,32 @@ void Window::pageEditReturnPressed()
 
     //  something went wrong, so restore the correct value
     m_pageNumber->setText(QString::number(m_currentPage+1));
+}
+
+void Window::percentageEditReturnPressed()
+{
+    //  user typed Enter while in the percentage field.
+    QString s = m_percentage->text();
+    if (s.length()>0)
+    {
+        bool ok;
+        int n = s.toInt(&ok);
+        if (ok)
+        {
+            double f = double(n)/100;
+
+            if ( f>=m_minScale && f<=m_maxScale )
+            {
+                m_scalePage = f;
+                m_pages->zoom (m_scalePage, m_currentPage);
+                return;
+            }
+        }
+    }
+
+    //  restore the value
+    m_percentage->setText(QString::number((int)(100*m_scalePage)));
+
 }
 
 void Window::keyPressEvent(QKeyEvent* event)
@@ -211,6 +245,9 @@ bool Window::OpenFile (QString path)
     int nPages = m_document->GetPageCount();
     m_pageNumber->setText(QString::number(1));
     m_totalPages->setText(QString::number(nPages));
+
+    //  set initial percentage
+    m_percentage->setText(QString::number((int)(100*m_scalePage)));
 
     //  prepare thumbnails
     m_thumbnails->setDocument(m_document);
@@ -448,25 +485,30 @@ void Window::print()
 
 void Window::zoomIn()
 {
-    m_scalePage += 0.20;
-    if (m_scalePage>16)
-        m_scalePage = 16;
+    m_scalePage += m_zoomInc;
+    if (m_scalePage > m_maxScale)
+        m_scalePage = m_maxScale;
+
     m_pages->zoom (m_scalePage, m_currentPage);
+    m_percentage->setText(QString::number((int)(100*m_scalePage)));
 }
 
 void Window::zoomOut()
 {
-    m_scalePage -= 0.20;
-    if (m_scalePage<0.2)
-        m_scalePage = 0.2;
+    m_scalePage -= m_zoomInc;
+    if (m_scalePage < m_minScale)
+        m_scalePage = m_minScale;
 
     m_pages->zoom (m_scalePage, m_currentPage);
+    m_percentage->setText(QString::number((int)(100*m_scalePage)));
 }
 
 void Window::normalSize()
 {
     m_scalePage = 1.0;
     m_pages->zoom (m_scalePage, m_currentPage);
+    m_percentage->setText(QString::number((int)(100*m_scalePage)));
+
 }
 
 void Window::pageUp()

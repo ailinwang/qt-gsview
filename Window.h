@@ -52,6 +52,7 @@ private slots:
     void quit();
     void actionThumbnails();
     void pageEditReturnPressed();
+    void percentageEditReturnPressed();
     void thumbnailsReady();
     void pagesReady();
     void toggleAnnotations();
@@ -84,6 +85,7 @@ private:
     //  additional toolbar widgets
     QLineEdit *m_pageNumber = NULL;
     QLabel *m_totalPages = NULL;
+    QLineEdit *m_percentage = NULL;
 
     //  document that contains all of the mupDF functionality
     Document *m_document = NULL;
@@ -95,6 +97,10 @@ private:
     static void countWindowDown() {if (m_numWindows>0) m_numWindows--;}
 
     bool m_showAnnotations = true;
+
+    const double m_minScale = 0.05;
+    const double m_maxScale = 16;
+    const double m_zoomInc  = 0.25;
 };
 
 #endif  //  WINDOW_H
