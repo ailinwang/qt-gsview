@@ -53,6 +53,7 @@ Window::Window(QWidget *parent) :
     connect(ui->actionThumbnails, SIGNAL(triggered()), this, SLOT(actionThumbnails()));
     connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
     connect(ui->actionAnnotations, SIGNAL(triggered()), this, SLOT(toggleAnnotations()));
+    ui->actionAnnotations->setText(tr("Hide &Annotations"));
 
     //  help menu
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
@@ -538,6 +539,7 @@ void Window::toggleAnnotations()
         m_pages->annot (m_showAnnotations);
         if (ui->leftScrollArea->isVisible())
             m_thumbnails->annot (m_showAnnotations);
+        ui->actionAnnotations->setText(tr("Show &Annotations"));
     }
     else
     {
@@ -545,6 +547,7 @@ void Window::toggleAnnotations()
         m_pages->annot (m_showAnnotations);
         if (ui->leftScrollArea->isVisible())
             m_thumbnails->annot (m_showAnnotations);
+        ui->actionAnnotations->setText(tr("Hide &Annotations"));
     }
 }
 
