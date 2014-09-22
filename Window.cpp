@@ -20,14 +20,12 @@ Window::Window(QWidget *parent) :
     //  create and set up the left-side scrolling area
     m_thumbnails = new ThumbnailList();
     m_thumbnails->setScrollArea(ui->leftScrollArea);
-    m_thumbnails->setClickable(true);
     m_thumbnails->hide();  //  initially hidden
     connect(m_thumbnails, SIGNAL(imagesReady()), this, SLOT(thumbnailsReady()));
 
     //  create and set up the right-side scrolling area
     m_pages = new PageList();
     m_pages->setScrollArea(ui->rightScrollArea);
-    m_pages->setClickable(false);
     connect(m_pages, SIGNAL(imagesReady()), this, SLOT(pagesReady()));
 
     //  create and initialize the mu Document

@@ -34,13 +34,12 @@ public:
     void zoom (double scale, int nPage);
     void annot (bool showAnnotations);
 
-    bool clickable() const {return m_clickable;}
-    void setClickable(bool val) {m_clickable = val;}
-
     void buildImages();
 
     void setScale(double scale) {m_scale=scale;}
     virtual double getScale();
+
+    virtual bool clickable() {return false;}
 
 protected:
     QScrollArea *getScrollArea() {return m_scrollArea;}
@@ -65,7 +64,6 @@ private:
     bool m_imagesBuilt = false;
     Document *m_document = NULL;
     double m_scale = 1.0;
-    bool m_clickable = false;
     bool m_shown = false;
     bool m_showAnnotations = true;
 };
