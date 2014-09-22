@@ -2,9 +2,10 @@
 #include <QtWidgets>
 #include <QAbstractScrollArea>
 #include <QAction>
-#include <QPrintDialog>
+//#include <QPrintDialog>
 
 #include "Window.h"
+#include "Printer.h"
 #include "ui_Window.h"
 
 #include "QtUtil.h"
@@ -381,104 +382,8 @@ int Window::m_numWindows = 0;
 
 void Window::print()
 {
-    //  get the printer
-    QPrinter printer(QPrinter::HighResolution);
-    QPrintDialog *dialog = new QPrintDialog(&printer, this);
-    dialog->setWindowTitle(tr("Print Document"));
-    if (dialog->exec() != QDialog::Accepted)
-        return;
-    dialog->hide();
-
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    QApplication::sendPostedEvents();
-
-    //  get scale factor based on printer's resolution
-    double scalePrint = printer.resolution() / 72;
-
-    //  figure out printing range
-    int fromPage = 1;
-    int toPage = m_document->GetPageCount();
-    if (printer.fromPage()>0)
-        fromPage = printer.fromPage();
-    if (printer.toPage()>0)
-        toPage = printer.toPage();
-    if (toPage>m_document->GetPageCount())
-        toPage = m_document->GetPageCount();
-
-    //  those were 1-based, so subtract
-    fromPage -= 1;
-    toPage -= 1;
-
-    //  begin printing
-    QPainter *painter = new QPainter();
-    painter->begin(&printer);
-
-    int numPages = toPage-fromPage+1;
-    QProgressDialog progress("Printing", "Cancel", 0, numPages, this);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.show();
-    QApplication::sendPostedEvents();
-
-    bool cancelled = false;
-
-    //  for each page
-    int page = fromPage;
-    while (page <= toPage)
-    {
-        progress.setValue(page-fromPage+1);
-        QString message; message.sprintf("Printing %d of %d ...", page, numPages);
-        progress.setLabelText(message);
-        QApplication::sendPostedEvents();
-
-        if (progress.wasCanceled())
-        {
-            cancelled = true;
-            break;
-        }
-
-        //  if not the first page, start a new page
-        if (page != fromPage)
-            printer.newPage();
-
-        //  compute page size
-        point_t pageSize;
-        m_document->GetPageSize(page, scalePrint, &pageSize);
-
-        //  render a bitmap
-        int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
-        Byte *bitmap = new Byte[numBytes];
-        m_document->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y, m_showAnnotations);
-
-        //  copy to printer
-        QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
-        painter->drawImage(0, 0, *myImage);
-
-        delete myImage;
-        delete bitmap;
-
-        page++;
-    }
-
-    progress.hide();
-    QApplication::sendPostedEvents();
-
-    QApplication::restoreOverrideCursor();
-    QApplication::sendPostedEvents();
-
-    //  end printing
-    if (cancelled)
-    {
-        QMessageBox::information(this, "", "Printing was cancelled.");
-    }
-    else
-    {
-        QMessageBox::information(this, "", "Printing is complete.");
-    }
-    painter->end();
-
-    //  don't need the painter any more
-    delete painter;
-    painter = NULL;
+    Printer p(this);
+    p.print();
 }
 
 void Window::zoomIn()

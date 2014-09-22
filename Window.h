@@ -33,6 +33,9 @@ public:
 	static void open();
     bool OpenFile (QString path);
 
+    Document *document() {return m_document;}
+    bool getShowAnnotations() {return m_showAnnotations;}
+
 protected:
 	void keyPressEvent(QKeyEvent* event);
     void customEvent(QEvent *event);
