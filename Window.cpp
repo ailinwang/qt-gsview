@@ -2,6 +2,7 @@
 #include <QtWidgets>
 #include <QAbstractScrollArea>
 #include <QAction>
+#include <QTemporaryDir>
 
 #include "Window.h"
 #include "Printer.h"
@@ -9,10 +10,29 @@
 
 #include "QtUtil.h"
 
+//  temp folder stuff
+QString tempFolderPath("");
+QString gsAppPath("/Users/fredross-perry/Desktop/mac/gs");
+
 Window::Window(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Window)
 {
+    //  create the temp path
+    tempFolderPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    tempFolderPath += "/";
+    tempFolderPath += "gsview/";
+//    qDebug() << "Temp path is" << tempFolderPath;
+
+    //  create the folder.
+    QDir dir(tempFolderPath);
+    if (!dir.exists())
+        dir.mkpath(".");
+
+    //  TODO: extract apps to there, then modify gsPath;
+
+
+
     //  set up the UI
     ui->setupUi(this);
     setupToolbar();
@@ -225,23 +245,25 @@ bool Window::OpenFile (QString path)
 {
     //  handle .PS and .EPS by running ghostscript first
     QFileInfo fileInfo (path);
-    if (fileInfo.suffix().toLower() == QString("ps") || fileInfo.suffix().toLower() == QString("eps"))
+    if (fileInfo.suffix().toLower() == QString("ps") ||
+        fileInfo.suffix().toLower() == QString("eps")   )
     {
-        //  TODO: put this in a temp folder
-        QString newPath = path;
-        newPath += ".pdf";
+        //  put the result into the temp folder
+        QString newPath = tempFolderPath + fileInfo.fileName() + ".pdf";
 
         //  create a process to do the conversion
         QProcess *process = new QProcess(this);
 
-        //  TODO: use an internal copy of gs
-        QString command = "/Users/fredross-perry/Desktop/mac/ps2pdfwr ";
-        command += "\"" + path + "\"";
-        command += " ";
-        command += "\"" + newPath + "\"";
-        process->start(command);
+        //  construct the command
+        QString command = gsAppPath;
+        command += " -P- -dSAFER -q -P- -dNOPAUSE -dBATCH -sDEVICE=pdfwrite ";
+        command += "-sOutputFile=\"" + newPath + "\"";
+        command += " -c .setpdfwrite ";
+        command += "-f \"" + path + "\"";
+//        qDebug("command is: %s", command.toStdString().c_str());
 
-        //  wait for conversion to finish
+        //  do it, and wait
+        process->start(command);
         process->waitForFinished();
 
         //  now open the temp file.
