@@ -14,7 +14,6 @@ public:
     explicit Printer(QObject *parent = 0);
 
     void print();
-    void printFinish();
     void setWindow (Window *win) {m_window=win;}
 
     void pdfPrint (QPrinter *printer, QString path, int fromPage, int toPage);
@@ -28,8 +27,6 @@ public slots:
 private:
     Window *m_window = NULL;
     int m_jobID = 0;
-    int num_options = 0;
-    cups_option_t *options = NULL;
     QTimer *m_monitor = NULL;
 };
 

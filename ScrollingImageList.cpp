@@ -187,6 +187,8 @@ void ScrollingImageList::renderImage(int i)
 {
     point_t pageSize = m_images[i].pageSize();
 
+//    qDebug("rendering page %d at size %d x %d", i, (int)pageSize.X, (int)pageSize.Y);
+
     //  render
     int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
     Byte *bitmap = new Byte[numBytes];
