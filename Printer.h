@@ -22,7 +22,6 @@ public:
 signals:
 
 public slots:
-    void monitor();
 
 private:
     Window *m_window = NULL;

@@ -15,6 +15,7 @@ INCPATH+=../../include/
 DEFINES += _QT
 
 QT       += core gui
+
 qtHaveModule(printsupport): QT += printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -75,4 +76,3 @@ FORMS += \
 RESOURCES += \
     resources.qrc
 
-OTHER_FILES +=

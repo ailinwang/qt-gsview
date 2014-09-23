@@ -20,88 +20,6 @@ Printer::Printer(QObject *parent) : QObject(parent)
 {
 }
 
-#if 0
-
-void Printer::monitor()
-{
-}
-
-void Printer::print()
-{
-    //  get the printer
-    QPrinter printer(QPrinter::HighResolution);
-    QPrintDialog *dialog = new QPrintDialog(&printer, m_window);
-    dialog->setWindowTitle(QString("Print Document"));
-    if (dialog->exec() != QDialog::Accepted)
-        return;
-    dialog->hide();
-
-    //  figure out printing range
-    int fromPage = 1;
-    int toPage = m_window->document()->GetPageCount();
-    if (printer.fromPage()>0)
-        fromPage = printer.fromPage();
-    if (printer.toPage()>0)
-        toPage = printer.toPage();
-    if (toPage>m_window->document()->GetPageCount())
-        toPage = m_window->document()->GetPageCount();
-
-    //  get scale factor based on printer's resolution
-    double scalePrint = printer.resolution() / 72;
-
-    //  those were 1-based, so subtract
-    fromPage -= 1;
-    toPage -= 1;
-
-    //  begin printing
-    QPainter *painter = new QPainter();
-    painter->begin(&printer);
-
-    //  for each page
-    int page = fromPage;
-    while (page <= toPage)
-    {
-        //  if not the first page, start a new page
-        if (page != fromPage)
-            printer.newPage();
-
-        //  compute page size
-        point_t pageSize;
-        m_window->document()->GetPageSize(page, scalePrint, &pageSize);
-
-        //  render a bitmap
-        int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
-        Byte *bitmap = new Byte[numBytes];
-        m_window->document()->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y, m_window->getShowAnnotations());
-
-        //  copy to printer
-        QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
-        painter->drawImage(0, 0, *myImage);
-
-        delete myImage;
-        delete bitmap;
-
-        page++;
-    }
-
-    //  end printing
-    painter->end();
-    delete painter;
-    painter = NULL;
-
-    QMessageBox::information(m_window, "", "Printing is complete.");
-}
-
-#endif
-
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-
-#if 1
-
 QString jobStateName(ipp_jstate_t state)
 {
     switch (state)
@@ -145,28 +63,6 @@ ipp_jstate_t getJobState(int jobID)
     qDebug("monitor: job %d is in state %s", jobID, jobStateName(job_state).toStdString().c_str());
 
     return job_state;
-}
-
-void Printer::monitor()
-{
-    ipp_jstate_t job_state = getJobState(m_jobID);
-
-    if (job_state == IPP_JOB_COMPLETED ||
-        job_state == IPP_JOB_PENDING   ||
-        job_state == IPP_JOB_PROCESSING   )
-    {
-        m_monitor->stop();
-        delete m_monitor;
-        m_monitor = NULL;
-
-        QMessageBox::information(m_window, "", "Printing is complete.");
-
-        //  TODO: OSX, launch corresponding queue?
-    }
-    else
-    {
-
-    }
 }
 
 void Printer::print()
@@ -221,8 +117,6 @@ void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPag
 
     cupsFreeOptions(num_options, options);
 
-    ipp_jstate_t state = getJobState(m_jobID);
-
     ipp_jstate_t job_state = getJobState(m_jobID);
 
     if (job_state == IPP_JOB_COMPLETED ||
@@ -237,11 +131,6 @@ void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPag
     {
         QMessageBox::information(m_window, "", "Error creating print job.");
     }
-
-//    //  start the monitor
-//    m_monitor = new QTimer(this);
-//    connect (m_monitor, SIGNAL(timeout()), this, SLOT(monitor()));
-//    m_monitor->start(1000);
 }
 
 void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
@@ -340,5 +229,80 @@ void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
 
 }
 
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------
+
+#if 0
+
+void Printer::print()
+{
+    //  get the printer
+    QPrinter printer(QPrinter::HighResolution);
+    QPrintDialog *dialog = new QPrintDialog(&printer, m_window);
+    dialog->setWindowTitle(QString("Print Document"));
+    if (dialog->exec() != QDialog::Accepted)
+        return;
+    dialog->hide();
+
+    //  figure out printing range
+    int fromPage = 1;
+    int toPage = m_window->document()->GetPageCount();
+    if (printer.fromPage()>0)
+        fromPage = printer.fromPage();
+    if (printer.toPage()>0)
+        toPage = printer.toPage();
+    if (toPage>m_window->document()->GetPageCount())
+        toPage = m_window->document()->GetPageCount();
+
+    //  get scale factor based on printer's resolution
+    double scalePrint = printer.resolution() / 72;
+
+    //  those were 1-based, so subtract
+    fromPage -= 1;
+    toPage -= 1;
+
+    //  begin printing
+    QPainter *painter = new QPainter();
+    painter->begin(&printer);
+
+    //  for each page
+    int page = fromPage;
+    while (page <= toPage)
+    {
+        //  if not the first page, start a new page
+        if (page != fromPage)
+            printer.newPage();
+
+        //  compute page size
+        point_t pageSize;
+        m_window->document()->GetPageSize(page, scalePrint, &pageSize);
+
+        //  render a bitmap
+        int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
+        Byte *bitmap = new Byte[numBytes];
+        m_window->document()->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y, m_window->getShowAnnotations());
+
+        //  copy to printer
+        QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
+        painter->drawImage(0, 0, *myImage);
+
+        delete myImage;
+        delete bitmap;
+
+        page++;
+    }
+
+    //  end printing
+    painter->end();
+    delete painter;
+    painter = NULL;
+
+    QMessageBox::information(m_window, "", "Printing is complete.");
+}
+
 #endif
+
 
