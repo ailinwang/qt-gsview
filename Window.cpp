@@ -223,9 +223,40 @@ bool Window::handlePassword()
 
 bool Window::OpenFile (QString path)
 {
-    //  load a file by path
+    //  handle .PS and .EPS by running ghostscript first
+    QFileInfo fileInfo (path);
+    if (fileInfo.suffix().toLower() == QString("ps") || fileInfo.suffix().toLower() == QString("eps"))
+    {
+        //  TODO: put this in a temp folder
+        QString newPath = path;
+        newPath += ".pdf";
 
-    //  TODO handle .PS and .EPS by running ghostscript first
+        //  create a process to do the conversion
+        QProcess *process = new QProcess(this);
+
+        //  TODO: use an internal copy of gs
+        QString command = "/Users/fredross-perry/Desktop/mac/ps2pdfwr ";
+        command += "\"" + path + "\"";
+        command += " ";
+        command += "\"" + newPath + "\"";
+        process->start(command);
+
+        //  wait for conversion to finish
+        process->waitForFinished();
+
+        //  now open the temp file.
+        return OpenFile2(newPath);
+    }
+    else
+    {
+        //  open directly
+        return OpenFile2(path);
+    }
+}
+
+bool Window::OpenFile2 (QString path)
+{
+    //  load a file by path
 
     //  open the doc
     bool result = m_document->OpenFile(path.toStdString());
@@ -335,7 +366,7 @@ void Window::open()
     dialog.setOption(QFileDialog::DontUseNativeDialog, true);
 
     dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz)"));
+    dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz *.ps *.eps)"));
 
     //  create a window that will show the file.
     Window *newWindow = new Window();

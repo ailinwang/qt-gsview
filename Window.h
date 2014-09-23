@@ -32,6 +32,7 @@ public:
 
 	static void open();
     bool OpenFile (QString path);
+    bool OpenFile2 (QString path);
 
     Document *document() {return m_document;}
     bool getShowAnnotations() {return m_showAnnotations;}
