@@ -36,11 +36,6 @@ QImage * QtUtil::QImageFromData(unsigned char *samples, int w, int h)
     return myImage;
 }
 
-void QtUtil::errorMessage(const std::string theTitle, const std::string theMessage)
-{
-    QMessageBox::critical(NULL, QString(theTitle.c_str()), QString(theMessage.c_str()));
-}
-
 QString getRealAppDirPath()
 {
     QString path = qApp->applicationDirPath();

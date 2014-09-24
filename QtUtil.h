@@ -7,7 +7,6 @@ class QtUtil
 {
 public:
     static QImage * QImageFromData(unsigned char *samples, int w, int h);
-    static void errorMessage(const std::string theTitle, const std::string theMessage);
 
     static QString getTempFolderPath();
     static QString getGsPath();

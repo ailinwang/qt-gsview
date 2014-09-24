@@ -36,17 +36,19 @@ void Document::CleanUp()
 bool Document::OpenFile(const std::string fileName)
 {
     status_t result = mu_ctx->OpenDocument((char *)fileName.c_str());
-    if (result == S_ISOK)
-    {
-        m_opened = true;
-        m_pageCount = mu_ctx->GetPageCount();
+    if (result != S_ISOK)
+        return false;
+
+    m_pageCount = mu_ctx->GetPageCount();
+    if (m_pageCount<=0)
+        return false;  //  we should find at least one page
+
+    m_opened = true;
 
 //        //  allocate an array of pages
 //        m_pages = new Page[m_pageCount];
 
-        return true;
-    }
-    return false;
+    return true;
 }
 
 bool Document::GetPageSize (int page_num, double scale, point_t *render_size)

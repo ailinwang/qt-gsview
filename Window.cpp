@@ -264,7 +264,7 @@ bool Window::OpenFile2 (QString path)
     bool result = m_document->OpenFile(path.toStdString());
     if (!result)
     {
-        QtUtil::errorMessage("Error opening file", "");
+        QMessageBox::critical(NULL, "", "Error opening file");
         return false;
     }
 
