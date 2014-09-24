@@ -11,27 +11,35 @@
 #include "QtUtil.h"
 
 //  temp folder stuff
-QString tempFolderPath("");
-QString gsAppPath("/Users/fredross-perry/Desktop/mac/gs");
+static bool tempDone = false;
+static QString tempFolderPath("");
+static QString gsAppPath("/Users/fredross-perry/Desktop/mac/gs");
+static QString gxpsAppPath("/Users/fredross-perry/Desktop/macApps/gxps");
 
 Window::Window(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Window)
 {
     //  create the temp path
-    tempFolderPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-    tempFolderPath += "/";
-    tempFolderPath += "gsview/";
-//    qDebug() << "Temp path is" << tempFolderPath;
+    if (!tempDone)
+    {
+        tempDone = true;
 
-    //  create the folder.
-    QDir dir(tempFolderPath);
-    if (!dir.exists())
-        dir.mkpath(".");
+        tempFolderPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+        tempFolderPath += "/";
+        tempFolderPath += "gsview/";
+    //    qDebug() << "Temp path is" << tempFolderPath;
 
-    //  TODO: extract apps to there, then modify gsPath;
+        //  create the folder.
+        QDir dir(tempFolderPath);
+        if (!dir.exists())
+            dir.mkpath(".");
 
+        Printer::setExternalPaths(tempFolderPath, gsAppPath, gxpsAppPath);
 
+        //  TODO: extract apps to there, then modify gsPath;
+
+    }
 
     //  set up the UI
     ui->setupUi(this);

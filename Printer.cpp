@@ -16,6 +16,17 @@
 
 #include <cups/cups.h>
 
+static QString tempFolderPath("");
+static QString gsAppPath("");
+static QString gxpsAppPath("");
+
+void Printer::setExternalPaths(QString in_tempFolderPath, QString in_gsAppPath, QString in_gxpsAppPath)
+{
+    tempFolderPath = in_tempFolderPath;
+    gsAppPath      = in_gsAppPath;
+    gxpsAppPath    = in_gxpsAppPath;
+}
+
 Printer::Printer(QObject *parent) : QObject(parent)
 {
 }
@@ -91,6 +102,29 @@ void Printer::print()
     {
         //  print it as is
         pdfPrint (&printer, m_window->getPath(), fromPage, toPage);
+    }
+    else if (fileInfo.suffix().toLower() == QString("xps"))
+    {
+        //  put the result into the temp folder
+        QString newPath = tempFolderPath + fileInfo.fileName() + ".pdf";
+
+        //  create a process to do the conversion
+        QProcess *process = new QProcess(this);
+
+        //  construct the command
+        QString command = gxpsAppPath;
+        command += " -dNOPAUSE -sDEVICE=pdfwrite ";
+        command += "-sOutputFile=\"" + newPath + "\"";
+        command += " ";
+        command += "\"" + m_window->getPath() + "\"";
+        qDebug("command is: %s", command.toStdString().c_str());
+
+        //  do it, and wait
+        process->start(command);
+        process->waitForFinished();
+
+        //  print the new one
+        pdfPrint (&printer, newPath, fromPage, toPage);
     }
     else
     {
