@@ -1,6 +1,9 @@
 #include "QtUtil.h"
 
+#include <QApplication>
 #include <QMessageBox>
+#include <QStandardPaths>
+#include <QDir>
 
 QImage * QtUtil::QImageFromData(unsigned char *samples, int w, int h)
 {
@@ -32,3 +35,47 @@ void QtUtil::errorMessage(const std::string theTitle, const std::string theMessa
 {
     QMessageBox::critical(NULL, QString(theTitle.c_str()), QString(theMessage.c_str()));
 }
+
+QString QtUtil::getGsPath()
+{
+    QString path = qApp->applicationDirPath() + QString(GS_PATH);
+//    qDebug() << "getGsPath = " << path;
+    return path;
+}
+
+QString QtUtil::getGxpsPath()
+{
+    QString path = qApp->applicationDirPath() + QString(GXPS_PATH);
+//    qDebug() << "getGxpsPath = " << path;
+    return path;
+}
+
+//  temp folder stuff
+static bool tempDone = false;
+static QString tempFolderPath("");
+
+QString QtUtil::getTempFolderPath()
+{
+    //  create the temp path
+    if (!tempDone)
+    {
+        tempDone = true;
+
+        tempFolderPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+        tempFolderPath += "/";
+        tempFolderPath += "gsview/";
+
+//        qDebug() << "Temp path is" << tempFolderPath;
+
+        //  create the folder.
+        QDir dir(tempFolderPath);
+        if (!dir.exists())
+            dir.mkpath(".");
+    }
+
+    return tempFolderPath;
+}
+
+
+
+

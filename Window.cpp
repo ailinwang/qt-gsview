@@ -7,47 +7,12 @@
 #include "Window.h"
 #include "Printer.h"
 #include "ui_Window.h"
-
 #include "QtUtil.h"
-
-//  temp folder stuff
-static bool tempDone = false;
-static QString tempFolderPath("");
-
-//  ony good for mac.
-static QString gsAppPath("../../../gs");
-static QString gxpsAppPath("../../../gxps");
 
 Window::Window(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Window)
 {
-    QString s = qApp->applicationDirPath();
-    qDebug() << "app dir = " << s;
-    gsAppPath   = s + "/../../../gs";
-    gxpsAppPath = s + "/../../../gxps";
-
-    //  create the temp path
-    if (!tempDone)
-    {
-        tempDone = true;
-
-        tempFolderPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-        tempFolderPath += "/";
-        tempFolderPath += "gsview/";
-    //    qDebug() << "Temp path is" << tempFolderPath;
-
-        //  create the folder.
-        QDir dir(tempFolderPath);
-        if (!dir.exists())
-            dir.mkpath(".");
-
-        Printer::setExternalPaths(tempFolderPath, gsAppPath, gxpsAppPath);
-
-        //  TODO: extract apps to there, then modify gsPath;
-
-    }
-
     //  set up the UI
     ui->setupUi(this);
     setupToolbar();
@@ -264,13 +229,13 @@ bool Window::OpenFile (QString path)
         fileInfo.suffix().toLower() == QString("eps")   )
     {
         //  put the result into the temp folder
-        QString newPath = tempFolderPath + fileInfo.fileName() + ".pdf";
+        QString newPath = QtUtil::getTempFolderPath() + fileInfo.fileName() + ".pdf";
 
         //  create a process to do the conversion
         QProcess *process = new QProcess(this);
 
         //  construct the command
-        QString command = "\"" + gsAppPath + "\"";
+        QString command = "\"" + QtUtil::getGsPath() + "\"";
         command += " -P- -dSAFER -q -P- -dNOPAUSE -dBATCH -sDEVICE=pdfwrite ";
         command += "-sOutputFile=\"" + newPath + "\"";
         command += " -c .setpdfwrite ";

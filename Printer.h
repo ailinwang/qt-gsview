@@ -19,8 +19,6 @@ public:
     void pdfPrint (QPrinter *printer, QString path, int fromPage, int toPage);
     void bitmapPrint (QPrinter *printer, int fromPage, int toPage);
 
-    static void setExternalPaths (QString tempFolderPath, QString gsAppPath, QString gxpsAppPath);
-
 signals:
 
 public slots:

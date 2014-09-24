@@ -14,6 +14,12 @@ INCPATH+=../../include/
 
 DEFINES += _QT
 
+macx: DEFINES += GS_PATH=\\\"/../../../apps/gs\\\"
+macx: DEFINES += GXPS_PATH=\\\"/../../../apps/gxps\\\"
+
+unix:!macx: DEFINES += GS_PATH=\\\"/apps/gs\\\"
+unix:!macx: DEFINES += GXPS_PATH=\\\"/apps/gxps\\\"
+
 QT       += core gui
 
 qtHaveModule(printsupport): QT += printsupport
@@ -79,3 +85,19 @@ RESOURCES += \
 OTHER_FILES += \
     macApps/gs \
     macApps/gxps
+
+CONFIG(debug, debug|release) {
+    install_it.path = build/debug/apps
+macx:     install_it.files += macApps/gs
+macx:     install_it.files += macApps/gxps
+unix:!macx:     install_it.files += unixApps/gs
+unix:!macx:     install_it.files += unixApps/gxps
+    INSTALLS += install_it
+} else {
+    install_it.path = build/release/apps
+macx:     install_it.files += macApps/gs
+macx:     install_it.files += macApps/gxps
+unix:!macx:     install_it.files += unixApps/gs
+unix:!macx:     install_it.files += unixApps/gxps
+    INSTALLS += install_it
+}

@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/apps">
-        <file>resources/macApps/gs</file>
-        <file>resources/macApps/gxps</file>
-    </qresource>
-</RCC>
