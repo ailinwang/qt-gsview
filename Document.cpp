@@ -39,9 +39,12 @@ bool Document::OpenFile(const std::string fileName)
     if (result != S_ISOK)
         return false;
 
+    //  return false if there are no pages.
+    //  this can happen if a file is incorrectly typed,
+    //  that is, if a txt file is masquerading as a pdf file.
     m_pageCount = mu_ctx->GetPageCount();
     if (m_pageCount<=0)
-        return false;  //  we should find at least one page
+        return false;
 
     m_opened = true;
 
