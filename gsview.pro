@@ -75,3 +75,7 @@ FORMS += \
 
 RESOURCES += \
     resources.qrc
+
+OTHER_FILES += \
+    macApps/gs \
+    macApps/gxps

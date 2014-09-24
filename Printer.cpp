@@ -112,7 +112,7 @@ void Printer::print()
         QProcess *process = new QProcess(this);
 
         //  construct the command
-        QString command = gxpsAppPath;
+        QString command = "\"" + gxpsAppPath + "\"";
         command += " -dNOPAUSE -sDEVICE=pdfwrite ";
         command += "-sOutputFile=\"" + newPath + "\"";
         command += " ";

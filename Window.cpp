@@ -13,13 +13,20 @@
 //  temp folder stuff
 static bool tempDone = false;
 static QString tempFolderPath("");
-static QString gsAppPath("/Users/fredross-perry/Desktop/mac/gs");
-static QString gxpsAppPath("/Users/fredross-perry/Desktop/macApps/gxps");
+
+//  ony good for mac.
+static QString gsAppPath("../../../gs");
+static QString gxpsAppPath("../../../gxps");
 
 Window::Window(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Window)
 {
+    QString s = qApp->applicationDirPath();
+    qDebug() << "app dir = " << s;
+    gsAppPath   = s + "/../../../gs";
+    gxpsAppPath = s + "/../../../gxps";
+
     //  create the temp path
     if (!tempDone)
     {
@@ -263,12 +270,12 @@ bool Window::OpenFile (QString path)
         QProcess *process = new QProcess(this);
 
         //  construct the command
-        QString command = gsAppPath;
+        QString command = "\"" + gsAppPath + "\"";
         command += " -P- -dSAFER -q -P- -dNOPAUSE -dBATCH -sDEVICE=pdfwrite ";
         command += "-sOutputFile=\"" + newPath + "\"";
         command += " -c .setpdfwrite ";
         command += "-f \"" + path + "\"";
-//        qDebug("command is: %s", command.toStdString().c_str());
+        qDebug("command is: %s", command.toStdString().c_str());
 
         //  do it, and wait
         process->start(command);
