@@ -14,6 +14,8 @@ INCPATH+=../../include/
 
 DEFINES += _QT
 
+macx: DEFINES += _QT_MAC
+
 QT       += core gui
 
 qtHaveModule(printsupport): QT += printsupport
@@ -81,9 +83,6 @@ RESOURCES += \
 
 unix!macx: {
 
-    DEFINES += GS_PATH=\\\"/apps/gs\\\"
-    DEFINES += GXPS_PATH=\\\"/apps/gxps\\\"
-
     OTHER_FILES += \
         unixApps/gs \
         unixApps/gxps
@@ -94,9 +93,6 @@ unix!macx: {
 }
 
 macx: {
-
-    DEFINES += GS_PATH=\\\"/../../../apps/gs\\\"
-    DEFINES += GXPS_PATH=\\\"/../../../apps/gxps\\\"
 
     OTHER_FILES += \
         macApps/gs \

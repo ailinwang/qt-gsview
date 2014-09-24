@@ -7,10 +7,15 @@
 
 QImage * QtUtil::QImageFromData(unsigned char *samples, int w, int h)
 {
+    //  An earlier version of the code used to rearrange the pixels
+    //  to match the expected image format (commented-out below).
+    //  this no longer seems to be necessary, so we let
+    //  QImage create itself directly from the pixels given.
+
     QImage *myImage = new QImage(samples, w, h, QImage::Format_ARGB32);
 
 //    QImage *myImage = new QImage(w, h, QImage::Format_ARGB32);
-
+//
 //    int index = 0;
 //    for (int row=0; row <h ;row++)
 //    {
@@ -23,7 +28,7 @@ QImage * QtUtil::QImageFromData(unsigned char *samples, int w, int h)
 //            unsigned char alpha = samples[index+3];
 //            index+= 4;
 //            uint pixel = red + (green<<8) + (blue<<16) + (alpha<<24);
-
+//
 //            myImage->setPixel (col, row, pixel);
 //        }
 //    }
@@ -36,18 +41,27 @@ void QtUtil::errorMessage(const std::string theTitle, const std::string theMessa
     QMessageBox::critical(NULL, QString(theTitle.c_str()), QString(theMessage.c_str()));
 }
 
+QString getRealAppDirPath()
+{
+    QString path = qApp->applicationDirPath();
+    if (!path.endsWith( QDir::separator()))
+        path +=  QDir::separator();
+
+#ifdef _QT_MAC
+    path += QString("../../../");
+#endif
+
+    return path;
+}
+
 QString QtUtil::getGsPath()
 {
-    QString path = qApp->applicationDirPath() + QString(GS_PATH);
-//    qDebug() << "getGsPath = " << path;
-    return path;
+    return getRealAppDirPath() + QString("apps/gs");
 }
 
 QString QtUtil::getGxpsPath()
 {
-    QString path = qApp->applicationDirPath() + QString(GXPS_PATH);
-//    qDebug() << "getGxpsPath = " << path;
-    return path;
+    return getRealAppDirPath() + QString("apps/gxps");
 }
 
 //  temp folder stuff
