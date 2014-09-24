@@ -14,12 +14,6 @@ INCPATH+=../../include/
 
 DEFINES += _QT
 
-macx: DEFINES += GS_PATH=\\\"/../../../apps/gs\\\"
-macx: DEFINES += GXPS_PATH=\\\"/../../../apps/gxps\\\"
-
-unix:!macx: DEFINES += GS_PATH=\\\"/apps/gs\\\"
-unix:!macx: DEFINES += GXPS_PATH=\\\"/apps/gxps\\\"
-
 QT       += core gui
 
 qtHaveModule(printsupport): QT += printsupport
@@ -82,22 +76,35 @@ FORMS += \
 RESOURCES += \
     resources.qrc
 
-OTHER_FILES += \
-    macApps/gs \
-    macApps/gxps
+#  The stuff below copies some executable files, and controls where the
+#  main app will look for them
 
-CONFIG(debug, debug|release) {
-    install_it.path = build/debug/apps
-macx:     install_it.files += macApps/gs
-macx:     install_it.files += macApps/gxps
-unix:!macx:     install_it.files += unixApps/gs
-unix:!macx:     install_it.files += unixApps/gxps
-    INSTALLS += install_it
-} else {
-    install_it.path = build/release/apps
-macx:     install_it.files += macApps/gs
-macx:     install_it.files += macApps/gxps
-unix:!macx:     install_it.files += unixApps/gs
-unix:!macx:     install_it.files += unixApps/gxps
-    INSTALLS += install_it
+unix!macx: {
+
+    DEFINES += GS_PATH=\\\"/apps/gs\\\"
+    DEFINES += GXPS_PATH=\\\"/apps/gxps\\\"
+
+    OTHER_FILES += \
+        unixApps/gs \
+        unixApps/gxps
+
+    QMAKE_POST_LINK += $$quote(mkdir -p ./apps $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/unixApps/gs ./apps/gs $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/unixApps/gxps ./apps/gxps $$escape_expand(\n\t))
 }
+
+macx: {
+
+    DEFINES += GS_PATH=\\\"/../../../apps/gs\\\"
+    DEFINES += GXPS_PATH=\\\"/../../../apps/gxps\\\"
+
+    OTHER_FILES += \
+        macApps/gs \
+        macApps/gxps
+
+    QMAKE_POST_LINK += $$quote(mkdir -p ./apps $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gs ./apps/gs $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gxps ./apps/gxps $$escape_expand(\n\t))
+}
+
+
