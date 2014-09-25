@@ -1,4 +1,4 @@
-#include "page.h"
+#include "Page.h"
 
 Page::Page()
 {
