@@ -7,7 +7,8 @@
 macx: ICON = resources/gsview_app.icns
 
 CONFIG += c++11
-QMAKE_CXXFLAGS += -std=c++11 -stdlib=libstdc++
+QMAKE_CXXFLAGS += -std=c++11
+macx: QMAKE_CXXFLAGS += -stdlib=libstdc++
 
 INCPATH+=.
 INCPATH+=../../include/
