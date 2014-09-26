@@ -82,18 +82,18 @@ RESOURCES += \
 #  The stuff below copies some executable files, and controls where the
 #  main app will look for them
 
-unix!macx: {
+unix:!macx {
 
-    OTHER_FILES += \
-        unixApps/gs \
-        unixApps/gxps
+OTHER_FILES += \
+    linuxApps/gs \
+    linuxApps/gxps
 
     QMAKE_POST_LINK += $$quote(mkdir -p ./apps $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/unixApps/gs ./apps/gs $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/unixApps/gxps ./apps/gxps $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/linuxApps/gs ./apps/gs $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/linuxApps/gxps ./apps/gxps $$escape_expand(\n\t))
 }
 
-macx: {
+macx {
 
     OTHER_FILES += \
         macApps/gs \
@@ -103,5 +103,4 @@ macx: {
     QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gs ./apps/gs $$escape_expand(\n\t))
     QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gxps ./apps/gxps $$escape_expand(\n\t))
 }
-
 
