@@ -43,32 +43,16 @@ void ImageWidget::setSelected(bool isSelected)
     m_selected = isSelected;
 }
 
-QString eventTypeName(QEvent *event)
-{
-    static int eventEnumIndex = QEvent::staticMetaObject.indexOfEnumerator("Type");
-    QString name = QEvent::staticMetaObject.enumerator(eventEnumIndex).valueToKey(event->type());
-    return name;
-}
-
 bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
 {
-    switch( event->type() )
-    {
-        case QEvent::MouseButtonRelease:
-            if (clickable())
-            {
-                QApplication::postEvent(this->window(), new ImageClickedEvent(m_pageNumber));
-            }
-            else
-            {
+    //  process the event
+    bool result = QLabel::eventFilter(obj, event);
 
-            }
-            break;
+    //  post event if it was a click
+    if (event->type() == QEvent::MouseButtonRelease)
+        QApplication::postEvent(this->window(), new ImageClickedEvent(m_pageNumber));
 
-        default:
-            break;
-    }
-
-    // pass the event on to the parent class
-    return QLabel::eventFilter(obj, event);
+    //  done
+    return result;
 }
+

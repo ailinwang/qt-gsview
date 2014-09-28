@@ -22,9 +22,6 @@ public:
     void show();
     void hide();
 
-    bool imagesBuilt() const;
-    void setImagesBuilt(bool imagesBuilt);
-
     Document *document() const {return m_document;}
     void setDocument(Document *document) {m_document = document;}
 
@@ -41,11 +38,12 @@ public:
 
     virtual bool clickable() {return false;}
 
+    bool eventFilter(QObject *target, QEvent *event);
+
 protected:
     QScrollArea *getScrollArea() {return m_scrollArea;}
 
 public slots:
-    void imagesBuiltSlot();
     void sliderReleasedSlot();
     void valueChangedSlot(int val);
 
@@ -55,16 +53,15 @@ signals:
 private:
     void renderVisibleImages();
     void renderImage(int index);
-    void delayedRender();
     bool isImageVisible(int nPage);
     void rebuild (int nPage);
+    void onImagesReady();
 
     QScrollArea *m_scrollArea = NULL;
     ImageWidget *m_images = NULL;
     bool m_imagesBuilt = false;
     Document *m_document = NULL;
     double m_scale = 1.0;
-    bool m_shown = false;
     bool m_showAnnotations = true;
 };
 

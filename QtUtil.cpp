@@ -4,6 +4,9 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QDir>
+#include <QtWidgets>
+#include <QEvent>
+
 
 QImage * QtUtil::QImageFromData(unsigned char *samples, int w, int h)
 {
@@ -83,6 +86,13 @@ QString QtUtil::getTempFolderPath()
     }
 
     return tempFolderPath;
+}
+
+QString QtUtil::eventTypeName(QEvent *event)
+{
+    static int eventEnumIndex = QEvent::staticMetaObject.indexOfEnumerator("Type");
+    QString name = QEvent::staticMetaObject.enumerator(eventEnumIndex).valueToKey(event->type());
+    return name;
 }
 
 

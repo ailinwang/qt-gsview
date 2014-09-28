@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QTimer>
 #include <QScrollBar>
+#include <QDebug>
 
 ScrollingImageList::ScrollingImageList(QObject *parent) :
     QObject(parent)
@@ -24,36 +25,21 @@ void ScrollingImageList::setScrollArea(QScrollArea *scrollArea)
     QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
     connect (slider, SIGNAL(sliderReleased()), this, SLOT(sliderReleasedSlot()));
     connect (slider, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSlot(int)));
+
+    QWidget* contentWidget = m_scrollArea->widget();
+    contentWidget->installEventFilter(this);
 }
 
 void ScrollingImageList::show()
 {
     if (NULL != m_scrollArea)
         m_scrollArea->show();
-
-    bool wasShown = m_shown;
-    m_shown = true;
-
-    if (wasShown)
-    {
-        delayedRender();
-    }
 }
 
 void ScrollingImageList::hide()
 {
     if (NULL != m_scrollArea)
         m_scrollArea->hide();
-}
-
-bool ScrollingImageList::imagesBuilt() const
-{
-    return m_imagesBuilt;
-}
-
-void ScrollingImageList::setImagesBuilt(bool imagesBuilt)
-{
-    m_imagesBuilt = imagesBuilt;
 }
 
 double ScrollingImageList::getScale()
@@ -63,7 +49,7 @@ double ScrollingImageList::getScale()
 
 void ScrollingImageList::buildImages()
 {
-    if (!imagesBuilt())
+    if (!m_imagesBuilt)
     {
         //  create an array of images
         int nPages = m_document->GetPageCount();
@@ -93,8 +79,7 @@ void ScrollingImageList::buildImages()
             contentWidget->layout()->addWidget(&(m_images[i]));
         }
 
-        setImagesBuilt(true);
-        delayedRender();
+        m_imagesBuilt = true;
     }
 }
 
@@ -146,7 +131,6 @@ void ScrollingImageList::rebuild (int nPage)
 
     //  go to the given page and render visible.
     goToPage(nPage);
-    delayedRender();
 }
 
 void ScrollingImageList::zoom (double theScale, int nPage)
@@ -162,7 +146,7 @@ void ScrollingImageList::zoom (double theScale, int nPage)
 }
 
 
-void ScrollingImageList::imagesBuiltSlot()
+void ScrollingImageList::onImagesReady()
 {
     //  draw the images that can be seen
     renderVisibleImages();
@@ -205,12 +189,6 @@ void ScrollingImageList::renderImage(int i)
     delete bitmap;
 }
 
-void ScrollingImageList::delayedRender()
-{
-    //  TODO:  something smarter
-    QTimer::singleShot(200, this, SLOT(imagesBuiltSlot()));
-}
-
 void ScrollingImageList::renderVisibleImages()
 {
     int nPages = m_document->GetPageCount();
@@ -233,7 +211,7 @@ void ScrollingImageList::renderVisibleImages()
 
 void ScrollingImageList::hilightImage(int nImage)
 {
-    if (!imagesBuilt())
+    if (!m_imagesBuilt)
         return;
 
     int nPages = m_document->GetPageCount();
@@ -251,17 +229,17 @@ bool ScrollingImageList::isImageVisible(int nPage)
     if (visibleRegion.isEmpty())
         return false;
 
-    QRect rect = visibleRegion.boundingRect();
+//    QRect rect = visibleRegion.boundingRect();
 
-    if (rect.height() < m_images[nPage].height()*0.20)
-        return false;
+//    if (rect.height() < m_images[nPage].height()*0.20)
+//        return false;
 
     return true;
 }
 
 void ScrollingImageList::goToPage (int nPage, bool evenIfVisible)
 {
-    if (!imagesBuilt())
+    if (!m_imagesBuilt)
         return;
 
     //  if the current page is in view, do nothing.
@@ -276,4 +254,18 @@ void ScrollingImageList::goToPage (int nPage, bool evenIfVisible)
     m_scrollArea->verticalScrollBar()->setValue(scrollTo);
 }
 
+bool ScrollingImageList::eventFilter(QObject *target, QEvent *event)
+{
+    //  process the event
+    bool result = QObject::eventFilter(target, event);
+
+    //  if it was a layout, render visible
+    if (event->type() == QEvent::LayoutRequest)
+    {
+        onImagesReady();
+    }
+
+    //  done
+    return result;
+}
 
