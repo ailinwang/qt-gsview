@@ -201,7 +201,7 @@ status_t muctx::InitializeContext()
 	for (i = 0; i < FZ_LOCK_MAX; i++)
     {
 #ifdef _QT
-        //  nothing to do?
+        pthread_mutex_init (&(mu_criticalsec[i]), NULL);
 #else
 		InitializeCriticalSectionEx(&mu_criticalsec[i], 0, 0);
 #endif
