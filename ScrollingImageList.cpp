@@ -26,6 +26,7 @@ void ScrollingImageList::setScrollArea(QScrollArea *scrollArea)
     connect (slider, SIGNAL(sliderReleased()), this, SLOT(sliderReleasedSlot()));
     connect (slider, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSlot(int)));
 
+    //  install an event filter on the scrolling area.
     QWidget* contentWidget = m_scrollArea->widget();
     contentWidget->installEventFilter(this);
 }
@@ -171,8 +172,6 @@ void ScrollingImageList::renderImage(int i)
 {
     point_t pageSize = m_images[i].pageSize();
 
-//    qDebug("rendering page %d at size %d x %d", i, (int)pageSize.X, (int)pageSize.Y);
-
     //  render
     int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
     Byte *bitmap = new Byte[numBytes];
@@ -229,8 +228,8 @@ bool ScrollingImageList::isImageVisible(int nPage)
     if (visibleRegion.isEmpty())
         return false;
 
+    //  I forget why I did this.
 //    QRect rect = visibleRegion.boundingRect();
-
 //    if (rect.height() < m_images[nPage].height()*0.20)
 //        return false;
 

@@ -60,7 +60,7 @@ ipp_jstate_t getJobState(int jobID)
     //  Free the job array
     cupsFreeJobs(num_jobs, jobs);
 
-    qDebug("monitor: job %d is in state %s", jobID, jobStateName(job_state).toStdString().c_str());
+//    qDebug("monitor: job %d is in state %s", jobID, jobStateName(job_state).toStdString().c_str());
 
     return job_state;
 }
@@ -106,7 +106,7 @@ void Printer::print()
         command += "-sOutputFile=\"" + newPath + "\"";
         command += " ";
         command += "\"" + m_window->getPath() + "\"";
-        qDebug("command is: %s", command.toStdString().c_str());
+//        qDebug("command is: %s", command.toStdString().c_str());
 
         //  do it, and wait
         process->start(command);

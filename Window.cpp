@@ -240,7 +240,7 @@ bool Window::OpenFile (QString path)
         command += "-sOutputFile=\"" + newPath + "\"";
         command += " -c .setpdfwrite ";
         command += "-f \"" + path + "\"";
-        qDebug("command is: %s", command.toStdString().c_str());
+//        qDebug("command is: %s", command.toStdString().c_str());
 
         //  do it, and wait
         process->start(command);
