@@ -30,6 +30,7 @@ public:
 
     void zoom (double scale, int nPage);
     void annot (bool showAnnotations);
+    void links (bool showLinks);
 
     void buildImages();
 
@@ -56,6 +57,7 @@ private:
     bool isImageVisible(int nPage);
     void rebuild (int nPage);
     void onImagesReady();
+    void reRender();
 
     QScrollArea *m_scrollArea = NULL;
     ImageWidget *m_images = NULL;
@@ -63,6 +65,7 @@ private:
     Document *m_document = NULL;
     double m_scale = 1.0;
     bool m_showAnnotations = true;
+    bool m_showLinks = false;
 };
 
 #endif  //  SCROLLINGIMAGELIST_H

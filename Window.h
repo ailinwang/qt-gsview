@@ -64,6 +64,7 @@ private slots:
     void toggleAnnotations();
     void homeSlot();
     void endSlot();
+    void toggleLinks();
 
 private:
     Ui::Window *ui;
@@ -104,6 +105,7 @@ private:
     static void countWindowDown() {if (m_numWindows>0) m_numWindows--;}
 
     bool m_showAnnotations = true;
+    bool m_showLinks = false;
 
     const double m_minScale = 0.05;
     const double m_maxScale = 5;

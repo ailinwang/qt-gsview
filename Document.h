@@ -27,11 +27,14 @@ public:
     bool RequiresPassword();
     bool ApplyPassword(const std::string password);
 
+    int GetLinks(int page_num);
+
 private:
 
     muctx *mu_ctx = NULL;
     bool m_opened = false;
     int m_pageCount = 0;
+    std::mutex mutex_lock;
 
 //    Page *m_pages = NULL;
 //    Page *m_thumbnails = NULL;

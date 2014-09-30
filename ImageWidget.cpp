@@ -15,20 +15,25 @@ void ImageWidget::paintEvent(QPaintEvent *event)
     //  draw ourselves
     QLabel::paintEvent(event);
 
+    QPainter painter(this);
+
     //  draw 'selected" appearance
     if (selected())
     {
-        QPainter painter(this);
-
         QRect rect(0,0,this->width(),this->height());
         rect.translate(2,2);
         rect.setWidth(rect.width()-4);
         rect.setHeight(rect.height()-4);
-
         QRectF rectf(rect);
+
         QPen lineStyle (QColor("#24A719"), 2);
         painter.setPen(lineStyle);
         painter.drawRect(rectf);
+    }
+
+    if (showLinks())
+    {
+        //  TODO
     }
 }
 

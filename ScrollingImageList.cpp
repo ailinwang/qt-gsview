@@ -87,7 +87,17 @@ void ScrollingImageList::buildImages()
 void ScrollingImageList::annot (bool showAnnotations)
 {
     m_showAnnotations = showAnnotations;
+    reRender();
+}
 
+void ScrollingImageList::links (bool showLinks)
+{
+    m_showLinks = showLinks;
+    reRender();
+}
+
+void ScrollingImageList::reRender()
+{
     //  just re-render any images that are currently rendered
     int nPages = m_document->GetPageCount();
     for (int i=0; i<nPages; i++)
@@ -181,6 +191,9 @@ void ScrollingImageList::renderImage(int i)
     QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
     QPixmap pix = QPixmap::fromImage(*myImage);
     m_images[i].setPixmap(pix);
+
+    //  get the links and put them in the image.
+    m_images[i].setShowLinks(m_showLinks);
 
     m_images[i].setRendered(true);
 

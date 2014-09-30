@@ -159,11 +159,12 @@
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
     <addaction name="actionZoom_Normal"/>
-    <addaction name="separator"/>
     <addaction name="actionFull_Screen"/>
+    <addaction name="separator"/>
     <addaction name="actionThumbnails"/>
     <addaction name="separator"/>
     <addaction name="actionAnnotations"/>
+    <addaction name="actionLinks"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -377,6 +378,15 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionLinks">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/hyperlink.png</normaloff>:/new/prefix1/resources/hyperlink.png</iconset>
+   </property>
+   <property name="text">
+    <string>Links</string>
    </property>
   </action>
  </widget>

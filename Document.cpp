@@ -66,6 +66,18 @@ bool Document::GetPageSize (int page_num, double scale, point_t *render_size)
     return true;
 }
 
+int Document::GetLinks(int page_num)
+{
+    sh_vector_link link_smart_ptr_vec(new std::vector<sh_link>());
+    mutex_lock.lock();
+    unsigned int num_items = mu_ctx->GetLinks(page_num, link_smart_ptr_vec);
+    mutex_lock.unlock();
+
+
+
+    return num_items;
+}
+
 bool Document::RenderPage (int page_num, double scale, unsigned char *bmp_data, int bmp_width,
                     int bmp_height, bool showAnnotations)
 {

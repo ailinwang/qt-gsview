@@ -52,8 +52,12 @@ Window::Window(QWidget *parent) :
 
     connect(ui->actionThumbnails, SIGNAL(triggered()), this, SLOT(actionThumbnails()));
     connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
+
     connect(ui->actionAnnotations, SIGNAL(triggered()), this, SLOT(toggleAnnotations()));
     ui->actionAnnotations->setText(tr("Hide &Annotations"));
+
+    connect(ui->actionLinks, SIGNAL(triggered()), this, SLOT(toggleLinks()));
+    ui->actionLinks->setText(tr("Show &Links"));
 
     //  help menu
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
@@ -105,6 +109,7 @@ void Window::setupToolbar()
 
     ui->toolBar->addAction(ui->actionThumbnails);
     ui->toolBar->addAction(ui->actionAnnotations);
+    ui->toolBar->addAction(ui->actionLinks);
 }
 
 Window::~Window()
@@ -551,6 +556,23 @@ void Window::toggleAnnotations()
         ui->actionAnnotations->setText(tr("Hide &Annotations"));
     }
 }
+
+void Window::toggleLinks()
+{
+    if (m_showLinks)
+    {
+        m_showLinks = false;
+        m_pages->links (m_showLinks);
+        ui->actionLinks->setText(tr("Show &Links"));
+    }
+    else
+    {
+        m_showLinks = true;
+        m_pages->links (m_showLinks);
+        ui->actionLinks->setText(tr("Hide &Links"));
+    }
+}
+
 
 void Window::homeSlot()
 {

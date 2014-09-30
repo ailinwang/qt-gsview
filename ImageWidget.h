@@ -43,6 +43,9 @@ public:
     bool clickable() const {return m_clickable;}
     void setClickable(bool val) {m_clickable = val;}
 
+    bool showLinks() const {return m_showLinks;}
+    void setShowLinks(bool showLinks) {m_showLinks = showLinks;}
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -54,6 +57,7 @@ private:
     point_t m_pageSize;
     bool m_selected = false;
     bool m_clickable = false;
+    bool m_showLinks = false;
 };
 
 #endif // IMAGEWIDGET_H
