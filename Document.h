@@ -7,6 +7,26 @@
 
 typedef unsigned char Byte;
 
+class Link
+{
+public:
+    int Type = NOT_SET;
+    std::string Uri;
+    int PageNum = -1;
+
+    int top = -1;
+    int bottom = -1;
+    int left = -1;
+    int right = -1;
+};
+
+class PageLinks
+{
+public:
+    bool processed = false;
+    std::vector<Link> links;
+};
+
 class Document
 {
 public:
@@ -27,7 +47,8 @@ public:
     bool RequiresPassword();
     bool ApplyPassword(const std::string password);
 
-    int GetLinks(int page_num);
+    int ComputeLinks (int page_num);
+    Link *GetLink(int page_num, int link_num);
 
 private:
 
@@ -35,6 +56,9 @@ private:
     bool m_opened = false;
     int m_pageCount = 0;
     std::mutex mutex_lock;
+
+    PageLinks *m_pageLinks = NULL;
+
 
 //    Page *m_pages = NULL;
 //    Page *m_thumbnails = NULL;

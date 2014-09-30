@@ -3,6 +3,7 @@
 
 #include "ImageWidget.h"
 #include "Window.h"
+#include "Document.h"
 
 ImageWidget::ImageWidget(QWidget *parent) :
     QLabel(parent)
@@ -33,7 +34,20 @@ void ImageWidget::paintEvent(QPaintEvent *event)
 
     if (showLinks())
     {
-        //  TODO
+        int n = m_document->ComputeLinks(m_pageNumber);
+        for (int i=0;i<n;i++)
+        {
+            Link *link = m_document->GetLink(m_pageNumber, i);
+            if (link != NULL)
+            {
+                //  make sure the rect is scaled
+                QRect rect(QPoint(m_scale*link->left,m_scale*link->top), QPoint(m_scale*link->right,m_scale*link->bottom));
+                QRectF rectf(rect);
+                QPen lineStyle (QColor("#24A719"), 2);
+                painter.setPen(lineStyle);
+                painter.drawRect(rectf);
+            }
+        }
     }
 }
 

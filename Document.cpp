@@ -48,6 +48,9 @@ bool Document::OpenFile(const std::string fileName)
 
     m_opened = true;
 
+    //  allocate an array of page links
+    m_pageLinks = new PageLinks[m_pageCount];
+
 //        //  allocate an array of pages
 //        m_pages = new Page[m_pageCount];
 
@@ -66,14 +69,60 @@ bool Document::GetPageSize (int page_num, double scale, point_t *render_size)
     return true;
 }
 
-int Document::GetLinks(int page_num)
+Link * Document::GetLink(int page_num, int link_num)
 {
+    int numItems = ComputeLinks(page_num);
+    if (numItems<=0)
+        return NULL;
+    if (link_num>=numItems)  //  zero-based
+        return NULL;
+
+    return &(m_pageLinks[page_num].links.at(link_num));
+}
+
+int Document::ComputeLinks(int page_num)
+{
+    //  see if links for this page were already done
+    if (m_pageLinks[page_num].processed)
+        return m_pageLinks[page_num].links.size();
+
+    //  get the links
     sh_vector_link link_smart_ptr_vec(new std::vector<sh_link>());
     mutex_lock.lock();
-    unsigned int num_items = mu_ctx->GetLinks(page_num, link_smart_ptr_vec);
+    int num_items = mu_ctx->GetLinks(page_num, link_smart_ptr_vec);
     mutex_lock.unlock();
 
+    //  no links found for this page
+    if (num_items == 0 || num_items == E_FAIL)
+        return 0;
 
+    //  run thru the list and repack
+    for (int k = 0; k < num_items; k++)
+    {
+        Link *new_link = new Link();
+        if (new_link == nullptr)
+            return 0;
+
+        sh_link muctx_link = link_smart_ptr_vec->at(k);
+
+        new_link->top    = muctx_link->upper_left.Y;
+        new_link->left   = muctx_link->upper_left.X;
+        new_link->bottom = muctx_link->lower_right.Y;
+        new_link->right  = muctx_link->lower_right.X;
+
+        new_link->PageNum = muctx_link->page_num;
+        new_link->Type = muctx_link->type;
+
+        if (new_link->Type == LINK_URI)
+        {
+            new_link->Uri = muctx_link->uri.get();
+        }
+
+        //  add to this page's link list
+        m_pageLinks[page_num].links.push_back(*new_link);
+    }
+
+    m_pageLinks[page_num].processed = true;
 
     return num_items;
 }

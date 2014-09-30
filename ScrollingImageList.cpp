@@ -76,6 +76,7 @@ void ScrollingImageList::buildImages()
             m_images[i].setPageSize(pageSize);
             m_images[i].setBackgroundRole(QPalette::Dark);
             m_images[i].setClickable(clickable());
+            m_images[i].setDocument(document());
 
             contentWidget->layout()->addWidget(&(m_images[i]));
         }
@@ -192,7 +193,11 @@ void ScrollingImageList::renderImage(int i)
     QPixmap pix = QPixmap::fromImage(*myImage);
     m_images[i].setPixmap(pix);
 
-    //  get the links and put them in the image.
+    //  get the links
+    //  TODO: put them somewhere
+    m_document->ComputeLinks(i);
+
+    //  tell image to show or hide the links.
     m_images[i].setShowLinks(m_showLinks);
 
     m_images[i].setRendered(true);
