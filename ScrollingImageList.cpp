@@ -94,7 +94,17 @@ void ScrollingImageList::annot (bool showAnnotations)
 void ScrollingImageList::links (bool showLinks)
 {
     m_showLinks = showLinks;
-    reRender();
+    //  just re-render any images that are currently rendered
+    int nPages = m_document->GetPageCount();
+    for (int i=0; i<nPages; i++)
+    {
+        if (m_images[i].rendered())
+        {
+            m_images[i].setShowLinks(showLinks);
+            m_images[i].repaint();
+        }
+
+    }
 }
 
 void ScrollingImageList::reRender()

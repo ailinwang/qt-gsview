@@ -26,11 +26,10 @@ void ImageWidget::paintEvent(QPaintEvent *event)
         rect.translate(2,2);
         rect.setWidth(rect.width()-4);
         rect.setHeight(rect.height()-4);
-        QRectF rectf(rect);
 
         QPen lineStyle (QColor("#24A719"), 2);
         painter.setPen(lineStyle);
-        painter.drawRect(rectf);
+        painter.drawRect(rect);
     }
 
     if (showLinks())
@@ -41,15 +40,14 @@ void ImageWidget::paintEvent(QPaintEvent *event)
             Link *link = m_document->GetLink(m_pageNumber, i);
             if (link != NULL)
             {
-                //  make sure the rect is scaled
-                QRect rect(QPoint(m_scale*link->left,m_scale*link->top), QPoint(m_scale*link->right,m_scale*link->bottom));
-                QRectF rectf(rect);
-                QPen lineStyle (QColor("#24A719"), 2);
-                painter.setPen(lineStyle);
-                painter.drawRect(rectf);
+                //  draw transparent blue filled rect
+                QRect rect ( QPoint(m_scale*link->left,m_scale*link->top),
+                             QPoint(m_scale*link->right,m_scale*link->bottom));
+                painter.fillRect(rect, QBrush(QColor("#506EB3E8")));  //  transparent blue
             }
         }
     }
+
 }
 
 void ImageWidget::setSelected(bool isSelected)
@@ -71,14 +69,15 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
     //  post event if it was a click
     if (event->type() == QEvent::MouseButtonRelease)
     {
-        if (m_inLink && m_link)
+        if (m_mouseInLink)
         {
-            //  launch the url
-            QUrl url(QString(m_link->Uri.c_str()));
-            bool result = QDesktopServices::openUrl(url);
+            //  in a link, so launch the url
+            QUrl url(QString(m_mouseInLink->Uri.c_str()));
+            QDesktopServices::openUrl(url);
         }
         else
         {
+            //  not in a link, post this event to the window
             QApplication::postEvent(this->window(), new ImageClickedEvent(m_pageNumber));
         }
     }
@@ -89,45 +88,47 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
 
 void ImageWidget::mouseMoveEvent( QMouseEvent * event )
 {
+    //  get coordinates of the cursor relative to the widget
+    //
     int x = event->x();
     int y = event->y();
 
-    bool inLink = false;
-
+    //  determine if the mouse is inside a link, and which one.
     int n = m_document->ComputeLinks(m_pageNumber);
     Link *linkIAmIn = NULL;
-    for (int i=0;i<n;i++)
+    for (int i=0; i<n; i++)
     {
         Link *link = m_document->GetLink(m_pageNumber, i);
         if (link != NULL)
         {
             //  make sure the rect is scaled
-            QRect rect(QPoint(m_scale*link->left,m_scale*link->top), QPoint(m_scale*link->right,m_scale*link->bottom));
+            QRect rect( QPoint(m_scale*link->left,m_scale*link->top),
+                        QPoint(m_scale*link->right,m_scale*link->bottom));
             if (rect.contains(QPoint(x,y)))
             {
-                inLink = true;
+                //  we're in a link
                 linkIAmIn = link;
                 break;
             }
         }
     }
 
-    if (m_inLink != inLink)
+    //  if the link we're in has changed,
+    if (m_mouseInLink != linkIAmIn)
     {
-        if (inLink)
+        if (linkIAmIn)
         {
+            //  in a link, so show the pointing hand
             QApplication::setOverrideCursor(Qt::PointingHandCursor);
-//            qDebug("setting hand");
-            m_link = linkIAmIn;
         }
         else
         {
+            //  not in a link, so restore normal cursor.
             QApplication::restoreOverrideCursor();
-//            qDebug("clearing hand");
-            m_link = NULL;
         }
 
-        m_inLink = inLink;
+        //  remember new value
+        m_mouseInLink = linkIAmIn;
     }
 
 }

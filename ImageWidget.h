@@ -66,8 +66,7 @@ private:
     bool m_clickable = false;
     bool m_showLinks = false;
     Document *m_document = NULL;
-    bool m_inLink = false;
-    Link *m_link = NULL;
+    Link *m_mouseInLink = NULL;
 };
 
 #endif // IMAGEWIDGET_H
