@@ -7,6 +7,7 @@
 #include "muctx.h"
 
 class Document;
+class Link;
 
 //  custom event that's sent when we are clicked
 class ImageClickedEvent : public QEvent
@@ -50,6 +51,8 @@ public:
 
     void setDocument(Document *doc) {m_document=doc;}
 
+    void mouseMoveEvent( QMouseEvent * event );
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -63,6 +66,8 @@ private:
     bool m_clickable = false;
     bool m_showLinks = false;
     Document *m_document = NULL;
+    bool m_inLink = false;
+    Link *m_link = NULL;
 };
 
 #endif // IMAGEWIDGET_H

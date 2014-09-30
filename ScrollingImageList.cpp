@@ -193,10 +193,6 @@ void ScrollingImageList::renderImage(int i)
     QPixmap pix = QPixmap::fromImage(*myImage);
     m_images[i].setPixmap(pix);
 
-    //  get the links
-    //  TODO: put them somewhere
-    m_document->ComputeLinks(i);
-
     //  tell image to show or hide the links.
     m_images[i].setShowLinks(m_showLinks);
 

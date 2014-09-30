@@ -59,7 +59,6 @@ private:
 
     PageLinks *m_pageLinks = NULL;
 
-
 //    Page *m_pages = NULL;
 //    Page *m_thumbnails = NULL;
 };
