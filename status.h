@@ -4,7 +4,7 @@ typedef enum {
 	S_ISOK = 0,
     E_FAILURE = -1,
 #ifdef _QT
-    E_FAIL = -1,
+    E_FAILX = -1,
 #endif
     E_OUTOFMEM = -2,
 	E_NEEDPASSWORD = -3

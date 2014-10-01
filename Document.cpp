@@ -93,7 +93,7 @@ int Document::ComputeLinks(int page_num)
     mutex_lock.unlock();
 
     //  no links found for this page
-    if (num_items == 0 || num_items == E_FAIL)
+    if (num_items == 0 || num_items == E_FAILURE)
         return 0;
 
     //  run thru the list and repack

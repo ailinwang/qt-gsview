@@ -60,6 +60,9 @@ unix: LIBS += -L$$PWD/../../build/debug/
 #  the order of the libraries here is very important.
 unix: LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs -lcups
 
+win32:  LIBS += -L$$PWD/../../build/debug/
+win32:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
+
 macx: LIBS += -lssl -lcrypto
 
 INCLUDEPATH += $$PWD/../../build/debug

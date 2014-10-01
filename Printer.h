@@ -2,7 +2,9 @@
 #define PRINTER_H
 
 #include "Window.h"
+#ifdef USE_CUPS
 #include <cups/cups.h>
+#endif
 #include <QTimer>
 
 #include <QObject>

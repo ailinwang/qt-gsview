@@ -14,12 +14,15 @@
 #include <QTimer>
 #include <QFileInfo>
 
+#ifdef USE_CUPS
 #include <cups/cups.h>
+#endif
 
 Printer::Printer(QObject *parent) : QObject(parent)
 {
 }
 
+#ifdef USE_CUPS
 QString jobStateName(ipp_jstate_t state)
 {
     switch (state)
@@ -65,6 +68,8 @@ ipp_jstate_t getJobState(int jobID)
     return job_state;
 }
 
+#endif
+
 void Printer::print()
 {
     //  get the printer
@@ -90,10 +95,15 @@ void Printer::print()
     if (fileInfo.suffix().toLower() == QString("pdf"))
     {
         //  print it as is
+#ifdef USE_CUPS
         pdfPrint (&printer, m_window->getPath(), fromPage, toPage);
+#else
+        bitmapPrint (&printer, fromPage, toPage);
+#endif
     }
     else if (fileInfo.suffix().toLower() == QString("xps"))
     {
+#ifdef USE_CUPS
         //  put the result into the temp folder
         QString newPath = QtUtil::getTempFolderPath() + fileInfo.fileName() + ".pdf";
 
@@ -114,6 +124,9 @@ void Printer::print()
 
         //  print the new one
         pdfPrint (&printer, newPath, fromPage, toPage);
+#else
+        bitmapPrint (&printer, fromPage, toPage);
+#endif
     }
     else
     {
@@ -123,6 +136,7 @@ void Printer::print()
     }
 }
 
+#ifdef USE_CUPS
 void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPage)
 {
     //  set up options
@@ -155,6 +169,7 @@ void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPag
         QMessageBox::information(m_window, "", "Error creating print job.");
     }
 }
+#endif
 
 void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
 {

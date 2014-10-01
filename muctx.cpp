@@ -280,7 +280,7 @@ int muctx::MeasurePage(int page_num, point_t *size)
 	}
 	fz_catch(mu_ctx)
 	{
-		return E_FAIL;
+        return E_FAILURE;
 	}
 	return 0;
 }
@@ -354,7 +354,7 @@ int muctx::GetContents(sh_vector_content contents_vec)
 	}
 	fz_catch(mu_ctx)
 	{
-		return E_FAIL;
+        return E_FAILURE;
 	}
 	return has_content;
 }
@@ -401,7 +401,7 @@ int muctx::GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec)
 	}
 	fz_catch(mu_ctx)
 	{
-		return E_FAIL;
+        return E_FAILURE;
 	}
 	return hit_count;
 }
@@ -474,7 +474,7 @@ unsigned int muctx::GetLinks(int page_num, sh_vector_link links_vec)
 	}
 	fz_catch(mu_ctx)
 	{
-		return E_FAIL;
+        return E_FAILURE;
 	}
 	return num_links;
 }
