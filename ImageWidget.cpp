@@ -32,7 +32,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
         painter.drawRect(rect);
     }
 
-    if (showLinks())
+    if (showLinks() && !thumbnail())
     {
         int n = m_document->ComputeLinks(m_pageNumber);
         for (int i=0;i<n;i++)
@@ -69,13 +69,13 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
     //  post event if it was a click
     if (event->type() == QEvent::MouseButtonRelease)
     {
-        if (m_mouseInLink)
+        if (m_mouseInLink && !thumbnail())
         {
             //  in a link, so launch the url
             QUrl url(QString(m_mouseInLink->Uri.c_str()));
             QDesktopServices::openUrl(url);
         }
-        else
+        else if (thumbnail())
         {
             //  not in a link, post this event to the window
             QApplication::postEvent(this->window(), new ImageClickedEvent(m_pageNumber));
@@ -88,47 +88,53 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
 
 void ImageWidget::mouseMoveEvent( QMouseEvent * event )
 {
-    //  get coordinates of the cursor relative to the widget
-    //
-    int x = event->x();
-    int y = event->y();
-
-    //  determine if the mouse is inside a link, and which one.
-    int n = m_document->ComputeLinks(m_pageNumber);
-    Link *linkIAmIn = NULL;
-    for (int i=0; i<n; i++)
+    if (!thumbnail())
     {
-        Link *link = m_document->GetLink(m_pageNumber, i);
-        if (link != NULL)
+        //  get coordinates of the cursor relative to the widget
+        //
+        int x = event->x();
+        int y = event->y();
+
+        //  determine if the mouse is inside a link, and which one.
+        int n = m_document->ComputeLinks(m_pageNumber);
+        Link *linkIAmIn = NULL;
+        for (int i=0; i<n; i++)
         {
-            //  make sure the rect is scaled
-            QRect rect( QPoint(m_scale*link->left,m_scale*link->top),
-                        QPoint(m_scale*link->right,m_scale*link->bottom));
-            if (rect.contains(QPoint(x,y)))
+            Link *link = m_document->GetLink(m_pageNumber, i);
+            if (link != NULL)
             {
-                //  we're in a link
-                linkIAmIn = link;
-                break;
+                //  make sure the rect is scaled
+                QRect rect( QPoint(m_scale*link->left,m_scale*link->top),
+                            QPoint(m_scale*link->right,m_scale*link->bottom));
+                if (rect.contains(QPoint(x,y)))
+                {
+                    //  we're in a link
+                    linkIAmIn = link;
+                    break;
+                }
             }
         }
-    }
 
-    //  if the link we're in has changed,
-    if (m_mouseInLink != linkIAmIn)
-    {
-        if (linkIAmIn)
+        //  if the link we're in has changed,
+        if (m_mouseInLink != linkIAmIn)
         {
-            //  in a link, so show the pointing hand
-            QApplication::setOverrideCursor(Qt::PointingHandCursor);
-        }
-        else
-        {
-            //  not in a link, so restore normal cursor.
-            QApplication::restoreOverrideCursor();
+            if (linkIAmIn)
+            {
+                //  in a link, so show the pointing hand
+                this->setCursor(Qt::PointingHandCursor);
+                qApp->processEvents();
+            }
+            else
+            {
+                //  not in a link, so restore normal cursor.
+                this->setCursor(Qt::ArrowCursor);
+                qApp->processEvents();
+            }
+
+            //  remember new value
+            m_mouseInLink = linkIAmIn;
         }
 
-        //  remember new value
-        m_mouseInLink = linkIAmIn;
     }
 
 }

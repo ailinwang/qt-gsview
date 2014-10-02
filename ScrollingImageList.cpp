@@ -75,7 +75,7 @@ void ScrollingImageList::buildImages()
             m_images[i].setScale(theScale);
             m_images[i].setPageSize(pageSize);
             m_images[i].setBackgroundRole(QPalette::Dark);
-            m_images[i].setClickable(clickable());
+            m_images[i].setThumbnail(thumbnails());
             m_images[i].setDocument(document());
 
             contentWidget->layout()->addWidget(&(m_images[i]));

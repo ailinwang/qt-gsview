@@ -37,7 +37,7 @@ public:
     void setScale(double scale) {m_scale=scale;}
     virtual double getScale();
 
-    virtual bool clickable() {return false;}
+    virtual bool thumbnails() {return false;}
 
     bool eventFilter(QObject *target, QEvent *event);
 

@@ -6,28 +6,28 @@
 
 macx: ICON = resources/gsview_app.icns
 
+#  C and C++ compiler configuration
 CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
 macx: QMAKE_CXXFLAGS += -stdlib=libstdc++
 
+#  include file paths
 INCPATH+=.
 INCPATH+=../../include/
 
+#  proprocessor
 DEFINES += _QT
-
 macx: DEFINES += _QT_MAC
+unix: DEFINES += USE_CUPS
 
-unix:  DEFINES += USE_CUPS
-
+#  Qt configuration
 QT       += core gui
-
 qtHaveModule(printsupport): QT += printsupport
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 TARGET = gsview
 TEMPLATE = app
 
+#  various files
 HEADERS       = \
     muctx.h \
     status.h \
@@ -58,40 +58,26 @@ SOURCES       = \
     PageList.cpp \
     Printer.cpp
 
-unix: LIBS += -L$$PWD/../../build/debug/
-#  the order of the libraries here is very important.
-unix: LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs -lcups
-
-win32:  LIBS += -L$$PWD/../../build/debug/
-win32:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
-
-macx: LIBS += -lssl -lcrypto
-
-INCLUDEPATH += $$PWD/../../build/debug
-DEPENDPATH += $$PWD/../../build/debug
-
-unix: PRE_TARGETDEPS += $$PWD/../../build/debug/libfreetype.a
-unix: PRE_TARGETDEPS += $$PWD/../../build/debug/libjbig2dec.a
-unix: PRE_TARGETDEPS += $$PWD/../../build/debug/libjpeg.a
-unix: PRE_TARGETDEPS += $$PWD/../../build/debug/libmujs.a
-unix: PRE_TARGETDEPS += $$PWD/../../build/debug/libmupdf.a
-unix: PRE_TARGETDEPS += $$PWD/../../build/debug/libopenjpeg.a
-unix: PRE_TARGETDEPS += $$PWD/../../build/debug/libz.a
-
 FORMS += \
     Window.ui
 
 RESOURCES += \
     resources.qrc
 
+#  Libraries to link to
+#  the order of the libraries here is very important.
+LIBS += -L$$PWD/../../build/debug/
+unix:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs -lcups
+win32: LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
+macx:  LIBS += -lssl -lcrypto
+
 #  The stuff below copies some executable files, and controls where the
 #  main app will look for them
 
 unix:!macx {
-
-OTHER_FILES += \
-    linuxApps/gs \
-    linuxApps/gxps
+    OTHER_FILES += \
+        linuxApps/gs \
+        linuxApps/gxps
 
     QMAKE_POST_LINK += $$quote(mkdir -p ./apps $$escape_expand(\n\t))
     QMAKE_POST_LINK += $$quote(cp $$PWD/linuxApps/gs ./apps/gs $$escape_expand(\n\t))
@@ -99,13 +85,10 @@ OTHER_FILES += \
 }
 
 macx {
-
     OTHER_FILES += \
         macApps/gs \
         macApps/gxps
-
     QMAKE_POST_LINK += $$quote(mkdir -p ./apps $$escape_expand(\n\t))
     QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gs ./apps/gs $$escape_expand(\n\t))
     QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gxps ./apps/gxps $$escape_expand(\n\t))
 }
-

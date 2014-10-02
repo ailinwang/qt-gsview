@@ -43,8 +43,8 @@ public:
     bool selected() const {return m_selected;}
     void setSelected(bool selected);
 
-    bool clickable() const {return m_clickable;}
-    void setClickable(bool val) {m_clickable = val;}
+    bool thumbnail() const {return m_thumbnail;}
+    void setThumbnail(bool val) {m_thumbnail = val;}
 
     bool showLinks() const {return m_showLinks;}
     void setShowLinks(bool showLinks) {m_showLinks = showLinks;}
@@ -63,7 +63,7 @@ private:
     double m_scale = 1.0;
     point_t m_pageSize;
     bool m_selected = false;
-    bool m_clickable = false;
+    bool m_thumbnail = false;
     bool m_showLinks = false;
     Document *m_document = NULL;
     Link *m_mouseInLink = NULL;

@@ -9,7 +9,7 @@ public:
     ThumbnailList();
 
     virtual double getScale();
-    virtual bool clickable() {return true;}
+    virtual bool thumbnails() {return true;}
 
 protected:
 };

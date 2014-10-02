@@ -130,8 +130,44 @@ int Document::ComputeLinks(int page_num)
 bool Document::RenderPage (int page_num, double scale, unsigned char *bmp_data, int bmp_width,
                     int bmp_height, bool showAnnotations)
 {
-    mu_ctx->RenderPage (page_num, bmp_data, bmp_width,
-                       bmp_height, scale, false, showAnnotations);
+
+//    mu_ctx->RenderPage (page_num, bmp_data, bmp_width,
+//                       bmp_height, scale, false, showAnnotations);
+
+    //  bmp_data has already been allocated by the caller.
+    if (bmp_data == NULL)
+    {
+        return false;
+    }
+
+    mutex_lock.lock();
+
+    void *dlist = NULL;
+    int page_height;
+    int page_width;
+    dlist = (void*) mu_ctx->CreateDisplayList (page_num, &page_width, &page_height);
+
+    void *annotlist = NULL;
+    if (showAnnotations)
+        annotlist = (void*) mu_ctx->CreateAnnotationList (page_num);
+
+    mutex_lock.unlock();
+
+    if (dlist == NULL)
+    {
+        return false;
+    }
+
+    status_t code = mu_ctx->RenderPageMT (dlist, annotlist, page_width, page_height,
+                                    &(bmp_data[0]), bmp_width, bmp_height,
+                                    scale, false, false,
+                                    { double(0), double(0) },
+                                    { double(page_width), double(page_height) });
+    if (code != S_ISOK)
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -150,4 +186,3 @@ bool Document::ApplyPassword(const std::string password)
     bool ok = mu_ctx->ApplyPassword((char *)password.c_str());
     return ok;
 }
-
