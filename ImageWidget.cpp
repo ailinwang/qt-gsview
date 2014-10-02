@@ -47,7 +47,6 @@ void ImageWidget::paintEvent(QPaintEvent *event)
             }
         }
     }
-
 }
 
 void ImageWidget::setSelected(bool isSelected)
@@ -122,7 +121,7 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
             }
         }
 
-        //  if the link we're in has changed,
+        //  if the link we're in has changed, show/hide the hand cursor
         if (m_mouseInLink != linkIAmIn)
         {
             if (linkIAmIn)
@@ -140,7 +139,32 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
 
             //  remember new value
             m_mouseInLink = linkIAmIn;
+
+            //  if we're currently in a link, show/hide a tool tip
+            if (m_mouseInLink)
+            {
+                if (linkIAmIn->Type==LINK_GOTO)
+                {
+                    QToolTip::showText(event->globalPos(), QString("go to page ")+QString::number(linkIAmIn->PageNum));
+                }
+                else if (linkIAmIn->Type==LINK_URI)
+                {
+                    QToolTip::showText(event->globalPos(), QString(linkIAmIn->Uri.c_str()));
+                }
+                else
+                {
+                    QToolTip::hideText();
+                }
+            }
+            else
+            {
+                QToolTip::hideText();
+            }
+            qApp->processEvents();
+
         }
+
+
 
     }
 
