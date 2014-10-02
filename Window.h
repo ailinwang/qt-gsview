@@ -37,6 +37,7 @@ public:
     Document *document() {return m_document;}
     bool getShowAnnotations() {return m_showAnnotations;}
     QString getPath() {return m_path;}
+    void goToPage(int nPage);
 
 protected:
 	void keyPressEvent(QKeyEvent* event);
@@ -77,7 +78,7 @@ private:
     void enterFullScreen();
     void exitFullScreen();
     bool handlePassword();
-    void goToPage(int nPage);
+
     void zoom(double scale);
 
     //  pages

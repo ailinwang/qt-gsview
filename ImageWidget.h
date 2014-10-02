@@ -29,7 +29,6 @@ public:
     virtual void paintEvent(QPaintEvent *);
 
     void setPage(int nPage) {m_pageNumber=nPage;}
-    void setWindow (void *pWin) {m_window=pWin;}
 
     bool rendered() const {return m_rendered;}
     void setRendered(bool rendered) {m_rendered = rendered;}
@@ -58,7 +57,6 @@ protected:
 
 private:
     int m_pageNumber = 0;
-    void *m_window = NULL;
     bool m_rendered = false;
     double m_scale = 1.0;
     point_t m_pageSize;

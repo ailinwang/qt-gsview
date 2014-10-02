@@ -71,9 +71,16 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
     {
         if (m_mouseInLink && !thumbnail())
         {
-            //  in a link, so launch the url
-            QUrl url(QString(m_mouseInLink->Uri.c_str()));
-            QDesktopServices::openUrl(url);
+            //  handle URI and GOTO links
+            if (m_mouseInLink->Type == LINK_URI)
+            {
+                QUrl url(QString(m_mouseInLink->Uri.c_str()));
+                QDesktopServices::openUrl(url);
+            }
+            else if (m_mouseInLink->Type == LINK_GOTO)
+            {
+                ((Window *)this->window())->goToPage(m_mouseInLink->PageNum);
+            }
         }
         else if (thumbnail())
         {
