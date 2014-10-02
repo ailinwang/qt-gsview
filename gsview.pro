@@ -17,6 +17,8 @@ DEFINES += _QT
 
 macx: DEFINES += _QT_MAC
 
+unix:  DEFINES += USE_CUPS
+
 QT       += core gui
 
 qtHaveModule(printsupport): QT += printsupport
