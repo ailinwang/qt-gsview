@@ -62,7 +62,7 @@ bool Document::OpenFile(const std::string fileName)
 //        m_pages = new Page[m_pageCount];
 
     //  allocate an array of text block lists
-    m_block_list = new QVector<TextBlock>[m_pageCount];
+    m_block_list = new std::vector<TextBlock>[m_pageCount];
 
     return true;
 }
@@ -225,7 +225,7 @@ void Document::ComputeTextBlocks (int page_num)
             block->Width = width;
             block->Height = height;
             block->PageNumber = page_num;
-            block->line_list = new QVector<TextLine>();
+            block->line_list = new std::vector<TextLine>();
 
             //  add block to the block list
             m_block_list[page_num].push_back(*block);
@@ -242,7 +242,7 @@ void Document::ComputeTextBlocks (int page_num)
                 line->Y = top_y;
                 line->Width = width;
                 line->Height = height;
-                line->char_list = new QVector<TextCharacter>();
+                line->char_list = new std::vector<TextCharacter>();
 
                 //  add to the block's line list
                 block->line_list->push_back(*line);
@@ -273,7 +273,7 @@ void Document::HilightBlocks (double scale, int pageNumber, QPainter *painter)
     bool drawLines = true;
     bool drawChars = false;
 
-    int num_blocks = m_block_list[pageNumber].length();
+    int num_blocks = m_block_list[pageNumber].size();
     for (int kk = 0; kk < num_blocks; kk++)
     {
         TextBlock block = m_block_list[pageNumber].at(kk);
@@ -285,7 +285,7 @@ void Document::HilightBlocks (double scale, int pageNumber, QPainter *painter)
             painter->fillRect(brect, QBrush(QColor("#506EB3E8")));
         }
 
-        int num_lines = block.line_list->length();
+        int num_lines = block.line_list->size();
         for (int jj = 0; jj < num_lines; jj++)
         {
             TextLine line = block.line_list->at(jj);
@@ -298,7 +298,7 @@ void Document::HilightBlocks (double scale, int pageNumber, QPainter *painter)
                 painter->drawRect(lrect);
             }
 
-            int num_chars = line.char_list->length();
+            int num_chars = line.char_list->size();
             for (int ii = 0; ii < num_chars; ii++)
             {
                 TextCharacter theChar = line.char_list->at(ii);

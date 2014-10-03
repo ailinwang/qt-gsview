@@ -1,7 +1,7 @@
 #ifndef DOCUMENT_H
 #define DOCUMENT_H
 
-#include <QVector>
+#include <vector>
 
 #include "status.h"
 #include "muctx.h"
@@ -29,14 +29,14 @@ public:
 class TextLine : public Block
 {
 public:
-    QVector<TextCharacter> *char_list;
+    std::vector<TextCharacter> *char_list;
 };
 
 class TextBlock : public Block
 {
 public:
     int PageNumber;
-    QVector<TextLine> *line_list;
+    std::vector<TextLine> *line_list;
 };
 
 class Link
@@ -98,7 +98,7 @@ private:
 //    Page *m_pages = NULL;
 //    Page *m_thumbnails = NULL;
 
-    QVector<TextBlock> *m_block_list = NULL;
+    std::vector<TextBlock> *m_block_list = NULL;
 };
 
 #endif // DOCUMENT_H
