@@ -145,7 +145,7 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
             {
                 if (linkIAmIn->Type==LINK_GOTO)
                 {
-                    QToolTip::showText(event->globalPos(), QString("go to page ")+QString::number(linkIAmIn->PageNum));
+                    QToolTip::showText(event->globalPos(), QString("go to page ")+QString::number(linkIAmIn->PageNum+1));
                 }
                 else if (linkIAmIn->Type==LINK_URI)
                 {

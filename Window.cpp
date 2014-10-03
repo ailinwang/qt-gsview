@@ -499,19 +499,14 @@ void Window::updateActions()
 
 void Window::customEvent (QEvent *event)
 {
-    switch (event->type())
+    if (event->type() == ImageClickedEvent::IMAGE_CLICKED_EVENT)
     {
-    case ImageClickedEvent::IMAGE_CLICKED_EVENT:
-        {
-            int nPage = static_cast<ImageClickedEvent *>(event)->getPageNumber();
-            goToPage (nPage);
-        }
-        break;
-
-    default:
-        QMainWindow::customEvent(event);
-        break;
+        int nPage = static_cast<ImageClickedEvent *>(event)->getPageNumber();
+        goToPage (nPage);
+        return;
     }
+
+    QMainWindow::customEvent(event);
 }
 
 void Window::thumbnailsReady()
