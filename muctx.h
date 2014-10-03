@@ -122,7 +122,7 @@ public:
 							point_t bottom_right);
 	fz_display_list* CreateDisplayList(int page_num, int *width, int *height);
 	fz_display_list * CreateDisplayListText(int page_num, int *width,
-		int *height, fz_text_page **text, int *length);
+        int *height, fz_text_page **text, int *length, bool useCache);
 	fz_display_list * CreateAnnotationList(int page_num);
 	int MeasurePage(int page_num, point_t *size);
 	point_t MeasurePage(fz_page *page);
@@ -136,6 +136,13 @@ public:
 	bool ApplyPassword(char* password);
 	status_t SavePage(char *filename, int pagenum, int resolution, int type,
 		bool append);
+
+    int GetTextBlock (void *page, int block_num,
+        double *top_x, double *top_y, double *height, double *width);
+    int GetTextLine(void *page, int block_num, int line_num,
+        double *top_x, double *top_y, double *height, double *width);
+    int GetTextCharacter(void *page, int block_num, int line_num,
+        int item_num, double *top_x, double *top_y, double *height, double *width);
 
 #ifdef _WINRT_DLL
 	status_t InitializeStream(IRandomAccessStream^ readStream, char *ext);

@@ -47,6 +47,9 @@ void ImageWidget::paintEvent(QPaintEvent *event)
             }
         }
     }
+
+//    //  TESTTESTTEST:  hilight blocks
+//    m_document->HilightBlocks (m_scale, m_pageNumber, &painter);
 }
 
 void ImageWidget::setSelected(bool isSelected)

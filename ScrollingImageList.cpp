@@ -198,6 +198,8 @@ void ScrollingImageList::renderImage(int i)
     Byte *bitmap = new Byte[numBytes];
     m_document->RenderPage (i, m_images[i].scale(), bitmap, pageSize.X, pageSize.Y, m_showAnnotations);
 
+    m_document->ComputeTextBlocks(i);
+
     //  copy to widget
     QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
     QPixmap pix = QPixmap::fromImage(*myImage);

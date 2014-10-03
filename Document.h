@@ -1,11 +1,43 @@
 #ifndef DOCUMENT_H
 #define DOCUMENT_H
 
+#include <QVector>
+
 #include "status.h"
 #include "muctx.h"
 #include "Page.h"
 
+class QPainter;
+
 typedef unsigned char Byte;
+
+class Block
+{
+public:
+    double Height;
+    double Width;
+    double X;
+    double Y;
+};
+
+class TextCharacter : public Block
+{
+public:
+    char character;
+};
+
+class TextLine : public Block
+{
+public:
+    QVector<TextCharacter> *char_list;
+};
+
+class TextBlock : public Block
+{
+public:
+    int PageNumber;
+    QVector<TextLine> *line_list;
+};
 
 class Link
 {
@@ -50,6 +82,10 @@ public:
     int ComputeLinks (int page_num);
     Link *GetLink(int page_num, int link_num);
 
+    void ComputeTextBlocks (int page_num);
+
+    void HilightBlocks (double scale, int pageNumber, QPainter *painter);
+
 private:
 
     muctx *mu_ctx = NULL;
@@ -61,6 +97,8 @@ private:
 
 //    Page *m_pages = NULL;
 //    Page *m_thumbnails = NULL;
+
+    QVector<TextBlock> *m_block_list = NULL;
 };
 
 #endif // DOCUMENT_H

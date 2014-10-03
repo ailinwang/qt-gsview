@@ -1,5 +1,12 @@
 #include "Document.h"
 
+#include <QString>
+#include <QPainter>
+#include <QRect>
+#include <QPoint>
+#include <QBrush>
+#include <QColor>
+
 Document::Document()
 {
 }
@@ -53,6 +60,9 @@ bool Document::OpenFile(const std::string fileName)
 
 //        //  allocate an array of pages
 //        m_pages = new Page[m_pageCount];
+
+    //  allocate an array of text block lists
+    m_block_list = new QVector<TextBlock>[m_pageCount];
 
     return true;
 }
@@ -185,4 +195,123 @@ bool Document::ApplyPassword(const std::string password)
 {
     bool ok = mu_ctx->ApplyPassword((char *)password.c_str());
     return ok;
+}
+
+void Document::ComputeTextBlocks (int page_num)
+{
+    int width;
+    int height;
+    int num_blocks;
+    fz_text_page *text;
+    void *text_ptr = (void*)mu_ctx->CreateDisplayListText (page_num, &width, &height, &text, &num_blocks, false);
+
+    m_block_list[page_num].clear();
+    //  TODO: optimize
+
+    if (num_blocks>0)
+    {
+        //  for each block
+        for (int kk = 0; kk < num_blocks; kk++)
+        {
+            double top_x = 0, top_y = 0, height = 0, width = 0;
+
+            //  get next block
+            int num_lines = mu_ctx->GetTextBlock (text, kk, &top_x, &top_y, &height, &width);
+
+            //  init the block
+            TextBlock *block = new TextBlock();
+            block->X = top_x;
+            block->Y = top_y;
+            block->Width = width;
+            block->Height = height;
+            block->PageNumber = page_num;
+            block->line_list = new QVector<TextLine>();
+
+            //  add block to the block list
+            m_block_list[page_num].push_back(*block);
+
+            //  for each line
+            for (int jj = 0; jj < num_lines; jj++)
+            {
+                //  get next line
+                int num_chars = mu_ctx->GetTextLine (text, kk, jj, &top_x, &top_y, &height, &width);
+
+                //  init line
+                TextLine *line = new TextLine();
+                line->X = top_x;
+                line->Y = top_y;
+                line->Width = width;
+                line->Height = height;
+                line->char_list = new QVector<TextCharacter>();
+
+                //  add to the block's line list
+                block->line_list->push_back(*line);
+
+                for (int mm = 0; mm < num_chars; mm++)
+                {
+                    int character = mu_ctx->GetTextCharacter(text, kk, jj, mm, &top_x,
+                        &top_y, &height, &width);
+
+                    TextCharacter *textchar = new TextCharacter();
+                    textchar->X = top_x;
+                    textchar->Y = top_y;
+                    textchar->Width = width;
+                    textchar->Height = height;
+                    textchar->character = static_cast<char>(character);
+
+                    //  add to the
+                    line->char_list->push_back(*textchar);
+                }
+            }
+        }
+    }
+}
+
+void Document::HilightBlocks (double scale, int pageNumber, QPainter *painter)
+{
+    bool drawBlocks = false;
+    bool drawLines = true;
+    bool drawChars = false;
+
+    int num_blocks = m_block_list[pageNumber].length();
+    for (int kk = 0; kk < num_blocks; kk++)
+    {
+        TextBlock block = m_block_list[pageNumber].at(kk);
+
+        if (drawBlocks)
+        {
+            QRect brect ( QPoint(scale*block.X,scale*block.Y),
+                          QPoint(scale*(block.X+block.Width),scale*(block.Y+block.Height)));
+            painter->fillRect(brect, QBrush(QColor("#506EB3E8")));
+        }
+
+        int num_lines = block.line_list->length();
+        for (int jj = 0; jj < num_lines; jj++)
+        {
+            TextLine line = block.line_list->at(jj);
+
+            if (drawLines)
+            {
+                QRect lrect ( QPoint(scale*line.X,scale*line.Y),
+                              QPoint(scale*(line.X+line.Width),scale*(line.Y+line.Height)));
+                painter->setPen(QPen(QColor("#ff0000"), 1));
+                painter->drawRect(lrect);
+            }
+
+            int num_chars = line.char_list->length();
+            for (int ii = 0; ii < num_chars; ii++)
+            {
+                TextCharacter theChar = line.char_list->at(ii);
+
+                if (drawChars)
+                {
+                    QRect crect ( QPoint(scale*theChar.X,scale*theChar.Y),
+                                  QPoint(scale*(theChar.X+theChar.Width),scale*(theChar.Y+theChar.Height)));
+                    painter->setPen(QPen(QColor("#0000ff"), 1));
+                    painter->drawRect(crect);
+                }
+            }
+        }
+    }
+
 }

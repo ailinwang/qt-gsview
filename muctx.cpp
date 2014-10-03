@@ -174,8 +174,8 @@ void muctx::CleanUp(void)
 {
 	fz_free_outline(mu_ctx, mu_outline);
 	fz_close_document(mu_doc);
-	page_cache->Empty(mu_ctx);
-	annot_cache->Empty(mu_ctx);
+    page_cache->Empty(mu_ctx);
+    annot_cache->Empty(mu_ctx);
 	fz_free_context(mu_ctx);
 
 	delete page_cache;
@@ -570,7 +570,7 @@ fz_display_list * muctx::CreateDisplayList(int page_num, int *width, int *height
 /* A special version which will create the display list AND get the information
    that we need for various text selection tasks */
 fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *height,
-	fz_text_page **text_out, int *length)
+    fz_text_page **text_out, int *length, bool useCache)
 {
 	fz_text_sheet *sheet = NULL;
 	fz_text_page *text = NULL;
@@ -581,10 +581,14 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 	point_t page_size;
 	*length = 0;
 
-	/* First see if we have this one in the cache */
-	fz_display_list *dlist = page_cache->Use(page_num, width, height, mu_ctx);
-	if (dlist != NULL)
-		return dlist;
+    /* First see if we have this one in the cache */
+    fz_display_list *dlist = NULL;
+    if (useCache)
+    {
+        dlist = page_cache->Use(page_num, width, height, mu_ctx);
+        if (dlist != NULL)
+            return dlist;
+    }
 
 	/* Apparently not, lets go ahead and create and add to cache */
 	fz_var(dev);
@@ -618,7 +622,8 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 		*width = page_size.X;
 		*height = page_size.Y;
 		/* Add it to the cache and set that it is in use */
-		page_cache->Add(page_num, *width, *height, dlist, mu_ctx);
+        if (useCache)
+            page_cache->Add(page_num, *width, *height, dlist, mu_ctx);
 	}
 	fz_always(mu_ctx)
 	{
@@ -940,3 +945,76 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
 	}
 	return S_ISOK;
 }
+int muctx::GetTextBlock (void *page, int block_num,
+    double *top_x, double *top_y, double *height, double *width)
+{
+    fz_text_page *text = (fz_text_page*) page;
+    fz_text_block *block;
+
+    if (text->blocks[block_num].type != FZ_PAGE_BLOCK_TEXT)
+        return 0;
+    block = text->blocks[block_num].u.text;
+
+    *top_x = block->bbox.x0;
+    *top_y = block->bbox.y0;
+    *height = block->bbox.y1 - *top_y;
+    *width = block->bbox.x1 - *top_x;
+    return block->len;
+}
+
+/* Information about a line of text */
+int muctx::GetTextLine(void *page, int block_num, int line_num,
+    double *top_x, double *top_y, double *height, double *width)
+{
+    int len = 0;
+    fz_text_block *block;
+    fz_text_line line;
+    fz_text_span *span;
+    fz_text_page *text = (fz_text_page*)page;
+
+    block = text->blocks[block_num].u.text;
+    line = block->lines[line_num];
+
+    *top_x = line.bbox.x0;
+    *top_y = line.bbox.y0;
+    *height = line.bbox.y1 - *top_y;
+    *width = line.bbox.x1 - *top_x;
+
+    for (span = line.first_span; span; span = span->next)
+    {
+        len += span->len;
+    }
+    return len;
+}
+
+/* Information down to the character level */
+int muctx::GetTextCharacter(void *page, int block_num, int line_num,
+    int item_num, double *top_x, double *top_y, double *height, double *width)
+{
+    fz_text_block *block;
+    fz_text_line line;
+    fz_text_span *span;
+    fz_text_page *text = (fz_text_page*)page;
+    fz_char_and_box cab;
+    int index = item_num;
+
+    block = text->blocks[block_num].u.text;
+    line = block->lines[line_num];
+
+    span = line.first_span;
+    while (index >= span->len)
+    {
+        index = index - span->len;  /* Reset to start of next span */
+        span = span->next;  /* Get next span */
+    }
+
+    cab.c = span->text[index].c;
+    fz_text_char_bbox(&(cab.bbox), span, index);
+    *top_x = cab.bbox.x0;
+    *top_y = cab.bbox.y0;
+    *height = cab.bbox.y1 - *top_y;
+    *width = cab.bbox.x1 - *top_x;
+
+    return cab.c;
+}
+
