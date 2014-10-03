@@ -345,6 +345,9 @@
    </property>
   </action>
   <action name="actionThumbnails">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/new/prefix1/resources/thumb.png</normaloff>:/new/prefix1/resources/thumb.png</iconset>
@@ -369,6 +372,9 @@
    </property>
   </action>
   <action name="actionAnnotations">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/new/prefix1/resources/pencil.png</normaloff>:/new/prefix1/resources/pencil.png</iconset>
@@ -381,12 +387,18 @@
    </property>
   </action>
   <action name="actionLinks">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/new/prefix1/resources/hyperlink.png</normaloff>:/new/prefix1/resources/hyperlink.png</iconset>
    </property>
    <property name="text">
     <string>Links</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
  </widget>

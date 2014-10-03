@@ -54,10 +54,9 @@ Window::Window(QWidget *parent) :
     connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
 
     connect(ui->actionAnnotations, SIGNAL(triggered()), this, SLOT(toggleAnnotations()));
-    ui->actionAnnotations->setText(tr("Hide &Annotations"));
+    ui->actionAnnotations->setChecked(true);
 
     connect(ui->actionLinks, SIGNAL(triggered()), this, SLOT(toggleLinks()));
-    ui->actionLinks->setText(tr("Show &Links"));
 
     //  help menu
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
@@ -545,7 +544,6 @@ void Window::toggleAnnotations()
         m_pages->annot (m_showAnnotations);
         if (ui->leftScrollArea->isVisible())
             m_thumbnails->annot (m_showAnnotations);
-        ui->actionAnnotations->setText(tr("Show &Annotations"));
     }
     else
     {
@@ -553,7 +551,6 @@ void Window::toggleAnnotations()
         m_pages->annot (m_showAnnotations);
         if (ui->leftScrollArea->isVisible())
             m_thumbnails->annot (m_showAnnotations);
-        ui->actionAnnotations->setText(tr("Hide &Annotations"));
     }
 }
 
@@ -563,13 +560,11 @@ void Window::toggleLinks()
     {
         m_showLinks = false;
         m_pages->links (m_showLinks);
-        ui->actionLinks->setText(tr("Show &Links"));
     }
     else
     {
         m_showLinks = true;
         m_pages->links (m_showLinks);
-        ui->actionLinks->setText(tr("Hide &Links"));
     }
 }
 
