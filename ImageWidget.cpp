@@ -49,7 +49,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
     }
 
 //    //  TESTTESTTEST:  hilight blocks
-//    m_document->HilightBlocks (m_scale, m_pageNumber, &painter);
+//    HilightBlocks (&painter);
 }
 
 void ImageWidget::setSelected(bool isSelected)
@@ -166,11 +166,57 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
             qApp->processEvents();
 
         }
+    }
+}
 
+void ImageWidget::HilightBlocks (QPainter *painter)
+{
+    bool drawBlocks = false;
+    bool drawLines = true;
+    bool drawChars = false;
 
+    double scale = m_scale;
+    int pageNumber = m_pageNumber;
 
+    int num_blocks = m_document->blockList()[pageNumber].size();
+    for (int kk = 0; kk < num_blocks; kk++)
+    {
+        TextBlock block = m_document->blockList()[pageNumber].at(kk);
+
+        if (drawBlocks)
+        {
+            QRect brect ( QPoint(scale*block.X,scale*block.Y),
+                          QPoint(scale*(block.X+block.Width),scale*(block.Y+block.Height)));
+            painter->fillRect(brect, QBrush(QColor("#506EB3E8")));
+        }
+
+        int num_lines = block.line_list->size();
+        for (int jj = 0; jj < num_lines; jj++)
+        {
+            TextLine line = block.line_list->at(jj);
+
+            if (drawLines)
+            {
+                QRect lrect ( QPoint(scale*line.X,scale*line.Y),
+                              QPoint(scale*(line.X+line.Width),scale*(line.Y+line.Height)));
+                painter->setPen(QPen(QColor("#ff0000"), 1));
+                painter->drawRect(lrect);
+            }
+
+            int num_chars = line.char_list->size();
+            for (int ii = 0; ii < num_chars; ii++)
+            {
+                TextCharacter theChar = line.char_list->at(ii);
+
+                if (drawChars)
+                {
+                    QRect crect ( QPoint(scale*theChar.X,scale*theChar.Y),
+                                  QPoint(scale*(theChar.X+theChar.Width),scale*(theChar.Y+theChar.Height)));
+                    painter->setPen(QPen(QColor("#0000ff"), 1));
+                    painter->drawRect(crect);
+                }
+            }
+        }
     }
 
 }
-
-

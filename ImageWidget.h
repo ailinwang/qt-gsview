@@ -56,6 +56,9 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
 private:
+
+    void HilightBlocks (QPainter *painter);
+
     int m_pageNumber = 0;
     bool m_rendered = false;
     double m_scale = 1.0;

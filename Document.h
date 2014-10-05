@@ -84,7 +84,7 @@ public:
 
     void ComputeTextBlocks (int page_num);
 
-    void HilightBlocks (double scale, int pageNumber, QPainter *painter);
+    std::vector<TextBlock> *blockList() {return m_block_list;}
 
 private:
 
