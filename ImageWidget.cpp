@@ -48,8 +48,12 @@ void ImageWidget::paintEvent(QPaintEvent *event)
         }
     }
 
-//    //  TESTTESTTEST:  hilight blocks
-//    HilightBlocks (&painter);
+//    //  TESTTESTTEST:  hilight blocks.  Just to see that we've
+//    //  got the blocks right
+//    if (!thumbnail())
+//    {
+//        HilightBlocks (&painter, m_scale, m_pageNumber, false, true, false);  // blocks, lines, chars
+//    }
 }
 
 void ImageWidget::setSelected(bool isSelected)
@@ -169,15 +173,9 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
     }
 }
 
-void ImageWidget::HilightBlocks (QPainter *painter)
+void ImageWidget::HilightBlocks (QPainter *painter, double scale, int pageNumber,
+                                 bool drawBlocks, bool drawLines, bool drawChars)
 {
-    bool drawBlocks = false;
-    bool drawLines = true;
-    bool drawChars = false;
-
-    double scale = m_scale;
-    int pageNumber = m_pageNumber;
-
     int num_blocks = m_document->blockList()[pageNumber].size();
     for (int kk = 0; kk < num_blocks; kk++)
     {

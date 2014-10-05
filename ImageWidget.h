@@ -57,7 +57,8 @@ protected:
 
 private:
 
-    void HilightBlocks (QPainter *painter);
+    void HilightBlocks (QPainter *painter, double scale, int pageNumber,
+                        bool drawBlocks, bool drawLines, bool drawChars);
 
     int m_pageNumber = 0;
     bool m_rendered = false;
