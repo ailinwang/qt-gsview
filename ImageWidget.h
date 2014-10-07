@@ -8,6 +8,7 @@
 
 class Document;
 class Link;
+class TextLine;
 
 //  custom event that's sent when we are clicked
 class ImageClickedEvent : public QEvent
@@ -51,6 +52,12 @@ public:
     void setDocument(Document *doc) {m_document=doc;}
 
     void mouseMoveEvent( QMouseEvent * event );
+
+    int pageNumber() {return m_pageNumber;}
+
+    std::vector<TextLine *> m_selected_lines;
+    void clearSelection();
+    void addToSelection(TextLine *line);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

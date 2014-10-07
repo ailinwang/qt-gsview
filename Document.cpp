@@ -219,12 +219,11 @@ void Document::ComputeTextBlocks (int page_num)
             int num_lines = mu_ctx->GetTextBlock (text, kk, &top_x, &top_y, &height, &width);
 
             //  init the block
-            TextBlock *block = new TextBlock();
+            TextBlock *block = new TextBlock(page_num, kk);
             block->X = top_x;
             block->Y = top_y;
             block->Width = width;
             block->Height = height;
-            block->PageNumber = page_num;
             block->line_list = new std::vector<TextLine>();
 
             //  add block to the block list
@@ -237,7 +236,7 @@ void Document::ComputeTextBlocks (int page_num)
                 int num_chars = mu_ctx->GetTextLine (text, kk, jj, &top_x, &top_y, &height, &width);
 
                 //  init line
-                TextLine *line = new TextLine();
+                TextLine *line = new TextLine(page_num, kk, jj);
                 line->X = top_x;
                 line->Y = top_y;
                 line->Width = width;
@@ -252,7 +251,7 @@ void Document::ComputeTextBlocks (int page_num)
                     int character = mu_ctx->GetTextCharacter(text, kk, jj, mm, &top_x,
                         &top_y, &height, &width);
 
-                    TextCharacter *textchar = new TextCharacter();
+                    TextCharacter *textchar = new TextCharacter(page_num, kk, jj, mm);
                     textchar->X = top_x;
                     textchar->Y = top_y;
                     textchar->Width = width;

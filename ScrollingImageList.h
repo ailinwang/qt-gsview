@@ -43,6 +43,7 @@ public:
 
 protected:
     QScrollArea *getScrollArea() {return m_scrollArea;}
+    ImageWidget *images() {return m_images;}
 
 public slots:
     void sliderReleasedSlot();

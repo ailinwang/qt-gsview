@@ -48,6 +48,23 @@ void ImageWidget::paintEvent(QPaintEvent *event)
         }
     }
 
+    if (m_selected_lines.size()>0)
+    {
+        //  we have selected things.  Hilight them.
+
+        for (int jj = 0; jj < m_selected_lines.size(); jj++)
+        {
+            TextLine line = *(m_selected_lines.at(jj));
+
+            double scale = this->scale();
+            QRect lrect ( QPoint(scale*line.X,scale*line.Y),
+                          QPoint(scale*(line.X+line.Width),scale*(line.Y+line.Height)));
+            painter.setPen(QPen(QColor("#ff0000"), 1));
+            painter.drawRect(lrect);
+        }
+
+    }
+
 //    //  TESTTESTTEST:  hilight blocks.  Just to see that we've
 //    //  got the blocks right
 //    if (!thumbnail())
@@ -131,18 +148,18 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
         //  if the link we're in has changed, show/hide the hand cursor
         if (m_mouseInLink != linkIAmIn)
         {
-            if (linkIAmIn)
-            {
-                //  in a link, so show the pointing hand
-                this->setCursor(Qt::PointingHandCursor);
-                qApp->processEvents();
-            }
-            else
-            {
-                //  not in a link, so restore normal cursor.
-                this->setCursor(Qt::ArrowCursor);
-                qApp->processEvents();
-            }
+//            if (linkIAmIn)
+//            {
+//                //  in a link, so show the pointing hand
+//                this->setCursor(Qt::PointingHandCursor);
+//                qApp->processEvents();
+//            }
+//            else
+//            {
+//                //  not in a link, so restore normal cursor.
+//                this->setCursor(Qt::ArrowCursor);
+//                qApp->processEvents();
+//            }
 
             //  remember new value
             m_mouseInLink = linkIAmIn;
@@ -173,6 +190,34 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
     }
 
     QLabel::mouseMoveEvent(event);
+}
+
+void ImageWidget::clearSelection()
+{
+    m_selected_lines.clear();
+    update();
+}
+
+void ImageWidget::addToSelection(TextLine *line)
+{
+    bool found = false;
+    for (unsigned int i=0; i<m_selected_lines.size(); i++)
+    {
+        TextLine *x = m_selected_lines.at(i);
+        if (x->PageNumber==line->PageNumber &&
+            x->BlockNumber==line->BlockNumber &&
+            x->LineNumber==line->LineNumber)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        qDebug("addToSelection p=%d b=%d l=%d", line->PageNumber, line->BlockNumber, line->LineNumber );
+        m_selected_lines.push_back(line);
+    }
 }
 
 void ImageWidget::HilightBlocks (QPainter *painter, double scale, int pageNumber,

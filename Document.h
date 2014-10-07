@@ -23,19 +23,33 @@ public:
 class TextCharacter : public Block
 {
 public:
+    TextCharacter(int pageNum, int blockNum, int lineNum, int charNum)
+        {PageNumber=pageNum;BlockNumber=blockNum;LineNumber=lineNum;CharNumber=charNum;}
+    int PageNumber;
+    int BlockNumber;
+    int LineNumber;
+    int CharNumber;
     char character;
 };
 
 class TextLine : public Block
 {
 public:
+    TextLine(int pageNum, int blockNum, int lineNum)
+        {PageNumber=pageNum;BlockNumber=blockNum;LineNumber=lineNum;}
+    int PageNumber;
+    int BlockNumber;
+    int LineNumber;
     std::vector<TextCharacter> *char_list;
 };
 
 class TextBlock : public Block
 {
 public:
+    TextBlock(int pageNum, int blockNum)
+        {PageNumber=pageNum;BlockNumber=blockNum;}
     int PageNumber;
+    int BlockNumber;
     std::vector<TextLine> *line_list;
 };
 
