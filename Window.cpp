@@ -612,32 +612,7 @@ void Window::enterFullScreen()
     ui->actionFull_Screen->setText(tr("Exit &Full Screen"));
 }
 
-QPoint origin;
-QRubberBand *rubberBand = NULL;
-
 bool Window::eventFilter(QObject *object, QEvent *e)
 {
-    if (e->type() == QMouseEvent::MouseButtonPress)
-    {
-        origin = ((QMouseEvent *)e)->pos();
-        if (!rubberBand)
-            rubberBand = new QRubberBand(QRubberBand::Rectangle, ui->rightScrollArea);
-        rubberBand->setGeometry(QRect(origin, QSize()));
-        rubberBand->show();
-    }
-
-    else if (e->type() == QMouseEvent::MouseButtonRelease)
-    {
-        rubberBand->hide();
-    }
-
-    else if (e->type() == QMouseEvent::MouseMove)
-    {
-        if(((QMouseEvent *)e)->buttons() == Qt::LeftButton)
-        {
-            rubberBand->setGeometry(QRect(origin, ((QMouseEvent *)e)->pos()).normalized());
-        }
-    }
-
-    return false;
+    return m_pages->onEvent(e);
 }

@@ -7,6 +7,8 @@ class PageList : public ScrollingImageList
 {
 public:
     PageList();
+
+    bool onEvent(QEvent *e);
 };
 
 #endif // PAGELIST_H
