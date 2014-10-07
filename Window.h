@@ -42,6 +42,7 @@ public:
 protected:
 	void keyPressEvent(QKeyEvent* event);
     void customEvent(QEvent *event);
+    bool eventFilter(QObject *object, QEvent *e);
 
 private slots:
     void openAction();

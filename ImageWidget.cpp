@@ -70,7 +70,7 @@ void ImageWidget::setSelected(bool isSelected)
 bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
 {
     //  process the event
-    bool result = QLabel::eventFilter(obj, event);
+//    bool result = QLabel::eventFilter(obj, event);
 
     //  post event if it was a click
     if (event->type() == QEvent::MouseButtonRelease)
@@ -96,7 +96,7 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
     }
 
     //  done
-    return result;
+    return false;
 }
 
 void ImageWidget::mouseMoveEvent( QMouseEvent * event )
@@ -171,6 +171,8 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
 
         }
     }
+
+    QLabel::mouseMoveEvent(event);
 }
 
 void ImageWidget::HilightBlocks (QPainter *painter, double scale, int pageNumber,
