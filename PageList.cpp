@@ -10,6 +10,16 @@ PageList::PageList()
 
 void PageList::onMousePress(QEvent *e)
 {
+    //  if the shift key is pressed,
+    //  update the current selection instead of starting a new one.
+    QMouseEvent *me = ((QMouseEvent *)e);
+    Qt::KeyboardModifiers mods = me->modifiers();
+    if(me->modifiers() & Qt::ShiftModifier)
+    {
+        updateSelection(e);
+        return;
+    }
+
     //  clear current selections
     deselectText();
 
@@ -129,10 +139,12 @@ void PageList::updateSelection(QEvent *e)
                 bool bAdd = false;
                 if (m_origin.y() <= rect.top() && rect.top()<= posGlobal.y())
                     bAdd = true;
-//                if (m_origin.y() <= rect.bottom() && rect.bottom()<= posGlobal.y())
-//                    bAdd = true;
                 if (posGlobal.y() <= rect.top() && rect.top()<= m_origin.y())
                     bAdd = true;
+
+                //  these don't seem to work and I don't know why
+//                if (m_origin.y() <= rect.bottom() && rect.bottom()<= posGlobal.y())
+//                    bAdd = true;
 //                if (posGlobal.y() <= rect.bottom() && rect.bottom()<= m_origin.y())
 //                    bAdd = true;
 
@@ -140,8 +152,14 @@ void PageList::updateSelection(QEvent *e)
                 {
                     widget->addToSelection(&(block.line_list->at(jj)));
                 }
+                else
+                {
+                    widget->removeFromSelection(&(block.line_list->at(jj)));
+                }
+
             }
         }
+        widget->update();
     }
 }
 

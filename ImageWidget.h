@@ -55,9 +55,9 @@ public:
 
     int pageNumber() {return m_pageNumber;}
 
-    std::vector<TextLine *> m_selected_lines;
     void clearSelection();
     void addToSelection(TextLine *line);
+    void removeFromSelection(TextLine *line);
     QString selectedText();
 
 protected:
@@ -77,6 +77,7 @@ private:
     bool m_showLinks = false;
     Document *m_document = NULL;
     Link *m_mouseInLink = NULL;
+    std::vector<TextLine *> m_selected_lines;
 };
 
 #endif // IMAGEWIDGET_H

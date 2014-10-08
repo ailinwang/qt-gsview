@@ -196,6 +196,21 @@ void ImageWidget::clearSelection()
     update();
 }
 
+void ImageWidget::removeFromSelection(TextLine *line)
+{
+    for (unsigned int i=0; i<m_selected_lines.size(); i++)
+    {
+        TextLine *x = m_selected_lines.at(i);
+        if (x->PageNumber==line->PageNumber &&
+            x->BlockNumber==line->BlockNumber &&
+            x->LineNumber==line->LineNumber)
+        {
+            m_selected_lines.erase(m_selected_lines.begin() + i);
+            return;  //  should only be one
+        }
+    }
+}
+
 void ImageWidget::addToSelection(TextLine *line)
 {
     bool found = false;
@@ -215,7 +230,6 @@ void ImageWidget::addToSelection(TextLine *line)
     {
 //        qDebug("addToSelection p=%d b=%d l=%d", line->PageNumber, line->BlockNumber, line->LineNumber );
         m_selected_lines.push_back(line);
-        update();
     }
 }
 
