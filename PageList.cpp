@@ -111,17 +111,16 @@ void PageList::updateSelection(QEvent *e)
                 bool bAdd = false;
                 if (m_origin.y() <= rect.top() && rect.top()<= posGlobal.y())
                     bAdd = true;
-                if (m_origin.y() <= rect.bottom() && rect.bottom()<= posGlobal.y())
-                    bAdd = true;
+//                if (m_origin.y() <= rect.bottom() && rect.bottom()<= posGlobal.y())
+//                    bAdd = true;
                 if (posGlobal.y() <= rect.top() && rect.top()<= m_origin.y())
                     bAdd = true;
-                if (posGlobal.y() <= rect.bottom() && rect.bottom()<= m_origin.y())
-                    bAdd = true;
+//                if (posGlobal.y() <= rect.bottom() && rect.bottom()<= m_origin.y())
+//                    bAdd = true;
 
                 if ( bAdd)
                 {
                     widget->addToSelection(&(block.line_list->at(jj)));
-                    widget->update();
                 }
             }
         }

@@ -59,8 +59,10 @@ void ImageWidget::paintEvent(QPaintEvent *event)
             double scale = this->scale();
             QRect lrect ( QPoint(scale*line.X,scale*line.Y),
                           QPoint(scale*(line.X+line.Width),scale*(line.Y+line.Height)));
-            painter.setPen(QPen(QColor("#ff0000"), 1));
-            painter.drawRect(lrect);
+//            painter.setPen(QPen(QColor("#ff0000"), 1));
+//            painter.drawRect(lrect);
+
+            painter.fillRect(lrect, QBrush(QColor("#506EB3E8")));  //  transparent blue
         }
 
     }
@@ -215,8 +217,9 @@ void ImageWidget::addToSelection(TextLine *line)
 
     if (!found)
     {
-        qDebug("addToSelection p=%d b=%d l=%d", line->PageNumber, line->BlockNumber, line->LineNumber );
+//        qDebug("addToSelection p=%d b=%d l=%d", line->PageNumber, line->BlockNumber, line->LineNumber );
         m_selected_lines.push_back(line);
+        update();
     }
 }
 
