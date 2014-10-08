@@ -50,9 +50,9 @@ void ImageWidget::paintEvent(QPaintEvent *event)
 
     if (m_selected_lines.size()>0)
     {
-        //  we have selected things.  Hilight them.
+        //  we have selected lines.  Hilight them.
 
-        for (int jj = 0; jj < m_selected_lines.size(); jj++)
+        for (unsigned int jj = 0; jj < m_selected_lines.size(); jj++)
         {
             TextLine line = *(m_selected_lines.at(jj));
 
@@ -221,6 +221,26 @@ void ImageWidget::addToSelection(TextLine *line)
         m_selected_lines.push_back(line);
         update();
     }
+}
+
+QString ImageWidget::selectedText()
+{
+    QString theText;
+
+    for (unsigned int jj = 0; jj < m_selected_lines.size(); jj++)
+    {
+        TextLine line = *(m_selected_lines.at(jj));
+
+        int num_chars = line.char_list->size();
+        for (int ii = 0; ii < num_chars; ii++)
+        {
+            TextCharacter theChar = line.char_list->at(ii);
+            theText += QChar(theChar.character);
+        }
+        theText += QChar(10);
+    }
+
+    return theText;
 }
 
 void ImageWidget::HilightBlocks (QPainter *painter, double scale, int pageNumber,

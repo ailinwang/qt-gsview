@@ -42,6 +42,10 @@ Window::Window(QWidget *parent) :
     connect(ui->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
 
+    //  edit menu
+    connect(ui->actionCopy_Text, SIGNAL(triggered()), this, SLOT(copyText()));
+    connect(ui->actionDeselect_Text, SIGNAL(triggered()), this, SLOT(deselectText()));
+
     //  view menu
     connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
     connect(ui->actionZoom_Out, SIGNAL(triggered()), this, SLOT(zoomOut()));
@@ -563,6 +567,16 @@ void Window::toggleLinks()
         m_showLinks = true;
         m_pages->links (m_showLinks);
     }
+}
+
+void Window::copyText()
+{
+    m_pages->copyText();
+}
+
+void Window::deselectText()
+{
+    m_pages->deselectText();
 }
 
 

@@ -8,6 +8,8 @@ class PageList : public ScrollingImageList
 public:
     PageList();
     bool onEvent(QEvent *e);
+    void copyText();
+    void deselectText();
 
 private:
 
@@ -17,10 +19,7 @@ private:
     void manageCursor(QEvent *e);
     void updateSelection(QEvent *e);
 
-//    void renderSelection();
-
     QPoint m_origin;
-//    std::vector<TextLine> m_selected_lines;
 };
 
 #endif // PAGELIST_H

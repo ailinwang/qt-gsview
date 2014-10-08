@@ -183,7 +183,15 @@
     <addaction name="actionAbout"/>
     <addaction name="actionGSView_Help"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionCopy_Text"/>
+    <addaction name="actionDeselect_Text"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -408,6 +416,19 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionCopy_Text">
+   <property name="text">
+    <string>Copy Text</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionDeselect_Text">
+   <property name="text">
+    <string>Deselect Text</string>
    </property>
   </action>
  </widget>

@@ -58,6 +58,7 @@ public:
     std::vector<TextLine *> m_selected_lines;
     void clearSelection();
     void addToSelection(TextLine *line);
+    QString selectedText();
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

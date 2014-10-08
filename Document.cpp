@@ -199,6 +199,9 @@ bool Document::ApplyPassword(const std::string password)
 
 void Document::ComputeTextBlocks (int page_num)
 {
+    if (!m_block_list[page_num].empty())
+        return;
+
     int width;
     int height;
     int num_blocks;
@@ -206,7 +209,6 @@ void Document::ComputeTextBlocks (int page_num)
     void *text_ptr = (void*)mu_ctx->CreateDisplayListText (page_num, &width, &height, &text, &num_blocks, false);
 
     m_block_list[page_num].clear();
-    //  TODO: optimize
 
     if (num_blocks>0)
     {

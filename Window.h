@@ -67,6 +67,8 @@ private slots:
     void homeSlot();
     void endSlot();
     void toggleLinks();
+    void copyText();
+    void deselectText();
 
 private:
     Ui::Window *ui;

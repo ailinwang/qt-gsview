@@ -1,6 +1,6 @@
 #include <QPoint>
-#include <QRubberBand>
 #include <QMouseEvent>
+#include <QClipboard>
 
 #include "PageList.h"
 
@@ -8,17 +8,35 @@ PageList::PageList()
 {
 }
 
-
-
 void PageList::onMousePress(QEvent *e)
 {
     //  clear current selections
-    int nPages = document()->GetPageCount();
-    for (int i=0; i<nPages; i++)
-        images()[i].clearSelection();
+    deselectText();
 
     //  remember mouse location in global coordinates
     m_origin = getScrollArea()->mapToGlobal(((QMouseEvent *)e)->pos());
+}
+
+void PageList::deselectText()
+{
+    int nPages = document()->GetPageCount();
+    for (int i=0; i<nPages; i++)
+        images()[i].clearSelection();
+}
+
+void PageList::copyText()
+{
+    QString allText;
+    int nPages = document()->GetPageCount();
+    for (int i=0; i<nPages; i++)
+    {
+        QString pageText = images()[i].selectedText();
+        allText += pageText;
+    }
+
+    //  now put it on the clipboard
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(allText);
 }
 
 void PageList::onMouseRelease(QEvent *e)
