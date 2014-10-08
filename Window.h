@@ -72,6 +72,7 @@ private slots:
     void selectAllText();
     void fitPage();
     void fitWidth();
+    void fileInfo();
 
 private:
     Ui::Window *ui;

@@ -42,7 +42,8 @@ HEADERS       = \
     ThumbnailList.h \
     PageList.h \
     Printer.h \
-    AboutDialog.h
+    AboutDialog.h \
+    FileInfoDialog.h
 
 SOURCES       = \
     main.cpp \
@@ -58,11 +59,13 @@ SOURCES       = \
     ThumbnailList.cpp \
     PageList.cpp \
     Printer.cpp \
-    AboutDialog.cpp
+    AboutDialog.cpp \
+    FileInfoDialog.cpp
 
 FORMS += \
     Window.ui \
-    AboutDialog.ui
+    AboutDialog.ui \
+    FileInfoDialog.ui
 
 RESOURCES += \
     resources.qrc

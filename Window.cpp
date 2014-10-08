@@ -43,6 +43,7 @@ Window::Window(QWidget *parent) :
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveAction()));
     connect(ui->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
+    connect(ui->actionInfo, SIGNAL(triggered()), this, SLOT(fileInfo()));
 
     //  edit menu
     connect(ui->actionCopy_Text, SIGNAL(triggered()), this, SLOT(copyText()));
@@ -627,6 +628,69 @@ void Window::fitWidth()
 
     //  zoom it
     zoom (scale);
+}
+
+void Window::fileInfo()
+{
+    QString strVar;
+
+    strVar += "<table>";
+    strVar += "";
+
+    strVar += "<tr>";
+    strVar += "<td>";
+    strVar += "File:";
+    strVar += "</td>";
+    strVar += "<td>&nbsp;&nbsp;&nbsp;</td>";
+    strVar += "<td>";
+    strVar += getPath();
+    strVar += "</td>";
+    strVar += "</tr>";
+    strVar += "";
+
+    strVar += "<tr>";
+    strVar += "<td>";
+    strVar += "Document Type:";
+    strVar += "</td>";
+    strVar += "<td>&nbsp;&nbsp;&nbsp;</td>";
+    strVar += "<td>";
+    strVar += "tbd";
+    strVar += "</td>";
+    strVar += "</tr>";
+    strVar += "";
+
+    strVar += "<tr>";
+    strVar += "<td>";
+    strVar += "Pages:";
+    strVar += "</td>";
+    strVar += "<td>&nbsp;&nbsp;&nbsp;</td>";
+    strVar += "<td>";
+    strVar += QString::number(m_document->GetPageCount());
+    strVar += "</td>";
+    strVar += "</tr>";
+    strVar += "";
+
+    strVar += "<tr>";
+    strVar += "<td>";
+    strVar += "Current Page:";
+    strVar += "</td>";
+    strVar += "<td>&nbsp;&nbsp;&nbsp;</td>";
+    strVar += "<td>";
+    strVar += QString::number(m_currentPage);
+    strVar += "</td>";
+    strVar += "</tr>";
+    strVar += "";
+    strVar += "</table>";
+
+//    QMessageBox::information(NULL, "Info", strVar);
+
+    QMessageBox msgBox;
+    QSpacerItem* horizontalSpacer = new QSpacerItem(600, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    msgBox.setText( strVar );
+    msgBox.setWindowTitle("Info");
+    QGridLayout* layout = (QGridLayout*)msgBox.layout();
+    layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+    msgBox.exec();
 }
 
 void Window::homeSlot()
