@@ -59,6 +59,7 @@ public:
     void addToSelection(TextLine *line);
     void removeFromSelection(TextLine *line);
     QString selectedText();
+    void selectAllText();
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

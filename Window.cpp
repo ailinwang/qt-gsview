@@ -45,6 +45,7 @@ Window::Window(QWidget *parent) :
     //  edit menu
     connect(ui->actionCopy_Text, SIGNAL(triggered()), this, SLOT(copyText()));
     connect(ui->actionDeselect_Text, SIGNAL(triggered()), this, SLOT(deselectText()));
+    connect(ui->actionSelect_All_Text, SIGNAL(triggered()), this, SLOT(selectAllText()));
 
     //  view menu
     connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
@@ -579,6 +580,10 @@ void Window::deselectText()
     m_pages->deselectText();
 }
 
+void Window::selectAllText()
+{
+    m_pages->selectAllText();
+}
 
 void Window::homeSlot()
 {

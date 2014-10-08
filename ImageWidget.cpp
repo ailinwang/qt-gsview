@@ -253,6 +253,28 @@ QString ImageWidget::selectedText()
     return theText;
 }
 
+void ImageWidget::selectAllText()
+{
+    //  clear old selection
+    m_selected_lines.clear();
+
+    //  build new one
+    int num_blocks = m_document->blockList()[pageNumber()].size();
+    for (int kk = 0; kk < num_blocks; kk++)
+    {
+        TextBlock *block = &(m_document->blockList()[pageNumber()].at(kk));
+
+        int num_lines = block->line_list->size();
+        for (int jj = 0; jj < num_lines; jj++)
+        {
+            TextLine *line = &(block->line_list->at(jj));
+            m_selected_lines.push_back(line);
+        }
+    }
+
+    update();
+}
+
 void ImageWidget::HilightBlocks (QPainter *painter, double scale, int pageNumber,
                                  bool drawBlocks, bool drawLines, bool drawChars)
 {

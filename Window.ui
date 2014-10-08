@@ -187,8 +187,9 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionCopy_Text"/>
     <addaction name="actionDeselect_Text"/>
+    <addaction name="actionCopy_Text"/>
+    <addaction name="actionSelect_All_Text"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -400,7 +401,7 @@
     <string>Annotations</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+A</string>
+    <string>Ctrl+N</string>
    </property>
   </action>
   <action name="actionLinks">
@@ -429,6 +430,14 @@
   <action name="actionDeselect_Text">
    <property name="text">
     <string>Deselect Text</string>
+   </property>
+  </action>
+  <action name="actionSelect_All_Text">
+   <property name="text">
+    <string>Select All Text</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>

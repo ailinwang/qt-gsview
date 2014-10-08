@@ -10,6 +10,7 @@ public:
     bool onEvent(QEvent *e);
     void copyText();
     void deselectText();
+    void selectAllText();
 
 private:
 

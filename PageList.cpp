@@ -34,6 +34,16 @@ void PageList::deselectText()
         images()[i].clearSelection();
 }
 
+void PageList::selectAllText()
+{
+    int nPages = document()->GetPageCount();
+    for (int i=0; i<nPages; i++)
+    {
+        document()->ComputeTextBlocks(i);
+        images()[i].selectAllText();
+    }
+}
+
 void PageList::copyText()
 {
     QString allText;
