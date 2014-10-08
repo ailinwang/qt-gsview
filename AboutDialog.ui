@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>549</width>
-    <height>418</height>
+    <height>430</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>380</y>
+     <y>390</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -51,7 +51,7 @@
      <x>10</x>
      <y>110</y>
      <width>251</width>
-     <height>101</height>
+     <height>111</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -75,7 +75,7 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>210</y>
+     <y>220</y>
      <width>531</width>
      <height>161</height>
     </rect>
