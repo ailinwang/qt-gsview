@@ -463,6 +463,10 @@
    </property>
   </action>
   <action name="actionInfo">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/info.png</normaloff>:/new/prefix1/resources/info.png</iconset>
+   </property>
    <property name="text">
     <string>Info...</string>
    </property>
