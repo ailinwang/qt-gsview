@@ -59,19 +59,15 @@ void ImageWidget::paintEvent(QPaintEvent *event)
             double scale = this->scale();
             QRect lrect ( QPoint(scale*line.X,scale*line.Y),
                           QPoint(scale*(line.X+line.Width),scale*(line.Y+line.Height)));
-//            painter.setPen(QPen(QColor("#ff0000"), 1));
-//            painter.drawRect(lrect);
-
             painter.fillRect(lrect, QBrush(QColor("#506EB3E8")));  //  transparent blue
         }
-
     }
 
 //    //  TESTTESTTEST:  hilight blocks.  Just to see that we've
 //    //  got the blocks right
 //    if (!thumbnail())
 //    {
-//        HilightBlocks (&painter, m_scale, m_pageNumber, false, true, false);  // blocks, lines, chars
+//        HilightBlocks (&painter, m_scale, m_pageNumber, false, true, true);  // blocks, lines, chars
 //    }
 }
 
