@@ -120,6 +120,9 @@ private:
     const double m_zoomInc  = 0.25;
 
     QString m_path = NULL;
+
+    QString m_fileExtension;
+    QString m_fileType;
 };
 
 #endif  //  WINDOW_H

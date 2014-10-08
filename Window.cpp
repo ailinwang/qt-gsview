@@ -241,8 +241,53 @@ bool Window::handlePassword()
 
 bool Window::OpenFile (QString path)
 {
-    //  handle .PS and .EPS by running ghostscript first
     QFileInfo fileInfo (path);
+
+    //  set the file type and extension.  Used by the File INfo
+    //  dialog.
+
+    if (fileInfo.suffix().toLower() == QString("pdf") )
+    {
+        m_fileExtension = "PDF";
+        m_fileType = "Portable Document Format";
+    }
+    else if (fileInfo.suffix().toLower() == QString("ps") )
+    {
+        m_fileExtension = "PS";
+        m_fileType = "PostScript";
+    }
+    else if (fileInfo.suffix().toLower() == QString("xps") )
+    {
+        m_fileExtension = "XPS";
+        m_fileType = "XPS";
+    }
+    else if (fileInfo.suffix().toLower() == QString("eps") )
+    {
+        m_fileExtension = "EPS";
+        m_fileType = "Encapsulated Postscript";
+    }
+    else if (fileInfo.suffix().toLower() == QString("cbz") )
+    {
+        m_fileExtension = "CBZ";
+        m_fileType = "Comic Book Archive";
+    }
+    else if (fileInfo.suffix().toLower() == QString("png") )
+    {
+        m_fileExtension = "PNG";
+        m_fileType = "Portable Network Graphics Image";
+    }
+    else if (fileInfo.suffix().toLower() == QString("jpg") )
+    {
+        m_fileExtension = "JPG";
+        m_fileType = "Joint Photographic Experts Group Image";
+    }
+    else
+    {
+        m_fileExtension = "UNKNOWN";
+        m_fileType = "Unknown";
+    }
+
+    //  handle .PS and .EPS by running ghostscript first
     if (fileInfo.suffix().toLower() == QString("ps") ||
         fileInfo.suffix().toLower() == QString("eps")   )
     {
@@ -632,29 +677,35 @@ void Window::fitWidth()
 
 void Window::fileInfo()
 {
+    //  build an HTML string that is a table.
+
     QString strVar;
 
-    strVar += "<table>";
+    strVar += "<table style=\"font-weight:normal;\">";
     strVar += "";
 
     strVar += "<tr>";
     strVar += "<td>";
     strVar += "File:";
     strVar += "</td>";
-    strVar += "<td>&nbsp;&nbsp;&nbsp;</td>";
+    strVar += "<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
     strVar += "<td>";
     strVar += getPath();
     strVar += "</td>";
     strVar += "</tr>";
     strVar += "";
 
+    QString docType = m_fileExtension;
+    docType += " - ";
+    docType += m_fileType;
+
     strVar += "<tr>";
     strVar += "<td>";
     strVar += "Document Type:";
     strVar += "</td>";
-    strVar += "<td>&nbsp;&nbsp;&nbsp;</td>";
+    strVar += "<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
     strVar += "<td>";
-    strVar += "tbd";
+    strVar += docType;
     strVar += "</td>";
     strVar += "</tr>";
     strVar += "";
@@ -663,7 +714,7 @@ void Window::fileInfo()
     strVar += "<td>";
     strVar += "Pages:";
     strVar += "</td>";
-    strVar += "<td>&nbsp;&nbsp;&nbsp;</td>";
+    strVar += "<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
     strVar += "<td>";
     strVar += QString::number(m_document->GetPageCount());
     strVar += "</td>";
@@ -674,20 +725,21 @@ void Window::fileInfo()
     strVar += "<td>";
     strVar += "Current Page:";
     strVar += "</td>";
-    strVar += "<td>&nbsp;&nbsp;&nbsp;</td>";
+    strVar += "<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
     strVar += "<td>";
-    strVar += QString::number(m_currentPage);
+    strVar += QString::number(m_currentPage+1);
     strVar += "</td>";
     strVar += "</tr>";
     strVar += "";
     strVar += "</table>";
 
-//    QMessageBox::information(NULL, "Info", strVar);
+    //  show the message
 
     QMessageBox msgBox;
     QSpacerItem* horizontalSpacer = new QSpacerItem(600, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     msgBox.setText( strVar );
-    msgBox.setWindowTitle("Info");
+    QString title("Info");
+    msgBox.setWindowTitle(title);  //  TODO: this seems not to be working
     QGridLayout* layout = (QGridLayout*)msgBox.layout();
     layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
     msgBox.exec();
