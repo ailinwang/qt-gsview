@@ -168,15 +168,15 @@
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
     <addaction name="actionZoom_Normal"/>
+    <addaction name="actionFit_Page"/>
+    <addaction name="actionFit_Width"/>
+    <addaction name="separator"/>
     <addaction name="actionFull_Screen"/>
     <addaction name="separator"/>
     <addaction name="actionThumbnails"/>
-    <addaction name="separator"/>
     <addaction name="actionAnnotations"/>
     <addaction name="actionLinks"/>
     <addaction name="separator"/>
-    <addaction name="actionFit_Page"/>
-    <addaction name="actionFit_Width"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -333,7 +333,7 @@
   <action name="actionFull_Screen">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/new/prefix1/resources/ExpandFill48.png</normaloff>:/new/prefix1/resources/ExpandFill48.png</iconset>
+     <normaloff>:/new/prefix1/resources/full screen.png</normaloff>:/new/prefix1/resources/full screen.png</iconset>
    </property>
    <property name="text">
     <string>Full Screen</string>
@@ -443,11 +443,19 @@
    </property>
   </action>
   <action name="actionFit_Page">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/ExpandFill48.png</normaloff>:/new/prefix1/resources/ExpandFill48.png</iconset>
+   </property>
    <property name="text">
     <string>Fit Page</string>
    </property>
   </action>
   <action name="actionFit_Width">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/FitWidth.png</normaloff>:/new/prefix1/resources/FitWidth.png</iconset>
+   </property>
    <property name="text">
     <string>Fit Width</string>
    </property>

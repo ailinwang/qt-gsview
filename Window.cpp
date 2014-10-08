@@ -113,6 +113,8 @@ void Window::setupToolbar()
     ui->toolBar->insertWidget(NULL, pct);
 
     ui->toolBar->addAction(ui->actionZoom_Normal);
+    ui->toolBar->addAction(ui->actionFit_Page);
+    ui->toolBar->addAction(ui->actionFit_Width);
     ui->toolBar->addAction(ui->actionFull_Screen);
 
     ui->toolBar->addSeparator();

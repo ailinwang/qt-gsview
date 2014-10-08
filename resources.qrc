@@ -19,5 +19,7 @@
         <file>resources/gsview_app.icns</file>
         <file>resources/hyperlink.png</file>
         <file>resources/banner.png</file>
+        <file>resources/FitWidth.png</file>
+        <file>resources/full screen.png</file>
     </qresource>
 </RCC>
