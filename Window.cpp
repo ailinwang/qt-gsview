@@ -9,6 +9,8 @@
 #include "ui_Window.h"
 #include "QtUtil.h"
 
+#include "AboutDialog.h"
+
 Window::Window(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Window)
@@ -489,8 +491,8 @@ void Window::pageDown()
 
 void Window::helpAbout()
 {
-    QString message = tr("short version") + tr(" Qt<br/>") + tr("copyright");
-    QMessageBox::about(this, tr("About muPDF"), message);
+    AboutDialog *about = new AboutDialog(this);
+    about->show();
 }
 
 void Window::help()

@@ -18,5 +18,6 @@
         <file>resources/Close.png</file>
         <file>resources/gsview_app.icns</file>
         <file>resources/hyperlink.png</file>
+        <file>resources/banner.png</file>
     </qresource>
 </RCC>

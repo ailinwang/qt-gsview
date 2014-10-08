@@ -41,7 +41,8 @@ HEADERS       = \
     MyScrollArea.h \
     ThumbnailList.h \
     PageList.h \
-    Printer.h
+    Printer.h \
+    AboutDialog.h
 
 SOURCES       = \
     main.cpp \
@@ -56,10 +57,12 @@ SOURCES       = \
     MyScrollArea.cpp \
     ThumbnailList.cpp \
     PageList.cpp \
-    Printer.cpp
+    Printer.cpp \
+    AboutDialog.cpp
 
 FORMS += \
-    Window.ui
+    Window.ui \
+    AboutDialog.ui
 
 RESOURCES += \
     resources.qrc
