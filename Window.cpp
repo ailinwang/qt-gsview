@@ -53,6 +53,8 @@ Window::Window(QWidget *parent) :
     connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
     connect(ui->actionZoom_Out, SIGNAL(triggered()), this, SLOT(zoomOut()));
     connect(ui->actionZoom_Normal, SIGNAL(triggered()), this, SLOT(normalSize()));
+    connect(ui->actionFit_Page, SIGNAL(triggered()), this, SLOT(fitPage()));
+    connect(ui->actionFit_Width, SIGNAL(triggered()), this, SLOT(fitWidth()));
 
     connect(ui->actionPage_Up, SIGNAL(triggered()), this, SLOT(pageUp()));
     connect(ui->actionPage_Down, SIGNAL(triggered()), this, SLOT(pageDown()));
@@ -585,6 +587,44 @@ void Window::deselectText()
 void Window::selectAllText()
 {
     m_pages->selectAllText();
+}
+
+void Window::fitPage()
+{
+    //  get viewport size
+    double height = m_pages->height();
+    double width  = m_pages->width();
+
+    //  get native size of current page
+    point_t pageSize;
+    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
+    double page_height = pageSize.Y;
+    double page_width  = pageSize.X;
+
+    //  calculate zoom
+    double height_scale = double(height) / page_height;
+    double width_scale  = double(width)  / page_width;
+    double scale = std::min(height_scale, width_scale);
+
+    //  zoom it
+    zoom (scale);
+}
+
+void Window::fitWidth()
+{
+    //  get viewport size
+    double width  = m_pages->width();
+
+    //  get native size of current page
+    point_t pageSize;
+    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
+    double page_width  = pageSize.X;
+
+    //  calculate zoom
+    double scale  = double(width)  / page_width;
+
+    //  zoom it
+    zoom (scale);
 }
 
 void Window::homeSlot()

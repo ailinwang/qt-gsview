@@ -70,6 +70,8 @@ private slots:
     void copyText();
     void deselectText();
     void selectAllText();
+    void fitPage();
+    void fitWidth();
 
 private:
     Ui::Window *ui;

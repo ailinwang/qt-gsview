@@ -12,6 +12,9 @@ public:
     void deselectText();
     void selectAllText();
 
+    int height() {return getScrollArea()->viewport()->height();}
+    int width()  {return getScrollArea()->viewport()->width();}
+
 private:
 
     void onMousePress(QEvent *e);

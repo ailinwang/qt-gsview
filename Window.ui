@@ -175,6 +175,8 @@
     <addaction name="actionAnnotations"/>
     <addaction name="actionLinks"/>
     <addaction name="separator"/>
+    <addaction name="actionFit_Page"/>
+    <addaction name="actionFit_Width"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -438,6 +440,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionFit_Page">
+   <property name="text">
+    <string>Fit Page</string>
+   </property>
+  </action>
+  <action name="actionFit_Width">
+   <property name="text">
+    <string>Fit Width</string>
    </property>
   </action>
  </widget>
