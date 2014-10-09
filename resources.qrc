@@ -22,5 +22,6 @@
         <file>resources/FitWidth.png</file>
         <file>resources/full screen.png</file>
         <file>resources/info.png</file>
+        <file>resources/contents.png</file>
     </qresource>
 </RCC>

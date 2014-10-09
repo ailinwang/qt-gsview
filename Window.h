@@ -73,6 +73,7 @@ private slots:
     void fitPage();
     void fitWidth();
     void fileInfo();
+    void toggleContents();
 
 private:
     Ui::Window *ui;
@@ -114,6 +115,7 @@ private:
 
     bool m_showAnnotations = true;
     bool m_showLinks = false;
+    bool m_showContents = false;
 
     const double m_minScale = 0.05;
     const double m_maxScale = 5;

@@ -177,6 +177,7 @@
     <addaction name="separator"/>
     <addaction name="actionThumbnails"/>
     <addaction name="actionAnnotations"/>
+    <addaction name="actionContents"/>
     <addaction name="actionLinks"/>
     <addaction name="separator"/>
    </widget>
@@ -408,21 +409,6 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionLinks">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/new/prefix1/resources/hyperlink.png</normaloff>:/new/prefix1/resources/hyperlink.png</iconset>
-   </property>
-   <property name="text">
-    <string>Links</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+L</string>
-   </property>
-  </action>
   <action name="actionCopy_Text">
    <property name="text">
     <string>Copy Text</string>
@@ -469,6 +455,30 @@
    </property>
    <property name="text">
     <string>Info...</string>
+   </property>
+  </action>
+  <action name="actionContents">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/contents.png</normaloff>:/new/prefix1/resources/contents.png</iconset>
+   </property>
+   <property name="text">
+    <string>Contents</string>
+   </property>
+  </action>
+  <action name="actionLinks">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/hyperlink.png</normaloff>:/new/prefix1/resources/hyperlink.png</iconset>
+   </property>
+   <property name="text">
+    <string>Links</string>
    </property>
   </action>
  </widget>

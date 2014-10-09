@@ -68,6 +68,9 @@ Window::Window(QWidget *parent) :
     connect(ui->actionAnnotations, SIGNAL(triggered()), this, SLOT(toggleAnnotations()));
     ui->actionAnnotations->setChecked(true);
 
+    connect(ui->actionContents, SIGNAL(triggered()), this, SLOT(toggleContents()));
+    ui->actionContents->setChecked(false);
+
     connect(ui->actionLinks, SIGNAL(triggered()), this, SLOT(toggleLinks()));
 
     //  help menu
@@ -122,6 +125,7 @@ void Window::setupToolbar()
 
     ui->toolBar->addAction(ui->actionThumbnails);
     ui->toolBar->addAction(ui->actionAnnotations);
+    ui->toolBar->addAction(ui->actionContents);
     ui->toolBar->addAction(ui->actionLinks);
 }
 
@@ -725,6 +729,23 @@ void Window::fileInfo()
     QGridLayout* layout = (QGridLayout*)msgBox.layout();
     layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
     msgBox.exec();
+}
+
+void Window::toggleContents()
+{
+    if (m_showContents)
+    {
+        m_showContents = false;
+        QMessageBox::information(NULL, tr(""), tr("contents off"));
+    }
+    else
+    {
+        m_showContents = true;
+        QMessageBox::information(NULL, tr(""), tr("contents on"));
+    }
+
+
+
 }
 
 void Window::homeSlot()
