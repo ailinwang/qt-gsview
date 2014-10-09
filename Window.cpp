@@ -19,6 +19,11 @@ Window::Window(QWidget *parent) :
     ui->setupUi(this);
     setupToolbar();
 
+    //  contents area initially hidden
+    m_contents = new ContentsList();
+    m_contents->setScrollArea(ui->contentsScrollArea);
+    m_contents->hide();
+
     //  create and set up the left-side scrolling area
     m_thumbnails = new ThumbnailList();
     m_thumbnails->setScrollArea(ui->leftScrollArea);
@@ -358,6 +363,9 @@ bool Window::OpenFile2 (QString path)
 
     //  prepare thumbnails
     m_thumbnails->setDocument(m_document);
+
+    //  prepare contents
+    m_contents->setDocument(m_document);
 
     //  prepare pages
     m_pages->setDocument(m_document);
@@ -733,19 +741,17 @@ void Window::fileInfo()
 
 void Window::toggleContents()
 {
+    m_showContents = !m_showContents;
     if (m_showContents)
-    {
-        m_showContents = false;
-        QMessageBox::information(NULL, tr(""), tr("contents off"));
-    }
+        m_contents->show();
     else
-    {
-        m_showContents = true;
-        QMessageBox::information(NULL, tr(""), tr("contents on"));
-    }
+        m_contents->hide();
 
+    ui->actionContents->setChecked(m_showContents);
 
-
+    //  if we're showing, get the contents and put them in the list
+    if (m_showContents)
+        m_contents->build();
 }
 
 void Window::homeSlot()

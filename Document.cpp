@@ -267,3 +267,48 @@ void Document::ComputeTextBlocks (int page_num)
         }
     }
 }
+
+unsigned int Document::ComputeContents()
+{
+    //  if we did this already
+    if (m_content_items != NULL)
+        return m_content_items->size();
+
+    //  generate the contents
+    //  We get back a standard smart pointer from muctx interface
+    sh_vector_content content_smart_ptr_vec(new std::vector<sh_content>());
+    int has_content;
+    mutex_lock.lock();
+    has_content = mu_ctx->GetContents(content_smart_ptr_vec);
+    mutex_lock.unlock();
+
+    //  sorry, none.
+    if (!has_content)
+        return 0;
+
+    //  make a new vector
+    m_content_items = new std::vector<ContentItem *>();
+
+    //  copy the content items
+    unsigned int num_items = content_smart_ptr_vec->size();
+    for (unsigned int k = 0; k < num_items; k++)
+    {
+        ContentItem *new_content = new ContentItem();
+        sh_content muctx_content = content_smart_ptr_vec->at(k);
+        new_content->Page = muctx_content->page;
+        new_content->StringMargin = muctx_content->string_margin;
+        new_content->StringOrig = muctx_content->string_orig;
+        m_content_items->push_back(new_content);
+    }
+    return num_items;
+}
+
+ContentItem *Document::GetContentItem(int item_num)
+{
+    if (m_content_items == NULL)
+        return NULL;
+    if (item_num+1 > m_content_items->size())
+        return NULL;
+
+    return m_content_items->at(item_num);
+}

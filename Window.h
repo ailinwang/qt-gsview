@@ -13,6 +13,7 @@ class Window;
 #include "ImageWidget.h"
 #include "PageList.h"
 #include "ThumbnailList.h"
+#include "ContentsList.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -95,6 +96,9 @@ private:
 
     //  thumbnails
     ThumbnailList *m_thumbnails = NULL;
+
+    //  contents
+    ContentsList *m_contents = NULL;
 
     //  current page
     int m_currentPage = 0;

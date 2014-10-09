@@ -11,6 +11,14 @@ class QPainter;
 
 typedef unsigned char Byte;
 
+class ContentItem
+{
+public:
+    std::string StringOrig;
+    std::string StringMargin;
+    int Page = 0;
+};
+
 class Block
 {
 public:
@@ -100,6 +108,9 @@ public:
 
     std::vector<TextBlock> *blockList() {return m_block_list;}
 
+    unsigned int ComputeContents();
+    ContentItem *GetContentItem(int item_num);
+
 private:
 
     muctx *mu_ctx = NULL;
@@ -113,6 +124,8 @@ private:
 //    Page *m_thumbnails = NULL;
 
     std::vector<TextBlock> *m_block_list = NULL;
+
+    std::vector<ContentItem *> *m_content_items = NULL;
 };
 
 #endif // DOCUMENT_H
