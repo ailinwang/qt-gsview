@@ -675,6 +675,24 @@ void Window::fitWidth()
     zoom (scale);
 }
 
+static QString makeRow(QString label, QString value)
+{
+    QString strVar;
+
+    strVar += "<tr>";
+    strVar += "<td>";
+    strVar += label;
+    strVar += "</td>";
+    strVar += "<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+    strVar += "<td>";
+    strVar += value;
+    strVar += "</td>";
+    strVar += "</tr>";
+    strVar += "";
+
+    return strVar;
+}
+
 void Window::fileInfo()
 {
     //  build an HTML string that is a table.
@@ -684,53 +702,17 @@ void Window::fileInfo()
     strVar += "<table style=\"font-weight:normal;\">";
     strVar += "";
 
-    strVar += "<tr>";
-    strVar += "<td>";
-    strVar += "File:";
-    strVar += "</td>";
-    strVar += "<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-    strVar += "<td>";
-    strVar += getPath();
-    strVar += "</td>";
-    strVar += "</tr>";
-    strVar += "";
+    strVar += makeRow(QString("File:"), getPath());
 
     QString docType = m_fileExtension;
     docType += " - ";
     docType += m_fileType;
+    strVar += makeRow(QString("Document Type:"), docType);
 
-    strVar += "<tr>";
-    strVar += "<td>";
-    strVar += "Document Type:";
-    strVar += "</td>";
-    strVar += "<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-    strVar += "<td>";
-    strVar += docType;
-    strVar += "</td>";
-    strVar += "</tr>";
-    strVar += "";
+    strVar += makeRow(QString("Pages:"), QString::number(m_document->GetPageCount()));
 
-    strVar += "<tr>";
-    strVar += "<td>";
-    strVar += "Pages:";
-    strVar += "</td>";
-    strVar += "<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-    strVar += "<td>";
-    strVar += QString::number(m_document->GetPageCount());
-    strVar += "</td>";
-    strVar += "</tr>";
-    strVar += "";
+    strVar += makeRow(QString("Current Page:"), QString::number(m_currentPage+1));
 
-    strVar += "<tr>";
-    strVar += "<td>";
-    strVar += "Current Page:";
-    strVar += "</td>";
-    strVar += "<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-    strVar += "<td>";
-    strVar += QString::number(m_currentPage+1);
-    strVar += "</td>";
-    strVar += "</tr>";
-    strVar += "";
     strVar += "</table>";
 
     //  show the message
