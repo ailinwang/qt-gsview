@@ -84,33 +84,40 @@ void ImageWidget::setSelected(bool isSelected)
 
 bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
 {
-    //  process the event
-//    bool result = QLabel::eventFilter(obj, event);
-
     //  post event if it was a click
     if (event->type() == QEvent::MouseButtonRelease)
     {
-        if (m_mouseInLink && !thumbnail())
+        if (thumbnail())
         {
-            //  handle URI and GOTO links
-            if (m_mouseInLink->Type == LINK_URI)
-            {
-                QUrl url(QString(m_mouseInLink->Uri.c_str()));
-                QDesktopServices::openUrl(url);
-            }
-            else if (m_mouseInLink->Type == LINK_GOTO)
-            {
-                ((Window *)this->window())->goToPage(m_mouseInLink->PageNum);
-            }
-        }
-        else if (thumbnail())
-        {
-            //  not in a link, post this event to the window
+            //  clicked on a thumbnail.
+            //  post event to the window
             QApplication::postEvent(this->window(), new ImageClickedEvent(m_pageNumber));
+        }
+        else
+        {
+            //  clicked on a page.
+            //  If we're in a link, and the control key is down, handle it.
+            if (m_mouseInLink)
+            {
+                QMouseEvent *me = ((QMouseEvent *)event);
+                if(me->modifiers() & Qt::ControlModifier)
+                {
+                    //  handle URI and GOTO links
+                    if (m_mouseInLink->Type == LINK_URI)
+                    {
+                        QUrl url(QString(m_mouseInLink->Uri.c_str()));
+                        QDesktopServices::openUrl(url);
+                    }
+                    else if (m_mouseInLink->Type == LINK_GOTO)
+                    {
+                        ((Window *)this->window())->goToPage(m_mouseInLink->PageNum);
+                    }
+                }
+            }
         }
     }
 
-    //  done
+    //  returning false allows the event to processed further.
     return false;
 }
 
@@ -143,27 +150,31 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
             }
         }
 
-        //  if the link we're in has changed, show/hide the hand cursor
+        QMouseEvent *me = ((QMouseEvent *)event);
+
+        //  if the link we're in has changed,
+        //  and the control key is held, show/hide the hand cursor
         if (m_mouseInLink != linkIAmIn)
         {
-//            if (linkIAmIn)
-//            {
-//                //  in a link, so show the pointing hand
-//                this->setCursor(Qt::PointingHandCursor);
-//                qApp->processEvents();
-//            }
-//            else
-//            {
-//                //  not in a link, so restore normal cursor.
-//                this->setCursor(Qt::ArrowCursor);
-//                qApp->processEvents();
-//            }
+            if (linkIAmIn && (me->modifiers() & Qt::ControlModifier))
+            {
+                //  in a link, so show the pointing hand
+                this->setCursor(Qt::PointingHandCursor);
+                qApp->processEvents();
+            }
+            else
+            {
+                //  not in a link, so restore normal cursor.
+                this->setCursor(Qt::ArrowCursor);
+                qApp->processEvents();
+            }
 
             //  remember new value
             m_mouseInLink = linkIAmIn;
 
-            //  if we're currently in a link, show/hide a tool tip
-            if (m_mouseInLink)
+            //  if we're currently in a link,
+            //  and the control key is held, show/hide a tool tip
+            if (m_mouseInLink && (me->modifiers() & Qt::ControlModifier))
             {
                 if (linkIAmIn->Type==LINK_GOTO)
                 {
