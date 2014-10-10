@@ -71,8 +71,8 @@ void ContentsList::build()
                 s += QString::number(item->Page+1);
                 s += QString("       ");
                 s += QString(item->StringMargin.c_str());
-                s += QString("   ");
-                s += QString(item->StringOrig.c_str());
+//                s += QString("   ");
+//                s += QString(item->StringOrig.c_str());
                 m_list->addItem(s);
             }
         }
