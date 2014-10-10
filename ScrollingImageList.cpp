@@ -120,7 +120,12 @@ void ScrollingImageList::reRender()
 
 void ScrollingImageList::rebuild (int nPage)
 {
-    //  resize and clear  all the images and mark as not rendered
+    QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
+    int oldMax = slider->maximum();
+    int oldVal = slider->value();
+    int newMax = 0;
+
+    //  resize and clear all the images and mark as not rendered
     int nPages = m_document->GetPageCount();
     for (int i=0; i<nPages; i++)
     {
@@ -131,8 +136,6 @@ void ScrollingImageList::rebuild (int nPage)
         m_images[i].setFixedHeight(pageSize.Y);
         m_images[i].setScale(m_scale);
         m_images[i].setPageSize(pageSize);
-
-//        m_images[i].clear();
 
         //  when we get here, it's probably because we're zooming.
         //  so, first just substitute a scaled version of the old pixmap.
@@ -149,16 +152,25 @@ void ScrollingImageList::rebuild (int nPage)
 
         m_images[i].setRendered(false);
         m_images[i].setBackgroundRole(QPalette::Dark);
+
+        newMax += pageSize.Y;
+        newMax += 8;  //  margin?
     }
 
-    //  go to the given page and render visible.
-    goToPage(nPage);
+    if (m_zooming)
+    {
+        int newVal = oldVal * newMax / oldMax;
+        slider->setValue(newVal);
+        m_zooming = false;
+    }
 }
 
 void ScrollingImageList::zoom (double theScale, int nPage)
 {
     if (theScale != m_scale)
     {
+        m_zooming = true;
+
         //  set the new value
         m_scale = theScale;
 
@@ -167,8 +179,13 @@ void ScrollingImageList::zoom (double theScale, int nPage)
     }
 }
 
-
 void ScrollingImageList::onImagesReady()
+{
+    QTimer::singleShot(100, this, SLOT(onImagesReady2()));
+//    onImagesReady2();
+}
+
+void ScrollingImageList::onImagesReady2()
 {
     //  draw the images that can be seen
     renderVisibleImages();

@@ -50,6 +50,7 @@ protected:
 public slots:
     void sliderReleasedSlot();
     void valueChangedSlot(int val);
+    void onImagesReady2();
 
 signals:
     void imagesReady();
@@ -68,6 +69,10 @@ private:
     double m_scale = 1.0;
     bool m_showAnnotations = true;
     bool m_showLinks = false;
+
+    bool m_zooming = false;
+
+
 };
 
 #endif  //  SCROLLINGIMAGELIST_H
