@@ -63,12 +63,9 @@ void ImageWidget::paintEvent(QPaintEvent *event)
         }
     }
 
-//    //  TESTTESTTEST:  hilight blocks.  Just to see that we've
-//    //  got the blocks right
+//    //  TESTTESTTEST:  hilight blocks.
 //    if (!thumbnail())
-//    {
 //        HilightBlocks (&painter, m_scale, m_pageNumber, false, true, true);  // blocks, lines, chars
-//    }
 }
 
 void ImageWidget::setSelected(bool isSelected)
@@ -96,11 +93,10 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
         else
         {
             //  clicked on a page.
-            //  If we're in a link, and the control key is down, handle it.
+            //  Handle it if we're not currently selecting text
             if (m_mouseInLink)
             {
-                QMouseEvent *me = ((QMouseEvent *)event);
-                if(me->modifiers() & Qt::ControlModifier)
+                if (m_selected_lines.size()<=0)
                 {
                     //  handle URI and GOTO links
                     if (m_mouseInLink->Type == LINK_URI)
@@ -152,11 +148,10 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
 
         QMouseEvent *me = ((QMouseEvent *)event);
 
-        //  if the link we're in has changed,
-        //  and the control key is held, show/hide the hand cursor
+        //  if the link we're in has changed, show/hide the hand cursor
         if (m_mouseInLink != linkIAmIn)
         {
-            if (linkIAmIn && (me->modifiers() & Qt::ControlModifier))
+            if (linkIAmIn)
             {
                 //  in a link, so show the pointing hand
                 this->setCursor(Qt::PointingHandCursor);
@@ -172,9 +167,8 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
             //  remember new value
             m_mouseInLink = linkIAmIn;
 
-            //  if we're currently in a link,
-            //  and the control key is held, show/hide a tool tip
-            if (m_mouseInLink && (me->modifiers() & Qt::ControlModifier))
+            //  if we're currently in a link, show/hide a tool tip
+            if (m_mouseInLink)
             {
                 if (linkIAmIn->Type==LINK_GOTO)
                 {
