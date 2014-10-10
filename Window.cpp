@@ -78,6 +78,18 @@ Window::Window(QWidget *parent) :
 
     connect(ui->actionLinks, SIGNAL(triggered()), this, SLOT(toggleLinks()));
 
+    connect(ui->actionAAHigh,       SIGNAL(triggered()), this, SLOT(setAA()));
+    connect(ui->actionAAMediumHigh, SIGNAL(triggered()), this, SLOT(setAA()));
+    connect(ui->actionAAMedium,     SIGNAL(triggered()), this, SLOT(setAA()));
+    connect(ui->actionAALow,        SIGNAL(triggered()), this, SLOT(setAA()));
+    connect(ui->actionAANone,       SIGNAL(triggered()), this, SLOT(setAA()));
+
+    ui->actionAAHigh->setData(QVariant(AA_HIGH));
+    ui->actionAAMediumHigh->setData(QVariant(AA_MEDHIGH));
+    ui->actionAAMedium->setData(QVariant(AA_MED));
+    ui->actionAALow->setData(QVariant(AA_LOW));
+    ui->actionAANone->setData(QVariant(AA_NONE));
+
     //  help menu
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
@@ -339,6 +351,8 @@ bool Window::OpenFile2 (QString path)
         QMessageBox::critical(NULL, "", "Error opening file");
         return false;
     }
+
+    m_document->SetAA(8);
 
     //  set the window title
     this->setWindowTitle(path);
@@ -752,6 +766,26 @@ void Window::toggleContents()
     //  if we're showing, get the contents and put them in the list
     if (m_showContents)
         m_contents->build();
+}
+
+void Window::setAA()
+{
+    //  first uncheck all the items.
+    ui->actionAAHigh->setChecked(false);
+    ui->actionAAMediumHigh->setChecked(false);
+    ui->actionAAMedium->setChecked(false);
+    ui->actionAALow->setChecked(false);
+    ui->actionAANone->setChecked(false);
+
+    //  now check the one that was sent
+    ((QAction *)sender())->setChecked(true);
+
+    //  get the value
+    QVariant qval = ((QAction *)sender())->data();
+    int val = qval.toInt();
+
+    m_document->SetAA(val);;
+    m_pages->reRender();
 }
 
 void Window::homeSlot()

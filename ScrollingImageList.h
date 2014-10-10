@@ -41,6 +41,8 @@ public:
 
     bool eventFilter(QObject *target, QEvent *event);
 
+    void reRender();
+
 protected:
     QScrollArea *getScrollArea() {return m_scrollArea;}
     ImageWidget *images() {return m_images;}
@@ -58,7 +60,6 @@ private:
     bool isImageVisible(int nPage);
     void rebuild (int nPage);
     void onImagesReady();
-    void reRender();
 
     QScrollArea *m_scrollArea = NULL;
     ImageWidget *m_images = NULL;

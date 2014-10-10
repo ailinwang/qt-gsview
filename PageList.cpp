@@ -13,7 +13,6 @@ void PageList::onMousePress(QEvent *e)
     //  if the shift key is pressed,
     //  update the current selection instead of starting a new one.
     QMouseEvent *me = ((QMouseEvent *)e);
-    Qt::KeyboardModifiers mods = me->modifiers();
     if(me->modifiers() & Qt::ShiftModifier)
     {
         updateSelection(e);

@@ -210,6 +210,8 @@ void ScrollingImageList::renderImage(int i)
 
     m_images[i].setRendered(true);
 
+    m_images[i].update();
+
     delete myImage;
     delete bitmap;
 }

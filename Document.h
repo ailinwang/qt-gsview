@@ -11,6 +11,15 @@ class QPainter;
 
 typedef unsigned char Byte;
 
+enum
+{
+    AA_HIGH = 8,
+    AA_MEDHIGH = 6,
+    AA_MED = 4,
+    AA_LOW = 2,
+    AA_NONE = 0
+};
+
 class ContentItem
 {
 public:
@@ -110,6 +119,8 @@ public:
 
     unsigned int ComputeContents();
     ContentItem *GetContentItem(int item_num);
+
+    void SetAA(int level);
 
 private:
 

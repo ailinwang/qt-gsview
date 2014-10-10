@@ -237,9 +237,26 @@
     <addaction name="actionCopy_Text"/>
     <addaction name="actionSelect_All_Text"/>
    </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <widget class="QMenu" name="menuAntiAlias">
+     <property name="title">
+      <string>AntiAlias</string>
+     </property>
+     <addaction name="actionAAHigh"/>
+     <addaction name="actionAAMediumHigh"/>
+     <addaction name="actionAAMedium"/>
+     <addaction name="actionAALow"/>
+     <addaction name="actionAANone"/>
+    </widget>
+    <addaction name="menuAntiAlias"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
+   <addaction name="menuOptions"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -520,6 +537,49 @@
    </property>
    <property name="text">
     <string>Links</string>
+   </property>
+  </action>
+  <action name="actionAAHigh">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>High</string>
+   </property>
+  </action>
+  <action name="actionAAMediumHigh">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Medium High</string>
+   </property>
+  </action>
+  <action name="actionAAMedium">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Medium</string>
+   </property>
+  </action>
+  <action name="actionAALow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Low</string>
+   </property>
+  </action>
+  <action name="actionAANone">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>None</string>
    </property>
   </action>
  </widget>

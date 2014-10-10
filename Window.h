@@ -75,6 +75,7 @@ private slots:
     void fitWidth();
     void fileInfo();
     void toggleContents();
+    void setAA();
 
 private:
     Ui::Window *ui;

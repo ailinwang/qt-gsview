@@ -312,3 +312,9 @@ ContentItem *Document::GetContentItem(int item_num)
 
     return m_content_items->at(item_num);
 }
+
+void Document::SetAA(int level)
+{
+    if (mu_ctx != NULL)
+        mu_ctx->SetAA(level);
+}
