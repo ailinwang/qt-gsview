@@ -47,7 +47,7 @@ void ContentsList::build()
     int nContentsItems = m_document->ComputeContents();
     if (nContentsItems<=0)
     {
-        QMessageBox::information(NULL, tr(""), tr("No contents found."));
+        QMessageBox::information(NULL, tr(""), tr("No table of contents found."));
         return;
     }
 
@@ -62,7 +62,6 @@ void ContentsList::build()
 
         connect (m_list, SIGNAL(itemClicked ( QListWidgetItem *)), this, SLOT(itemClicked ( QListWidgetItem *)));
 
-        int nPages = m_document->GetPageCount();
         for (int i=0; i<nContentsItems; i++)
         {
             ContentItem *item = m_document->GetContentItem(i);
