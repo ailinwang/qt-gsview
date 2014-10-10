@@ -2,6 +2,7 @@
 #include <QMessageBox>
 
 #include "ContentsList.h"
+#include "Window.h"
 
 ContentsList::ContentsList(QObject *parent) :
     QObject(parent)
@@ -59,6 +60,8 @@ void ContentsList::build()
         contentWidget->layout()->setContentsMargins(0,0,0,0);
         contentWidget->layout()->addWidget(m_list);
 
+        connect (m_list, SIGNAL(itemClicked ( QListWidgetItem *)), this, SLOT(itemClicked ( QListWidgetItem *)));
+
         int nPages = m_document->GetPageCount();
         for (int i=0; i<nContentsItems; i++)
         {
@@ -66,8 +69,8 @@ void ContentsList::build()
             if (item != NULL)
             {
                 QString s;
-                s += QString::number(item->Page);
-                s += QString("   ");
+                s += QString::number(item->Page+1);
+                s += QString("       ");
                 s += QString(item->StringMargin.c_str());
                 s += QString("   ");
                 s += QString(item->StringOrig.c_str());
@@ -75,4 +78,14 @@ void ContentsList::build()
             }
         }
     }
+}
+
+void ContentsList::itemClicked(QListWidgetItem *item)
+{
+    QString text = item->text();
+    QString firstWord = text.split(" ").at(0);
+    int page = firstWord.toInt();
+
+    ((Window *)m_scrollArea->window())->goToPage(page-1);
+
 }

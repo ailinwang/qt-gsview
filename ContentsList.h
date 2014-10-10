@@ -27,6 +27,7 @@ public:
 signals:
 
 public slots:
+    void itemClicked ( QListWidgetItem *item);
 
 private:
     QScrollArea *m_scrollArea = NULL;
