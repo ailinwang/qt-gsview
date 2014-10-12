@@ -18,6 +18,8 @@
 #include <cups/cups.h>
 #endif
 
+#include <ApplicationServices/ApplicationServices.h>
+
 Printer::Printer(QObject *parent) : QObject(parent)
 {
 }
@@ -160,9 +162,59 @@ void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPag
         job_state == IPP_JOB_PENDING   ||
         job_state == IPP_JOB_PROCESSING   )
     {
-        QMessageBox::information(m_window, "", "Print job created.");
 
-        //  TODO: OSX, launch corresponding queue?
+#ifdef _QT_MAC
+
+        //  launch corresponding queue app
+
+        //  find the queue name by running though the CUPS destinations
+        //  looking for a match.  The queue name is stored in the
+        //  "printer-info" option.
+
+        QString queueName("");
+
+        cups_dest_t *dests = NULL;
+        int numDests = cupsGetDests(&dests);
+        for (int i = 0; i < numDests; i++)
+        {
+            cups_dest_t dest = dests[i];
+            if (printer->printerName().compare(QString(dest.name))==0)
+            {
+                for (int j = 0; j < dest.num_options; j++)
+                {
+                    cups_option_t opt = dest.options[j];
+                    if (QString(opt.name).compare(QString("printer-info"))==0)
+                    {
+                        queueName = QString(opt.value);
+                        break;
+                    }
+                }
+            }
+            if (!queueName.isEmpty())
+                break;
+        }
+        cupsFreeDests(numDests, dests);
+
+        //  if we found the queue, launch it
+        if (!queueName.isEmpty())
+        {
+            //  app is in ~/Library/Printers/queueName.app
+            QString s;
+            s += "\"";
+            s += QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first();
+            s += "/Library/Printers/";
+            s += queueName;
+            s += ".app/Contents/MacOS/PrinterProxy";
+            s += "\"";
+
+            //  TODO: run in the background
+            QProcess process;
+            bool bRet = process.startDetached(s);
+        }
+
+#else
+        QMessageBox::information(m_window, "", "Print job created.");
+#endif
     }
     else
     {
