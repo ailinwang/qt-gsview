@@ -121,9 +121,14 @@ void ScrollingImageList::reRender()
 void ScrollingImageList::rebuild (int nPage)
 {
     QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
-    int oldMax = slider->maximum();
     int oldVal = slider->value();
-    int newMax = 0;
+
+    if (m_zooming)
+    {
+        int newVal = oldVal * m_zoomRatio;
+        slider->setValue(newVal);
+        m_zooming = false;
+    }
 
     //  resize and clear all the images and mark as not rendered
     int nPages = m_document->GetPageCount();
@@ -139,7 +144,7 @@ void ScrollingImageList::rebuild (int nPage)
 
         //  when we get here, it's probably because we're zooming.
         //  so, first just substitute a scaled version of the old pixmap.
-        //  then later, when the rendering tkes place, it will be replaced
+        //  then later, when the rendering takes place, it will be replaced
         //  with a better version.  But in the meantime, the zooming
         //  will appear instantaneously.
 
@@ -152,16 +157,6 @@ void ScrollingImageList::rebuild (int nPage)
 
         m_images[i].setRendered(false);
         m_images[i].setBackgroundRole(QPalette::Dark);
-
-        newMax += pageSize.Y;
-        newMax += 8;  //  margin?
-    }
-
-    if (m_zooming)
-    {
-        int newVal = oldVal * newMax / oldMax;
-        slider->setValue(newVal);
-        m_zooming = false;
     }
 }
 
@@ -170,6 +165,7 @@ void ScrollingImageList::zoom (double theScale, int nPage)
     if (theScale != m_scale)
     {
         m_zooming = true;
+        m_zoomRatio = theScale/m_scale;
 
         //  set the new value
         m_scale = theScale;

@@ -71,8 +71,7 @@ private:
     bool m_showLinks = false;
 
     bool m_zooming = false;
-
-
+    double m_zoomRatio;
 };
 
 #endif  //  SCROLLINGIMAGELIST_H
