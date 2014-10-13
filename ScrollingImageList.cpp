@@ -123,6 +123,8 @@ void ScrollingImageList::rebuild (int nPage)
     QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
     int oldVal = slider->value();
 
+    m_scrollArea->hide();
+
     if (m_zooming)
     {
         int newVal = oldVal * m_zoomRatio;
@@ -158,6 +160,9 @@ void ScrollingImageList::rebuild (int nPage)
         m_images[i].setRendered(false);
         m_images[i].setBackgroundRole(QPalette::Dark);
     }
+
+    qApp->processEvents();
+    m_scrollArea->show();
 }
 
 void ScrollingImageList::zoom (double theScale, int nPage)
