@@ -59,7 +59,7 @@ private:
     void renderVisibleImages();
     void renderImage(int index);
     bool isImageVisible(int nPage);
-    void rebuild (int nPage);
+    void rebuild ();
     void onImagesReady();
 
     QScrollArea *m_scrollArea = NULL;
@@ -69,9 +69,6 @@ private:
     double m_scale = 1.0;
     bool m_showAnnotations = true;
     bool m_showLinks = false;
-
-    bool m_zooming = false;
-    double m_zoomRatio;
 };
 
 #endif  //  SCROLLINGIMAGELIST_H

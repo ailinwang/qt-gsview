@@ -118,67 +118,101 @@ void ScrollingImageList::reRender()
     }
 }
 
-void ScrollingImageList::rebuild (int nPage)
+void ScrollingImageList::rebuild ()
 {
-    UNUSED(nPage);
+//    QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
+//    int oldVal = slider->value();
 
-    QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
-    int oldVal = slider->value();
+//    m_scrollArea->hide();
 
-    m_scrollArea->hide();
+//    if (m_zooming)
+//    {
+//        int newVal = oldVal * m_zoomRatio;
+//        slider->setValue(newVal);
+//        m_zooming = false;
+//    }
 
-    if (m_zooming)
-    {
-        int newVal = oldVal * m_zoomRatio;
-        slider->setValue(newVal);
-        m_zooming = false;
-    }
+//    //  resize and clear all the images and mark as not rendered
+//    int nPages = m_document->GetPageCount();
+//    for (int i=0; i<nPages; i++)
+//    {
+//        point_t pageSize;
+//        m_document->GetPageSize(i, m_scale, &pageSize);
 
-    //  resize and clear all the images and mark as not rendered
-    int nPages = m_document->GetPageCount();
-    for (int i=0; i<nPages; i++)
-    {
-        point_t pageSize;
-        m_document->GetPageSize(i, m_scale, &pageSize);
+//        m_images[i].setFixedWidth(pageSize.X);
+//        m_images[i].setFixedHeight(pageSize.Y);
+//        m_images[i].setScale(m_scale);
+//        m_images[i].setPageSize(pageSize);
 
-        m_images[i].setFixedWidth(pageSize.X);
-        m_images[i].setFixedHeight(pageSize.Y);
-        m_images[i].setScale(m_scale);
-        m_images[i].setPageSize(pageSize);
+//        //  when we get here, it's probably because we're zooming.
+//        //  so, first just substitute a scaled version of the old pixmap.
+//        //  then later, when the rendering takes place, it will be replaced
+//        //  with a better version.  But in the meantime, the zooming
+//        //  will appear instantaneously.
 
-        //  when we get here, it's probably because we're zooming.
-        //  so, first just substitute a scaled version of the old pixmap.
-        //  then later, when the rendering takes place, it will be replaced
-        //  with a better version.  But in the meantime, the zooming
-        //  will appear instantaneously.
+//        const QPixmap *pm = m_images[i].pixmap();
+//        if (pm)
+//        {
+//            QPixmap scaledPixmap = pm->scaled(m_images[i].size(), Qt::KeepAspectRatio);
+//            m_images[i].setPixmap(scaledPixmap);
+//        }
 
-        const QPixmap *pm = m_images[i].pixmap();
-        if (pm)
-        {
-            QPixmap scaledPixmap = pm->scaled(m_images[i].size(), Qt::KeepAspectRatio);
-            m_images[i].setPixmap(scaledPixmap);
-        }
+//        m_images[i].setRendered(false);
+//        m_images[i].setBackgroundRole(QPalette::Dark);
+//    }
 
-        m_images[i].setRendered(false);
-        m_images[i].setBackgroundRole(QPalette::Dark);
-    }
-
-    qApp->processEvents();
-    m_scrollArea->show();
+//    qApp->processEvents();
+//    m_scrollArea->show();
 }
 
 void ScrollingImageList::zoom (double theScale, int nPage)
 {
     if (theScale != m_scale)
     {
-        m_zooming = true;
-        m_zoomRatio = theScale/m_scale;
+        double zoomRatio = theScale/m_scale;
 
         //  set the new value
         m_scale = theScale;
 
-        //  do the rebuild
-        rebuild (nPage);
+        QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
+        int oldVal = slider->value();
+
+        m_scrollArea->widget()->hide();
+
+        int newVal = oldVal * zoomRatio;
+        slider->setValue(newVal);
+
+        //  resize and clear all the images and mark as not rendered
+        int nPages = m_document->GetPageCount();
+        for (int i=0; i<nPages; i++)
+        {
+            point_t pageSize;
+            m_document->GetPageSize(i, m_scale, &pageSize);
+
+            m_images[i].setFixedWidth(pageSize.X);
+            m_images[i].setFixedHeight(pageSize.Y);
+            m_images[i].setScale(m_scale);
+            m_images[i].setPageSize(pageSize);
+
+            //  when we get here, it's probably because we're zooming.
+            //  so, first just substitute a scaled version of the old pixmap.
+            //  then later, when the rendering takes place, it will be replaced
+            //  with a better version.  But in the meantime, the zooming
+            //  will appear instantaneously.
+
+            const QPixmap *pm = m_images[i].pixmap();
+            if (pm)
+            {
+                QPixmap scaledPixmap = pm->scaled(m_images[i].size(), Qt::KeepAspectRatio);
+                m_images[i].setPixmap(scaledPixmap);
+            }
+
+            m_images[i].setRendered(false);
+            m_images[i].setBackgroundRole(QPalette::Dark);
+        }
+
+        qApp->processEvents();
+        m_scrollArea->widget()->show();
     }
 }
 
