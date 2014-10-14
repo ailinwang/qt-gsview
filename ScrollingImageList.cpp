@@ -120,6 +120,8 @@ void ScrollingImageList::reRender()
 
 void ScrollingImageList::rebuild (int nPage)
 {
+    UNUSED(nPage);
+
     QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
     int oldVal = slider->value();
 
@@ -202,6 +204,8 @@ void ScrollingImageList::sliderReleasedSlot()
 
 void ScrollingImageList::valueChangedSlot(int val)
 {
+    UNUSED(val);
+
     QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
     if (!slider->isSliderDown())
         renderVisibleImages();

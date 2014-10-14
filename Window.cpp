@@ -836,5 +836,7 @@ void Window::enterFullScreen()
 
 bool Window::eventFilter(QObject *object, QEvent *e)
 {
+    UNUSED(object);
+
     return m_pages->onEvent(e);
 }

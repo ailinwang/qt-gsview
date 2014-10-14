@@ -207,6 +207,8 @@ void Document::ComputeTextBlocks (int page_num)
     int num_blocks;
     fz_text_page *text;
     void *text_ptr = (void*)mu_ctx->CreateDisplayListText (page_num, &width, &height, &text, &num_blocks, false);
+    if (text_ptr==NULL)
+        return;
 
     m_block_list[page_num].clear();
 
@@ -303,7 +305,7 @@ unsigned int Document::ComputeContents()
     return num_items;
 }
 
-ContentItem *Document::GetContentItem(int item_num)
+ContentItem *Document::GetContentItem (unsigned int item_num)
 {
     if (m_content_items == NULL)
         return NULL;

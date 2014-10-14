@@ -646,6 +646,10 @@ status_t muctx::RenderPageMT(void *dlist, void *a_dlist, int page_width, int pag
 							 float scale, bool flipy, bool tile, point_t top_left,
 							 point_t bottom_right)
 {
+    UNUSED(page_width);
+    UNUSED(tile);
+    UNUSED(bottom_right);
+
 	fz_device *dev = NULL;
 	fz_pixmap *pix = NULL;
 	fz_matrix ctm, *pctm = &ctm;

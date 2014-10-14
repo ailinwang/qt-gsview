@@ -209,7 +209,7 @@ void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPag
 
             //  TODO: run in the background
             QProcess process;
-            bool bRet = process.startDetached(s);
+            process.startDetached(s);
         }
 
 #else

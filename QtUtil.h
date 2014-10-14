@@ -1,6 +1,10 @@
 #ifndef QTUTIL_H
 #define QTUTIL_H
 
+//// use expression as sub-expression,
+//// then make type of full expression int, discard result
+//#define UNUSED(x) (void)(sizeof((x), 0))
+
 #include <QImage>
 
 class QtUtil

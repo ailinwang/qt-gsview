@@ -5,7 +5,6 @@
 
 #include "status.h"
 #include "muctx.h"
-#include "Page.h"
 
 class QPainter;
 
@@ -118,7 +117,7 @@ public:
     std::vector<TextBlock> *blockList() {return m_block_list;}
 
     unsigned int ComputeContents();
-    ContentItem *GetContentItem(int item_num);
+    ContentItem *GetContentItem(unsigned int item_num);
 
     void SetAA(int level);
 
@@ -130,9 +129,6 @@ private:
     std::mutex mutex_lock;
 
     PageLinks *m_pageLinks = NULL;
-
-//    Page *m_pages = NULL;
-//    Page *m_thumbnails = NULL;
 
     std::vector<TextBlock> *m_block_list = NULL;
 

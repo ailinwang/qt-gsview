@@ -60,7 +60,7 @@ void PageList::copyText()
 
 void PageList::onMouseRelease(QEvent *e)
 {
-
+    UNUSED(e);
 }
 
 void PageList::manageCursor(QEvent *e)

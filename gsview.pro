@@ -34,7 +34,6 @@ HEADERS       = \
     Cache.h \
     Window.h \
     Document.h \
-    Page.h \
     QtUtil.h \
     ScrollingImageList.h \
     ImageWidget.h \
@@ -52,7 +51,6 @@ SOURCES       = \
     Cache.cpp \
     Window.cpp \
     Document.cpp \
-    Page.cpp \
     QtUtil.cpp \
     ScrollingImageList.cpp \
     ImageWidget.cpp \

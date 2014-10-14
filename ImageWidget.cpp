@@ -81,6 +81,8 @@ void ImageWidget::setSelected(bool isSelected)
 
 bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
 {
+    UNUSED(obj);
+
     //  post event if it was a click
     if (event->type() == QEvent::MouseButtonRelease)
     {
@@ -145,8 +147,6 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
                 }
             }
         }
-
-        QMouseEvent *me = ((QMouseEvent *)event);
 
         //  if the link we're in has changed, show/hide the hand cursor
         if (m_mouseInLink != linkIAmIn)
