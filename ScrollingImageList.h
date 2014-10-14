@@ -28,7 +28,7 @@ public:
     void hilightImage(int nImage);
     void goToPage (int nPage, bool evenIfVisible=false);
 
-    void zoom (double scale, int nPage);
+    void zoom (double scale);
     void annot (bool showAnnotations);
     void links (bool showLinks);
 
@@ -50,7 +50,6 @@ protected:
 public slots:
     void sliderReleasedSlot();
     void valueChangedSlot(int val);
-    void onImagesReady2();
 
 signals:
     void imagesReady();
@@ -59,7 +58,6 @@ private:
     void renderVisibleImages();
     void renderImage(int index);
     bool isImageVisible(int nPage);
-    void rebuild ();
     void onImagesReady();
 
     QScrollArea *m_scrollArea = NULL;

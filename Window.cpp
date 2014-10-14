@@ -192,7 +192,7 @@ void Window::percentageEditReturnPressed()
             if ( f>=m_minScale && f<=m_maxScale )
             {
                 m_scalePage = f;
-                m_pages->zoom (m_scalePage, m_currentPage);
+                m_pages->zoom (m_scalePage);
                 return;
             }
         }
@@ -542,7 +542,7 @@ void Window::zoom (double newScale)
     if (m_scalePage < m_minScale)
         m_scalePage = m_minScale;
 
-    m_pages->zoom (m_scalePage, m_currentPage);
+    m_pages->zoom (m_scalePage);
     m_percentage->setText(QString::number((int)(100*m_scalePage)));
 }
 
