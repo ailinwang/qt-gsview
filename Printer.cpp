@@ -18,8 +18,6 @@
 #include <cups/cups.h>
 #endif
 
-#include <ApplicationServices/ApplicationServices.h>
-
 Printer::Printer(QObject *parent) : QObject(parent)
 {
 }
