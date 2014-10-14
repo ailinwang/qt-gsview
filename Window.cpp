@@ -755,6 +755,18 @@ void Window::fileInfo()
 
 void Window::toggleContents()
 {
+    if (!m_showContents)
+    {
+        //  do we have contents?
+        int nContentsItems = m_document->ComputeContents();
+        if (nContentsItems<=0)
+        {
+            ui->actionContents->setChecked(m_showContents);
+            QMessageBox::information(NULL, tr(""), tr("No table of contents found."));
+            return;
+        }
+    }
+
     m_showContents = !m_showContents;
     if (m_showContents)
         m_contents->show();

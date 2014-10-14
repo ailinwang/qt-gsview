@@ -43,14 +43,6 @@ void ContentsList::hide()
 
 void ContentsList::build()
 {
-    //  do we have contents?
-    int nContentsItems = m_document->ComputeContents();
-    if (nContentsItems<=0)
-    {
-        QMessageBox::information(NULL, tr(""), tr("No table of contents found."));
-        return;
-    }
-
     if (m_list == NULL)
     {
         //  make the list widget.
@@ -62,6 +54,7 @@ void ContentsList::build()
 
         connect (m_list, SIGNAL(itemClicked ( QListWidgetItem *)), this, SLOT(itemClicked ( QListWidgetItem *)));
 
+        int nContentsItems = m_document->ComputeContents();
         for (int i=0; i<nContentsItems; i++)
         {
             ContentItem *item = m_document->GetContentItem(i);

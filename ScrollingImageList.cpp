@@ -61,9 +61,11 @@ void ScrollingImageList::buildImages()
         contentWidget->setLayout(new QVBoxLayout(contentWidget));
         contentWidget->layout()->setContentsMargins(0,0,0,0);
 
+        //  set the initial scale value
         double theScale = getScale();
         setScale(theScale);
 
+        //  configure and add the images
         for (int i=0; i<nPages; i++)
         {
             point_t pageSize;
@@ -103,7 +105,6 @@ void ScrollingImageList::links (bool showLinks)
             m_images[i].setShowLinks(showLinks);
             m_images[i].repaint();
         }
-
     }
 }
 
