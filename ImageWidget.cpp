@@ -264,13 +264,22 @@ QString ImageWidget::selectedText()
 
     for (unsigned int jj = 0; jj < m_selected_lines.size(); jj++)
     {
-        TextLine line = *(m_selected_lines.at(jj));
+        TextLine *line = m_selected_lines.at(jj);
 
-        int num_chars = line.char_list->size();
+        int num_chars = line->char_list->size();
         for (int ii = 0; ii < num_chars; ii++)
         {
-            TextCharacter theChar = line.char_list->at(ii);
-            theText += QChar(theChar.character);
+            TextCharacter *theChar = &(line->char_list->at(ii));
+
+            bool include = false;
+            if (line->selBegin==-1 && line->selEnd)
+                include = true;
+
+            if (line->selBegin!=-1 && ii>=line->selBegin && line->selEnd!=-1 && ii<=line->selEnd)
+                include = true;
+
+            if (include)
+                theText += QChar(theChar->character);
         }
         theText += QChar(10);
     }
@@ -293,7 +302,7 @@ void ImageWidget::selectAllText()
         for (int jj = 0; jj < num_lines; jj++)
         {
             TextLine *line = &(block->line_list->at(jj));
-            m_selected_lines.push_back(line);
+            this->addToSelection(line);
         }
     }
 
