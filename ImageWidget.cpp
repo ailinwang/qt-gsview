@@ -56,10 +56,30 @@ void ImageWidget::paintEvent(QPaintEvent *event)
         {
             TextLine line = *(m_selected_lines.at(jj));
 
-            double scale = this->scale();
-            QRect lrect ( QPoint(scale*line.X,scale*line.Y),
-                          QPoint(scale*(line.X+line.Width),scale*(line.Y+line.Height)));
-            painter.fillRect(lrect, QBrush(QColor("#506EB3E8")));  //  transparent blue
+            if (line.selBegin==-1 && line.selEnd==-1)
+            {
+                //  this is a whole line.
+                double scale = this->scale();
+                QRect lrect ( QPoint(scale*line.X,scale*line.Y),
+                              QPoint(scale*(line.X+line.Width),scale*(line.Y+line.Height)));
+                painter.fillRect(lrect, QBrush(QColor("#506EB3E8")));  //  transparent blue
+            }
+            else
+            {
+                //  this is a partial line.
+                int num_chars = line.char_list->size();
+                for (int ii = 0; ii < num_chars; ii++)
+                {
+                    if (ii>=line.selBegin && ii<=line.selEnd)
+                    {
+                        TextCharacter theChar = line.char_list->at(ii);
+                        double scale = this->scale();
+                        QRect crect ( QPoint(scale*theChar.X,scale*theChar.Y),
+                                      QPoint(scale*(theChar.X+theChar.Width),scale*(theChar.Y+theChar.Height)));
+                        painter.fillRect(crect, QBrush(QColor("#506EB3E8")));  //  transparent blue
+                    }
+                }
+            }
         }
     }
 
@@ -216,7 +236,7 @@ void ImageWidget::removeFromSelection(TextLine *line)
     }
 }
 
-void ImageWidget::addToSelection(TextLine *line)
+void ImageWidget::addToSelection(TextLine *line, int selBegin, int selEnd)
 {
     bool found = false;
     for (unsigned int i=0; i<m_selected_lines.size(); i++)
@@ -232,10 +252,10 @@ void ImageWidget::addToSelection(TextLine *line)
     }
 
     if (!found)
-    {
-//        qDebug("addToSelection p=%d b=%d l=%d", line->PageNumber, line->BlockNumber, line->LineNumber );
         m_selected_lines.push_back(line);
-    }
+
+    line->selBegin = selBegin;
+    line->selEnd = selEnd;
 }
 
 QString ImageWidget::selectedText()

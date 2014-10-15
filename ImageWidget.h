@@ -56,7 +56,7 @@ public:
     int pageNumber() {return m_pageNumber;}
 
     void clearSelection();
-    void addToSelection(TextLine *line);
+    void addToSelection(TextLine *line, int selBegin=-1, int selEnd=-1);
     void removeFromSelection(TextLine *line);
     QString selectedText();
     void selectAllText();

@@ -108,10 +108,57 @@ void PageList::manageCursor(QEvent *e)
 
 }
 
+bool isBetween (int val, int a, int b)
+{
+    if (a<=val && val<=b)
+        return true;
+    if (b<=val && val<=a)
+        return true;
+    return false;
+}
+
+int charIndex(TextLine *line, ImageWidget *widget, QPoint pos)
+{
+    int num_chars = line->char_list->size();
+    for (int ii = 0; ii < num_chars; ii++)
+    {
+        TextCharacter *theChar = &(line->char_list->at(ii));
+        QRect cRect ( widget->scale()*theChar->X, widget->scale()*theChar->Y,
+                      widget->scale()*theChar->Width, widget->scale()*theChar->Height);
+        cRect.setTopLeft(widget->mapToGlobal(cRect.topLeft()));
+        cRect.setBottomRight(widget->mapToGlobal(cRect.bottomRight()));
+
+        if (ii==0)
+        {
+            if (pos.x()<cRect.left())
+                return 0;
+        }
+        else
+        {
+            if (isBetween(pos.x(), cRect.left(), cRect.right()))
+                return ii;
+            TextCharacter *theChar2 = &(line->char_list->at(ii-1));
+            QRect cRect2 ( widget->scale()*theChar2->X, widget->scale()*theChar2->Y,
+                           widget->scale()*theChar2->Width, widget->scale()*theChar2->Height);
+            cRect2.setTopLeft(widget->mapToGlobal(cRect2.topLeft()));
+            cRect2.setBottomRight(widget->mapToGlobal(cRect2.bottomRight()));
+
+            if (isBetween(pos.x(), cRect2.right(), cRect.left()))
+                return ii;
+        }
+    }
+
+    //  not found, return last one
+    return num_chars-1;
+}
+
 void PageList::updateSelection(QEvent *e)
 {
     //  new mouse location in global coords
     QPoint newPosGlobal = getScrollArea()->mapToGlobal(((QMouseEvent *)e)->pos());
+
+    bool movingDown  = (newPosGlobal.y() >= m_origin.y());
+    bool movingRight = (newPosGlobal.x() >= m_origin.x());
 
     //  which widget are we "in"?
     ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
@@ -129,11 +176,11 @@ void PageList::updateSelection(QEvent *e)
             int num_lines = block.line_list->size();
             for (int jj = 0; jj < num_lines; jj++)
             {
-                TextLine line = block.line_list->at(jj);
+                TextLine *line = &(block.line_list->at(jj));
 
                 //  global rect of the current line
-                QRect lineRect ( widget->scale()*line.X, widget->scale()*line.Y,
-                                 widget->scale()*line.Width, widget->scale()*line.Height);
+                QRect lineRect ( widget->scale()*line->X, widget->scale()*line->Y,
+                                 widget->scale()*line->Width, widget->scale()*line->Height);
                 lineRect.setTopLeft(widget->mapToGlobal(lineRect.topLeft()));
                 lineRect.setBottomRight(widget->mapToGlobal(lineRect.bottomRight()));
 
@@ -142,41 +189,60 @@ void PageList::updateSelection(QEvent *e)
                 bool bAdd = false;
                 if (lineRect.contains(m_origin) || lineRect.contains(newPosGlobal))
                     bAdd = true;
-                if (m_origin.y() <= lineRect.top() && lineRect.top()<= newPosGlobal.y())
+                if (isBetween(lineRect.top(), m_origin.y(), newPosGlobal.y()))
                     bAdd = true;
-                if (newPosGlobal.y() <= lineRect.top() && lineRect.top()<= m_origin.y())
-                    bAdd = true;  //  upside down
-                if (m_origin.y() <= lineRect.bottom() && lineRect.bottom()<= newPosGlobal.y())
+                if (isBetween(lineRect.bottom(), m_origin.y(), newPosGlobal.y()))
                     bAdd = true;
-                if (newPosGlobal.y() <= lineRect.bottom() && lineRect.bottom()<= m_origin.y())
-                    bAdd = true;  //  upside down
 
                 if ( bAdd)
                 {
-//                    bool upsideDown = (newPosGlobal.y() < m_origin.y());
-//                    if (lineRect.contains(m_origin) && lineRect.contains(newPosGlobal))
-//                    {
-//                        //  line contains both points
-//                        widget->addToSelection(&(block.line_list->at(jj)));
-//                    }
-//                    else if (lineRect.contains(m_origin))
-//                    {
-//                        //  line contains beginning
-//                        widget->addToSelection(&(block.line_list->at(jj)));
-//                    }
-//                    else if (lineRect.contains(newPosGlobal))
-//                    {
-//                        //  line contains end
-//                        widget->addToSelection(&(block.line_list->at(jj)));
-//                    }
-//                    else
-//                    {
-                        widget->addToSelection(&(block.line_list->at(jj)));
-//                    }
+                    int num_chars = line->char_list->size();
+
+                    if (lineRect.contains(m_origin) && lineRect.contains(newPosGlobal))
+                    {
+                        int i1 = charIndex(line, widget, m_origin);
+                        int i2 = charIndex(line, widget, newPosGlobal);
+                        if (movingRight)
+                        {
+                            widget->addToSelection(line, i1, i2);
+                        }
+                        else
+                        {
+                            widget->addToSelection(line, i2, i1);
+                        }
+                    }
+                    else if (lineRect.contains(m_origin))
+                    {
+                        int i1 = charIndex(line, widget, m_origin);
+                        if (movingDown)
+                        {
+                            widget->addToSelection(line, i1, num_chars-1);
+                        }
+                        else
+                        {
+                            widget->addToSelection(line, 0, i1);
+                        }
+                    }
+                    else if (lineRect.contains(newPosGlobal))
+                    {
+                        int i1 = charIndex(line, widget, newPosGlobal);
+                        if (movingDown)
+                        {
+                            widget->addToSelection(line, 0, i1);
+                        }
+                        else
+                        {
+                            widget->addToSelection(line, i1, num_chars-1);
+                        }
+                    }
+                    else
+                    {
+                        widget->addToSelection(line);
+                    }
                 }
                 else
                 {
-                    widget->removeFromSelection(&(block.line_list->at(jj)));
+                    widget->removeFromSelection(line);
                 }
             }
         }
