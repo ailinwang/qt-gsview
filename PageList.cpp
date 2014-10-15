@@ -111,7 +111,7 @@ void PageList::manageCursor(QEvent *e)
 void PageList::updateSelection(QEvent *e)
 {
     //  new mouse location in global coords
-    QPoint posGlobal = getScrollArea()->mapToGlobal(((QMouseEvent *)e)->pos());
+    QPoint newPosGlobal = getScrollArea()->mapToGlobal(((QMouseEvent *)e)->pos());
 
     //  which widget are we "in"?
     ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
@@ -131,41 +131,53 @@ void PageList::updateSelection(QEvent *e)
             {
                 TextLine line = block.line_list->at(jj);
 
-                //  rect of the line, in currently-scaled widget coords.
-                double scale = widget->scale();
-                QRect rect ( QPoint(scale*line.X,scale*line.Y),
-                             QPoint(scale*(line.X+line.Width),scale*(line.Y+line.Height)));
+                //  global rect of the current line
+                QRect lineRect ( widget->scale()*line.X, widget->scale()*line.Y,
+                                 widget->scale()*line.Width, widget->scale()*line.Height);
+                lineRect.setTopLeft(widget->mapToGlobal(lineRect.topLeft()));
+                lineRect.setBottomRight(widget->mapToGlobal(lineRect.bottomRight()));
 
-                //  transform to globals
-                QPoint p(rect.left(), rect.top());
-                p = widget->mapToGlobal(p);
-                rect.setLeft(p.x());
-                rect.setTop(p.y());
-
-                //  if the top or bottom of the line rect is
-                //  between the starting and current point of selection, add it
+                //  check to see if the line should be included
 
                 bool bAdd = false;
-                if (m_origin.y() <= rect.top() && rect.top()<= posGlobal.y())
+                if (lineRect.contains(m_origin) || lineRect.contains(newPosGlobal))
                     bAdd = true;
-                if (posGlobal.y() <= rect.top() && rect.top()<= m_origin.y())
+                if (m_origin.y() <= lineRect.top() && lineRect.top()<= newPosGlobal.y())
                     bAdd = true;
-
-                //  these don't seem to work and I don't know why
-//                if (m_origin.y() <= rect.bottom() && rect.bottom()<= posGlobal.y())
-//                    bAdd = true;
-//                if (posGlobal.y() <= rect.bottom() && rect.bottom()<= m_origin.y())
-//                    bAdd = true;
+                if (newPosGlobal.y() <= lineRect.top() && lineRect.top()<= m_origin.y())
+                    bAdd = true;  //  upside down
+                if (m_origin.y() <= lineRect.bottom() && lineRect.bottom()<= newPosGlobal.y())
+                    bAdd = true;
+                if (newPosGlobal.y() <= lineRect.bottom() && lineRect.bottom()<= m_origin.y())
+                    bAdd = true;  //  upside down
 
                 if ( bAdd)
                 {
-                    widget->addToSelection(&(block.line_list->at(jj)));
+//                    bool upsideDown = (newPosGlobal.y() < m_origin.y());
+//                    if (lineRect.contains(m_origin) && lineRect.contains(newPosGlobal))
+//                    {
+//                        //  line contains both points
+//                        widget->addToSelection(&(block.line_list->at(jj)));
+//                    }
+//                    else if (lineRect.contains(m_origin))
+//                    {
+//                        //  line contains beginning
+//                        widget->addToSelection(&(block.line_list->at(jj)));
+//                    }
+//                    else if (lineRect.contains(newPosGlobal))
+//                    {
+//                        //  line contains end
+//                        widget->addToSelection(&(block.line_list->at(jj)));
+//                    }
+//                    else
+//                    {
+                        widget->addToSelection(&(block.line_list->at(jj)));
+//                    }
                 }
                 else
                 {
                     widget->removeFromSelection(&(block.line_list->at(jj)));
                 }
-
             }
         }
         widget->update();

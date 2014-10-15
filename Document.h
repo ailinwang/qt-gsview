@@ -57,6 +57,8 @@ public:
     int BlockNumber;
     int LineNumber;
     std::vector<TextCharacter> *char_list;
+    int selBegin = -1;
+    int selEnd = -1;
 };
 
 class TextBlock : public Block
