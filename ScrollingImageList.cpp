@@ -126,33 +126,37 @@ void ScrollingImageList::zoom (double theScale)
         double zoomRatio = theScale/m_scale;
         int nPages = m_document->GetPageCount();
 
-        //  estimate which images will be visible after the zoom
-        QRegion vreg = m_scrollArea->widget()->visibleRegion();
-        QRect vrect = vreg.boundingRect();
-        vrect.setTop(vrect.top()*zoomRatio);  // future position, same size
-        int minVis = -1;
-        int maxVis = -1;
-        for (int i=0; i<nPages; i++)
-        {
-            QRect imRect = m_images[i].geometry();
-            imRect.setTop(imRect.top()*zoomRatio);  //  future top
-            imRect.setBottom(imRect.bottom()*zoomRatio);  //  future bottom
-            if (vrect.intersects(imRect))
-            {
-                //  will be visible
-                if (minVis==-1)
-                    minVis = i;
-                maxVis = i;
-            }
-        }
+//        //  estimate which images will be visible after the zoom
+//        QRegion vreg = m_scrollArea->widget()->visibleRegion();
+//        QRect vrect = vreg.boundingRect();
+//        vrect.setTop(vrect.top()*zoomRatio);  // future position, same size
+//        int minVis = -1;
+//        int maxVis = -1;
+//        for (int i=0; i<nPages; i++)
+//        {
+//            QRect imRect = m_images[i].geometry();
+//            imRect.setTop(imRect.top()*zoomRatio);  //  future top
+//            imRect.setBottom(imRect.bottom()*zoomRatio);  //  future bottom
+//            if (vrect.intersects(imRect))
+//            {
+//                //  will be visible
+//                if (minVis==-1)
+//                    minVis = i;
+//                maxVis = i;
+//            }
+//        }
 
-        //  hide the scroll area widget while we do the rest to avoid flickering
-        m_scrollArea->widget()->hide();
+//        qDebug("zoom raio = %f minVis=%d, maxVis = %d", zoomRatio, minVis, maxVis);
+
 
         //  estimate where the slider should go and send it there.
         QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
         int oldVal = slider->value();
         int newVal = oldVal * zoomRatio;
+
+        //  hide the scroll area widget while we do the rest to avoid flickering
+        m_scrollArea->widget()->hide();
+
         slider->setValue(newVal);
 
         //  set the new scale value
@@ -184,13 +188,17 @@ void ScrollingImageList::zoom (double theScale)
             }
 
             //  render if it will become visible later.
-            if (i>=minVis && i<=maxVis)
-                renderImage(i);
+//            if (i>=minVis && i<=maxVis)
+//                renderImage(i);
         }
 
         //  now show the scroll area again
+        //  and render
         qApp->processEvents();
         m_scrollArea->widget()->show();
+        qApp->processEvents();
+        renderVisibleImages();
+        qApp->processEvents();
 
         emit imagesReady();
     }
@@ -311,6 +319,9 @@ void ScrollingImageList::goToPage (int nPage, bool evenIfVisible)
     if (scrollTo<0)
         scrollTo = 0;
     m_scrollArea->verticalScrollBar()->setValue(scrollTo);
+
+    qApp->processEvents();
+    this->renderVisibleImages();
 }
 
 bool ScrollingImageList::eventFilter(QObject *target, QEvent *event)
