@@ -796,7 +796,7 @@ void Window::setAA()
     QVariant qval = ((QAction *)sender())->data();
     int val = qval.toInt();
 
-    m_document->SetAA(val);;
+    m_document->SetAA(val);
     m_pages->reRender();
 }
 

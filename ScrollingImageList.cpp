@@ -110,13 +110,16 @@ void ScrollingImageList::links (bool showLinks)
 
 void ScrollingImageList::reRender()
 {
-    //  just re-render any images that are currently rendered
+    //  mark all pages un-rendered,
+    //  then render the visible ones
+
     int nPages = m_document->GetPageCount();
+
     for (int i=0; i<nPages; i++)
-    {
-        if (m_images[i].rendered())
-            renderImage(i);
-    }
+        m_images[i].setRendered(false);
+
+    renderVisibleImages();
+
 }
 
 void ScrollingImageList::zoom (double theScale)
