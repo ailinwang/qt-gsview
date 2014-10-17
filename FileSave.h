@@ -7,6 +7,7 @@ class FileType {
 public:
     QString filterName;
     QString filterType;
+    QString filter;
 };
 
 class FileSave

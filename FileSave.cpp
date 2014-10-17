@@ -9,20 +9,20 @@
 #include "QtUtil.h"
 
 FileType fileTypes[] = {
-    {"PDF", "pdf"},
-    {"Linearizded PDF", "pdf"},
-    {"PDF 1.3", "pdf"},
-    {"PDF/A-1 RGB", "pdf"},
-    {"PDF/A-1 CMYK", "pdf"},
-    {"PDF/A-2 RGB", "pdf"},
-    {"PDF/A-2 CMYK", "pdf"},
-    {"PDF/X-3 Gray", "pdf"},
-    {"PDF/X-3 CMYK", "pdf"},
-    {"PCL-XL", "bin"},
-    {"XPS", "xps"},
-    {"Text", "txt"},
-    {"HTML", "html"},
-    {"XML", "xml"}
+    {"PDF",             "pdf" , "" },
+    {"Linearizded PDF", "pdf" , "" },
+    {"PDF 1.3",         "pdf" , "" },
+    {"PDF/A-1 RGB",     "pdf" , "" },
+    {"PDF/A-1 CMYK",    "pdf" , "" },
+    {"PDF/A-2 RGB",     "pdf" , "" },
+    {"PDF/A-2 CMYK",    "pdf" , "" },
+    {"PDF/X-3 Gray",    "pdf" , "" },
+    {"PDF/X-3 CMYK",    "pdf" , "" },
+    {"PCL-XL",          "bin" , "" },
+    {"XPS",             "xps" , "" },
+    {"Text",            "txt" , "" },
+    {"HTML",            "html", "" },
+    {"XML",             "xml" , "" }
 };
 int numTypes = 14;
 
@@ -36,9 +36,11 @@ void FileSave::run()
     QString types;
     for (int i=0;i<numTypes;i++)
     {
+        QString theFilter = fileTypes[i].filterName + QString(" (*.") + fileTypes[i].filterType + QString(")");
+        fileTypes[i].filter = theFilter;
         if (i>0)
             types += ";;";
-        types += fileTypes[i].filterName + QString(" (*.") + fileTypes[i].filterType + QString(")");
+        types += theFilter;
     }
 
     //  set up the dialog
