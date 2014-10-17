@@ -43,7 +43,8 @@ HEADERS       = \
     Printer.h \
     AboutDialog.h \
     FileInfoDialog.h \
-    ContentsList.h
+    ContentsList.h \
+    FileSave.h
 
 SOURCES       = \
     main.cpp \
@@ -60,7 +61,8 @@ SOURCES       = \
     Printer.cpp \
     AboutDialog.cpp \
     FileInfoDialog.cpp \
-    ContentsList.cpp
+    ContentsList.cpp \
+    FileSave.cpp
 
 FORMS += \
     Window.ui \

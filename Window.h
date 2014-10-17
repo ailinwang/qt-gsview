@@ -23,6 +23,8 @@ class QScrollArea;
 class QScrollBar;
 QT_END_NAMESPACE
 
+class FileSave;
+
 class Window : public QMainWindow
 {
 	Q_OBJECT
@@ -130,6 +132,7 @@ private:
 
     QString m_fileExtension;
     QString m_fileType;
+    FileSave *m_fileSave;
 };
 
 #endif  //  WINDOW_H

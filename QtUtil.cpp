@@ -95,6 +95,32 @@ QString QtUtil::eventTypeName(QEvent *event)
     return name;
 }
 
+QString QtUtil::extensionFromPath(QString path)
+{
+    QFileInfo fileInfo (path);
+    return fileInfo.suffix().toLower();
+}
+
+QString QtUtil::extensionFromFilter(QString filter)
+{
+    int start = 0;
+    int end = filter.length()-1;
+
+    for (int i=0;i<filter.length();i++)
+    {
+        if (filter.at(i) == QChar('*'))
+            start = i+2;
+
+        if (filter.at(i) == QChar(')'))
+        {
+            end = i-1;
+            break;
+        }
+    }
+
+    return filter.mid(start,end-start+1).toLower();
+}
+
 
 
 

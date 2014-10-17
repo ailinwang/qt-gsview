@@ -8,6 +8,7 @@
 #include "Printer.h"
 #include "ui_Window.h"
 #include "QtUtil.h"
+#include "FileSave.h"
 
 #include "AboutDialog.h"
 
@@ -18,6 +19,8 @@ Window::Window(QWidget *parent) :
     //  set up the UI
     ui->setupUi(this);
     setupToolbar();
+
+    m_fileSave = new FileSave(this);
 
     //  contents area initially hidden
     m_contents = new ContentsList();
@@ -440,7 +443,8 @@ void Window::closeAction()
 
 void Window::saveAction()
 {
-    QMessageBox::information (this, "", "saving is not yet implemented.");
+    //  do this in another class
+    m_fileSave->run();
 }
 
 // static
@@ -452,8 +456,7 @@ void Window::open()
                        desktopLocations.isEmpty() ? QDir::currentPath() : desktopLocations.first());
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
 
-    //  INFO: It's hard to debug in the Qt IDE when we use the native
-    //  file dialog.
+    //  INFO: It's hard to debug in the Qt IDE when we use the native file dialog.
     dialog.setOption(QFileDialog::DontUseNativeDialog, true);
 
     dialog.setFileMode(QFileDialog::ExistingFile);
