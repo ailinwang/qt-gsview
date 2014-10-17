@@ -3,6 +3,12 @@
 
 #include "Window.h"
 
+class FileType {
+public:
+    QString filterName;
+    QString filterType;
+};
+
 class FileSave
 {
 public:

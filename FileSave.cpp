@@ -8,6 +8,24 @@
 
 #include "QtUtil.h"
 
+FileType fileTypes[] = {
+    {"PDF", "pdf"},
+    {"Linearizded PDF", "pdf"},
+    {"PDF 1.3", "pdf"},
+    {"PDF/A-1 RGB", "pdf"},
+    {"PDF/A-1 CMYK", "pdf"},
+    {"PDF/A-2 RGB", "pdf"},
+    {"PDF/A-2 CMYK", "pdf"},
+    {"PDF/X-3 Gray", "pdf"},
+    {"PDF/X-3 CMYK", "pdf"},
+    {"PCL-XL", "bin"},
+    {"XPS", "xps"},
+    {"Text", "txt"},
+    {"HTML", "html"},
+    {"XML", "xml"}
+};
+int numTypes = 14;
+
 void FileSave::run()
 {
     //  where is the desktop?
@@ -15,7 +33,13 @@ void FileSave::run()
     QString desktop = desktopLocations.first();
 
     //  what are the file types?
-    QString types("PDF (*.pdf);;Postscript (*.ps);;Text (*.txt)");
+    QString types;
+    for (int i=0;i<numTypes;i++)
+    {
+        if (i>0)
+            types += ";;";
+        types += fileTypes[i].filterName + QString(" (*.") + fileTypes[i].filterType + QString(")");
+    }
 
     //  set up the dialog
     QFileDialog dialog(m_window, "Save", desktop);
@@ -51,11 +75,7 @@ void FileSave::run()
 
         //  now do the save
         QString message = "saving is not yet implemented.<br/><br/>";
-        message += "saving ";
-        message += fileName;
-        message += "<br/>as ";
-        message += filter;
-
+        message += "saving " + fileName + "<br/>as " + filter;
         QMessageBox::information (m_window, "", message);
     }
 
