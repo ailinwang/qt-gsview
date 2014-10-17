@@ -457,7 +457,7 @@ void Window::open()
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
 
     //  INFO: It's hard to debug in the Qt IDE when we use the native file dialog.
-    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, false);
 
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz *.ps *.eps)"));

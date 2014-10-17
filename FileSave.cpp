@@ -34,7 +34,8 @@ void FileSave::run()
 
     //  what are the file types?
     QString types;
-    for (int i=0;i<numTypes;i++)
+    int i;
+    for (i=0;i<numTypes;i++)
     {
         QString theFilter = fileTypes[i].filterName + QString(" (*.") + fileTypes[i].filterType + QString(")");
         fileTypes[i].filter = theFilter;
@@ -47,7 +48,7 @@ void FileSave::run()
     QFileDialog dialog(m_window, "Save", desktop);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     //  INFO: It's hard to debug in the Qt IDE when we use the native file dialog.
-    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, false);
     dialog.setNameFilter(types);
 
     //  get the name
@@ -75,10 +76,42 @@ void FileSave::run()
             return;
         }
 
+        //  find the matching type from the filter
+        int index = -1;
+        for (i=0;i<numTypes;i++)
+        {
+            if (filter==fileTypes[i].filter)
+            {
+                index = i;
+                break;
+            }
+        }
+
         //  now do the save
-        QString message = "saving is not yet implemented.<br/><br/>";
-        message += "saving " + fileName + "<br/>as " + filter;
-        QMessageBox::information (m_window, "", message);
+
+        if (index==0)
+        {
+            //  regular PDF - just copy the file
+            //  overwrite - the dialog will have asked the user this question
+            //  so it's ok to do it
+            QString original = m_window->getPath();
+            if (QFile::exists(fileName))
+                QFile::remove(fileName);
+            QFile::copy(original, fileName);
+        }
+        else if (index==1)
+        {
+            //  linearized PDF
+
+
+        }
+        else
+        {
+            //  NYI
+            QString message = "saving is not yet implemented.<br/><br/>";
+            message += "saving " + fileName + "<br/>as " + QString::number(index+1) + ". " + filter;
+            QMessageBox::information (m_window, "", message);
+        }
     }
 
 }
