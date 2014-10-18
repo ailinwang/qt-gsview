@@ -324,68 +324,62 @@ void Document::SetAA(int level)
 
 void Document::PDFExtract (const char *infile, const char *outfile,
                            const char *password, bool has_password,
-                           bool linearize, int in_num_pages, int *pages)
+                           bool linearize, int num_pages, int *pages)
 {
-    //  This function uses the muPDF tool pdfclean to output linearized PDF
-    //  from the source.
+    //  This function uses muTool to extract pages to a file.
 
-    //  there seems to be an issue with NOT supplying a range of pages,
-    //  so let's always use a page list.
-
-    //  construct a list of pages
-    int *page_list;
-    int i;
-    int num_pages;
-    if (in_num_pages>0)
+    //  make a page list.  If none was supplied, make a range
+    //  that includes all the pages.
+    std::string pagelist = "";
+    if (num_pages>0)
     {
-        //  use the pages given
-        num_pages = in_num_pages;
-        page_list = new int[num_pages];
-        for (i=0;i<num_pages;i++)
-            page_list[i] = pages[i];
+        for (int i=0; i<num_pages; i++)
+        {
+            if (i>0)
+                pagelist += ",";
+            pagelist += std::to_string(pages[i]+1);
+        }
     }
     else
     {
-        //  use all the pages in the doc
-        num_pages = GetPageCount();
-        page_list = new int[num_pages];
-        for (i=0;i<num_pages;i++)
-            page_list[i] = i+1;
+        pagelist += "1-" + std::to_string(GetPageCount());
     }
 
-    //  build a list of arguments
+    //  count the arguments
+    int argc = 3;  //  "clean", input file, output file
+    if (has_password)
+        argc += 2;
+    if (linearize)
+        argc += 1;
+    argc += 1;  //  always give pages
 
-    int argc = 3 + ((has_password) ? (2) : (0)) + ((linearize) ? (1) : (0)) + ((num_pages > 0) ? (1) : (0));
+    //  allocate argument array
     char **argv = new char*[argc];
+    int pos = 0;
 
-    int pos = 1;  //  why are we skipping the first arg?
-
+    //  build the argument list
+    static char clean[] = "clean";
+    argv[pos++] = clean;
     if (has_password)
     {
-        argv[pos++] = "-p";
+        static char dashp[] = "-p";
+        argv[pos++] = dashp;
         argv[pos++] = (char *)password;
     }
-
     if (linearize)
     {
-        argv[pos++] = "-l";
+        static char dashl[] = "-l";
+        argv[pos++] = dashl;
     }
-
     argv[pos++] = (char *)infile;
     argv[pos++] = (char *)outfile;
-
-    std::string pagelist = "";
-    for (i=0; i<num_pages; i++)
-    {
-        if (i>0)
-            pagelist += ",";
-        pagelist += std::to_string(i+1);
-    }
     argv[pos++] = (char *)pagelist.c_str();
+    argv[pos] = NULL;  //  done
 
-    //  now do it
+    //  run the tool
     int result = pdfclean_main (argc, argv);
+    UNUSED(result);
 
+    //  clean up
     delete(argv);
-    delete(page_list);
 }

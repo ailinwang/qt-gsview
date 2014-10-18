@@ -107,6 +107,8 @@ void FileSave::run()
         }
         else if (index==1)
         {
+            if (QFile::exists(fileName))
+                QFile::remove(fileName);
             //  linearized PDF
             m_window->document()->PDFExtract (original.toStdString().c_str(), fileName.toStdString().c_str(),
                                               password.toStdString().c_str(),
