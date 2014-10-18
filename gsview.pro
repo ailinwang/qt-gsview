@@ -62,7 +62,8 @@ SOURCES       = \
     AboutDialog.cpp \
     FileInfoDialog.cpp \
     ContentsList.cpp \
-    FileSave.cpp
+    FileSave.cpp \
+    ../../source/tools/pdfclean.c
 
 FORMS += \
     Window.ui \

@@ -89,12 +89,18 @@ void FileSave::run()
 
         //  now do the save
 
+        //  in all cases, the file dialog has asked the user about overwriting,
+        //  so it's OK not to ask here.
+
+        QString original = m_window->getPath();
+        QString password;
+
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        qApp->processEvents();
+
         if (index==0)
         {
             //  regular PDF - just copy the file
-            //  overwrite - the dialog will have asked the user this question
-            //  so it's ok to do it
-            QString original = m_window->getPath();
             if (QFile::exists(fileName))
                 QFile::remove(fileName);
             QFile::copy(original, fileName);
@@ -102,16 +108,22 @@ void FileSave::run()
         else if (index==1)
         {
             //  linearized PDF
-
-
+            m_window->document()->PDFExtract (original.toStdString().c_str(), fileName.toStdString().c_str(),
+                                              password.toStdString().c_str(),
+                                            password.length()>0, true, -1, NULL);
         }
         else
         {
+            QApplication::restoreOverrideCursor();
+            qApp->processEvents();
+
             //  NYI
             QString message = "saving is not yet implemented.<br/><br/>";
             message += "saving " + fileName + "<br/>as " + QString::number(index+1) + ". " + filter;
             QMessageBox::information (m_window, "", message);
         }
+        QApplication::restoreOverrideCursor();
+        qApp->processEvents();
     }
 
 }

@@ -123,6 +123,9 @@ public:
 
     void SetAA(int level);
 
+    void PDFExtract (const char *infile, const char *outfile, const char *password,
+        bool has_password, bool linearize, int num_pages, int *pages);
+
 private:
 
     muctx *mu_ctx = NULL;

@@ -1,5 +1,9 @@
 #include "Document.h"
 
+extern "C" {
+#include "mupdf/pdf-tools.h"
+}
+
 #include <QString>
 #include <QPainter>
 #include <QRect>
@@ -57,9 +61,6 @@ bool Document::OpenFile(const std::string fileName)
 
     //  allocate an array of page links
     m_pageLinks = new PageLinks[m_pageCount];
-
-//        //  allocate an array of pages
-//        m_pages = new Page[m_pageCount];
 
     //  allocate an array of text block lists
     m_block_list = new std::vector<TextBlock>[m_pageCount];
@@ -319,4 +320,72 @@ void Document::SetAA(int level)
 {
     if (mu_ctx != NULL)
         mu_ctx->SetAA(level);
+}
+
+void Document::PDFExtract (const char *infile, const char *outfile,
+                           const char *password, bool has_password,
+                           bool linearize, int in_num_pages, int *pages)
+{
+    //  This function uses the muPDF tool pdfclean to output linearized PDF
+    //  from the source.
+
+    //  there seems to be an issue with NOT supplying a range of pages,
+    //  so let's always use a page list.
+
+    //  construct a list of pages
+    int *page_list;
+    int i;
+    int num_pages;
+    if (in_num_pages>0)
+    {
+        //  use the pages given
+        num_pages = in_num_pages;
+        page_list = new int[num_pages];
+        for (i=0;i<num_pages;i++)
+            page_list[i] = pages[i];
+    }
+    else
+    {
+        //  use all the pages in the doc
+        num_pages = GetPageCount();
+        page_list = new int[num_pages];
+        for (i=0;i<num_pages;i++)
+            page_list[i] = i+1;
+    }
+
+    //  build a list of arguments
+
+    int argc = 3 + ((has_password) ? (2) : (0)) + ((linearize) ? (1) : (0)) + ((num_pages > 0) ? (1) : (0));
+    char **argv = new char*[argc];
+
+    int pos = 1;  //  why are we skipping the first arg?
+
+    if (has_password)
+    {
+        argv[pos++] = "-p";
+        argv[pos++] = (char *)password;
+    }
+
+    if (linearize)
+    {
+        argv[pos++] = "-l";
+    }
+
+    argv[pos++] = (char *)infile;
+    argv[pos++] = (char *)outfile;
+
+    std::string pagelist = "";
+    for (i=0; i<num_pages; i++)
+    {
+        if (i>0)
+            pagelist += ",";
+        pagelist += std::to_string(i+1);
+    }
+    argv[pos++] = (char *)pagelist.c_str();
+
+    //  now do it
+    int result = pdfclean_main (argc, argv);
+
+    delete(argv);
+    delete(page_list);
 }
