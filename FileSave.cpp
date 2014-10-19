@@ -7,7 +7,6 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QProgressDialog>
-#include <QBasicTimer>
 
 #include "QtUtil.h"
 
@@ -123,21 +122,15 @@ void FileSave::run()
             //  construct the command
             QString command = "\"" + QtUtil::getGsPath() + "\"";
             command += " -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dCompatibilityLevel=1.3";
-//            command += " -r72";  //  take this out later
+//            command += " -r72";
             command += " -o \"" + fileName + "\"";
             command += " -f \"" + original + "\"";
             qDebug("command is: %s", command.toStdString().c_str());
 
-            if (saveWithProgress(command))
-            {
-                //  TODO: swap temp file for real thing
-            }
+            saveWithProgress(command);
         }
         else
         {
-            QApplication::restoreOverrideCursor();
-            qApp->processEvents();
-
             //  NYI
             QString message = "saving is not yet implemented.<br/><br/>";
             message += "saving " + fileName + "<br/>as " + QString::number(index+1) + ". " + filter;
@@ -147,49 +140,35 @@ void FileSave::run()
 
 }
 
-bool FileSave::saveWithProgress(QString command)
+void FileSave::setProgress (int val)
 {
-    bool canceled = false;
+    m_progressDialog->setValue(val);
+    QString s = QString("Processed ")
+                    + QString::number(val) + QString(" of ")
+                    + QString::number(m_window->document()->GetPageCount()) + QString(" pages...");
+    m_progressDialog->setLabelText(s);
+}
 
+void FileSave::saveWithProgress(QString command)
+{
     //  show a progress widget
     m_progressDialog = new QProgressDialog(m_window);
     connect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
     m_progressDialog->setMaximum(m_window->document()->GetPageCount());
-    m_progressDialog->setValue(0);
+    setProgress(0);
     m_progressDialog->show();
     qApp->processEvents();
-
-    m_timer = new QBasicTimer();
-    m_timer->start(100,this);
 
     //  create a process to do the conversion.  During this time onReadyReadStandardOutput gets called;
     //  that's our opportunity to update the progress widget
     m_process = new QProcess(m_window);
     connect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
+    connect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
     m_process->start(command);
-    m_process->waitForFinished();
 
-    m_timer->stop();
-    delete m_timer;
-
-    if (m_progressDialog->wasCanceled())
-    {
-        QMessageBox::information (m_window, "", "Canceled.");
-        canceled = true;
-    }
-
-    //  take down progress widget
-    m_progressDialog->hide();
-    qApp->processEvents();
-    disconnect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
-    delete m_progressDialog;
-
-    //  disconnect/delete the process
-    disconnect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
-    delete m_process;
-    m_process=NULL;
-
-    return !canceled;
+    //  don't wait here, that will block the UI.
+    //  instead, clean up in onFinshed(), which will be called in both the
+    //  regular finish and when cancelling.
 }
 
 void FileSave::onReadyReadStandardOutput()
@@ -200,14 +179,12 @@ void FileSave::onReadyReadStandardOutput()
         int nc = m_process->readLine(data, 10000);
         data[nc] = 0;
 
-        qDebug("data: %s", data);
-
         //  every time we see "Page", crank the progress
         QString s(data);
         if (s.left(4).compare(QString("Page"))==0)
         {
             int val = m_progressDialog->value();
-            m_progressDialog->setValue(val+1);
+            setProgress(val+1);
             qApp->processEvents();
         }
     }
@@ -219,20 +196,27 @@ void FileSave::onCanceled()
     m_process->terminate();
 }
 
-void FileSave::timerEvent(QTimerEvent *event)
+void FileSave::onFinished(int exitCode)
 {
-    if (event->timerId() == m_timer->timerId())
-    {
-        if (m_progressDialog->wasCanceled())
-        {
-            qDebug("timerEvent onCanceled");
-            m_process->terminate();
-        }
-    }
-    else
-    {
-        QObject::timerEvent(event);
-    }
-}
+    qDebug("onFinshed, exit code = %d", exitCode);
 
+    bool canceled = false;
+    if (m_progressDialog->wasCanceled())
+        canceled = true;
+
+    //  take down progress widget
+    m_progressDialog->hide();
+    qApp->processEvents();
+    disconnect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
+    delete m_progressDialog;
+
+    //  disconnect/delete the process
+    disconnect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
+    disconnect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
+//    delete m_process;
+//    m_process=NULL;
+
+    if (canceled)
+        QMessageBox::information (NULL, "", "Canceled.");
+}
 
