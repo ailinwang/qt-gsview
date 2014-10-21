@@ -9,8 +9,8 @@
 #include "ui_Window.h"
 #include "QtUtil.h"
 #include "FileSave.h"
-
 #include "AboutDialog.h"
+#include "MessagesDialog.h"
 
 Window::Window(QWidget *parent) :
     QMainWindow(parent),
@@ -52,6 +52,7 @@ Window::Window(QWidget *parent) :
     connect(ui->actionPrint, SIGNAL(triggered()), this, SLOT(print()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
     connect(ui->actionInfo, SIGNAL(triggered()), this, SLOT(fileInfo()));
+    connect(ui->actionGhostscript_Messages, SIGNAL(triggered()), this, SLOT(ghostscriptMessages()));
 
     //  edit menu
     connect(ui->actionCopy_Text, SIGNAL(triggered()), this, SLOT(copyText()));
@@ -801,6 +802,12 @@ void Window::setAA()
 
     m_document->SetAA(val);
     m_pages->reRender();
+}
+
+void Window::ghostscriptMessages()
+{
+    m_messagesDialog = new MessagesDialog();
+    m_messagesDialog->show();
 }
 
 void Window::homeSlot()

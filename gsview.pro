@@ -44,7 +44,8 @@ HEADERS       = \
     AboutDialog.h \
     FileInfoDialog.h \
     ContentsList.h \
-    FileSave.h
+    FileSave.h \
+    MessagesDialog.h
 
 SOURCES       = \
     main.cpp \
@@ -63,12 +64,14 @@ SOURCES       = \
     FileInfoDialog.cpp \
     ContentsList.cpp \
     FileSave.cpp \
-    ../../source/tools/pdfclean.c
+    ../../source/tools/pdfclean.c \
+    MessagesDialog.cpp
 
 FORMS += \
     Window.ui \
     AboutDialog.ui \
-    FileInfoDialog.ui
+    FileInfoDialog.ui \
+    MessagesDialog.ui
 
 RESOURCES += \
     resources.qrc

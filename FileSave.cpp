@@ -9,6 +9,7 @@
 #include <QProgressDialog>
 
 #include "QtUtil.h"
+#include "MessagesDialog.h"
 
 FileType fileTypes[] = {
     {"PDF",             "pdf" , "" },
@@ -178,6 +179,9 @@ void FileSave::onReadyReadStandardOutput()
     {
         int nc = m_process->readLine(data, 10000);
         data[nc] = 0;
+
+        //  add to messages
+        MessagesDialog::addMessage(QString(data));
 
         //  every time we see "Page", crank the progress
         QString s(data);

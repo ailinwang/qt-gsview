@@ -196,6 +196,7 @@
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionInfo"/>
+    <addaction name="actionGhostscript_Messages"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -580,6 +581,11 @@
    </property>
    <property name="text">
     <string>None</string>
+   </property>
+  </action>
+  <action name="actionGhostscript_Messages">
+   <property name="text">
+    <string>Ghostscript Messages...</string>
    </property>
   </action>
  </widget>

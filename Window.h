@@ -24,6 +24,7 @@ class QScrollBar;
 QT_END_NAMESPACE
 
 class FileSave;
+class MessagesDialog;
 
 class Window : public QMainWindow
 {
@@ -78,6 +79,7 @@ private slots:
     void fileInfo();
     void toggleContents();
     void setAA();
+    void ghostscriptMessages();
 
 private:
     Ui::Window *ui;
@@ -133,6 +135,8 @@ private:
     QString m_fileExtension;
     QString m_fileType;
     FileSave *m_fileSave;
+
+    MessagesDialog *m_messagesDialog=NULL;
 };
 
 #endif  //  WINDOW_H
