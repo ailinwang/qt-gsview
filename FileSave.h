@@ -27,12 +27,15 @@ private slots:
     void onFinished(int exitCode);
 
 private:
-    void saveWithProgress(QString command);
+    void saveWithProgress(QString options, QString src, QString dst);
     void setProgress (int val);
 
     Window *m_window;
     QProcess *m_process = NULL;
     QProgressDialog *m_progressDialog;
+
+    QString m_dst;
+    QString m_tmp;
 };
 
 #endif // FILESAVE_H

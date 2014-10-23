@@ -1,6 +1,8 @@
 #include "MessagesDialog.h"
 #include "ui_MessagesDialog.h"
 
+#include <QAction>
+#include <QTime>
 #include <QString>
 
 QString MessagesDialog::m_messages;
@@ -22,7 +24,12 @@ MessagesDialog::~MessagesDialog()
 
 void MessagesDialog::addMessage(QString message)
 {
+    //  pre-pend the time of day
+    QTime time = QTime::currentTime();
+    m_messages += time.toString() + " ";
+
     m_messages += message;
+
 }
 
 void MessagesDialog::onClear()

@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QProgressDialog>
+#include <QTemporaryFile>
 
 #include "QtUtil.h"
 #include "MessagesDialog.h"
@@ -59,17 +60,17 @@ void FileSave::run()
     int result = dialog.exec();
     if (result == QDialog::Accepted)
     {
-        QString fileName = dialog.selectedFiles().first();
+        QString dst = dialog.selectedFiles().first();
         QString filter = dialog.selectedNameFilter();
         QString filterExt = QtUtil::extensionFromFilter(filter);
-        QString fileExt = QtUtil::extensionFromPath(fileName);
+        QString fileExt = QtUtil::extensionFromPath(dst);
 
         //  if the user gave no extension, use the filter
         if (fileExt.length()==0)
         {
             fileExt = filterExt;
-            fileName += ".";
-            fileName += filterExt;
+            dst += ".";
+            dst += filterExt;
         }
 
         //  if the extensions don't match, that's an error
@@ -101,40 +102,30 @@ void FileSave::run()
         if (index==0)
         {
             //  regular PDF - just copy the file
-            if (QFile::exists(fileName))
-                QFile::remove(fileName);
-            QFile::copy(original, fileName);
+            if (QFile::exists(dst))
+                QFile::remove(dst);
+            QFile::copy(original, dst);
         }
         else if (index==1)
         {
-            if (QFile::exists(fileName))
-                QFile::remove(fileName);
             //  linearized PDF
-            m_window->document()->PDFExtract (original.toStdString().c_str(), fileName.toStdString().c_str(),
+            if (QFile::exists(dst))
+                QFile::remove(dst);
+            m_window->document()->PDFExtract (original.toStdString().c_str(), dst.toStdString().c_str(),
                                               password.toStdString().c_str(),
                                             password.length()>0, true, -1, NULL);
         }
         else if (index==2)
         {
-            //  use gs with options = "-dCompatibilityLevel=1.3";
-
-            //  TODO: use an intermediate temp file.
-
-            //  construct the command
-            QString command = "\"" + QtUtil::getGsPath() + "\"";
-            command += " -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dCompatibilityLevel=1.3";
-//            command += " -r72";
-            command += " -o \"" + fileName + "\"";
-            command += " -f \"" + original + "\"";
-            qDebug("command is: %s", command.toStdString().c_str());
-
-            saveWithProgress(command);
+            QString options("-dCompatibilityLevel=1.3");
+//            options += " -r72";
+            saveWithProgress (options, original, dst);
         }
         else
         {
             //  NYI
             QString message = "saving is not yet implemented.<br/><br/>";
-            message += "saving " + fileName + "<br/>as " + QString::number(index+1) + ". " + filter;
+            message += "saving " + dst + "<br/>as " + QString::number(index+1) + ". " + filter;
             QMessageBox::information (m_window, "", message);
         }
     }
@@ -150,8 +141,22 @@ void FileSave::setProgress (int val)
     m_progressDialog->setLabelText(s);
 }
 
-void FileSave::saveWithProgress(QString command)
+void FileSave::saveWithProgress (QString options, QString src, QString dst)
 {
+    m_dst = dst;
+    m_tmp = dst + ".temp";
+
+    //  construct the command
+    QString command = "\"" + QtUtil::getGsPath() + "\"";
+    command += " -dNOPAUSE -dBATCH -sDEVICE=pdfwrite ";
+    command += options;
+    command += " -o \"" + m_tmp + "\"";
+    command += " -f \"" + src + "\"";
+
+    MessagesDialog::addMessage("\n");
+    MessagesDialog::addMessage("starting\n");
+    MessagesDialog::addMessage(command+"\n\n");
+
     //  show a progress widget
     m_progressDialog = new QProgressDialog(m_window);
     connect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
@@ -196,17 +201,41 @@ void FileSave::onReadyReadStandardOutput()
 
 void FileSave::onCanceled()
 {
-    qDebug("onCanceled");
     m_process->terminate();
 }
 
 void FileSave::onFinished(int exitCode)
 {
-    qDebug("onFinshed, exit code = %d", exitCode);
+    UNUSED(exitCode);
 
+    //  are we canceled?
     bool canceled = false;
     if (m_progressDialog->wasCanceled())
+    {
+        //  yes
         canceled = true;
+        MessagesDialog::addMessage("canceled.\n");
+
+        //  remove temp file
+        if (QFile::exists(m_tmp))
+            QFile::remove(m_tmp);
+
+        QMessageBox::information (NULL, "", "Canceled.");
+    }
+    else
+    {
+        //  no
+        MessagesDialog::addMessage("finished.\n");
+
+        //  remove destination file
+        if (QFile::exists(m_dst))
+            QFile::remove(m_dst);
+
+        //  put temp file in place
+        QFile::rename(m_tmp, m_dst);
+
+        QMessageBox::information (NULL, "", "Finished.");
+    }
 
     //  take down progress widget
     m_progressDialog->hide();
@@ -220,7 +249,5 @@ void FileSave::onFinished(int exitCode)
 //    delete m_process;
 //    m_process=NULL;
 
-    if (canceled)
-        QMessageBox::information (NULL, "", "Canceled.");
 }
 
