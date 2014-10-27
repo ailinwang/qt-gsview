@@ -391,3 +391,9 @@ std::string Document::GetText(int page_num, int type)
 
     return "";
 }
+
+void Document::SavePage(char *filename, int pagenum, int resolution, int type, bool append)
+{
+    if (mu_ctx != NULL)
+        mu_ctx->SavePage(filename, pagenum, resolution, type, append);
+}

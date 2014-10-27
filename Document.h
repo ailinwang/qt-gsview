@@ -99,6 +99,11 @@ public:
     static const int XML=1;
     static const int TEXT=2;
 
+    static const int SVG_OUT=0;
+    static const int PNM_OUT=1;
+    static const int PCL_OUT=2;
+    static const int PWG_OUT=3;
+
     Document();
     ~Document();
 
@@ -132,6 +137,9 @@ public:
         bool has_password, bool linearize, int num_pages, int *pages);
 
     std::string GetText(int page_num, int type);
+
+    void SavePage(char *filename, int pagenum, int resolution, int type,
+        bool append);
 
 private:
 

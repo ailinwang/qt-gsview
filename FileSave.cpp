@@ -24,7 +24,7 @@ FileType fileTypes[] = {
 //    {"PDF/A-2 CMYK",    "pdf" , "" },
 //    {"PDF/X-3 Gray",    "pdf" , "" },
 //    {"PDF/X-3 CMYK",    "pdf" , "" },
-    {"PCL-XL",          "bin" , "" },
+    {"PCL-XL",          "pcl" , "" },
     {"XPS",             "xps" , "" },
     {"Text",            "txt" , "" },
     {"HTML",            "html", "" },
@@ -157,6 +157,12 @@ void FileSave::run()
         else if (index==TYPE_XML)
         {
             saveAsText (dst, XML);
+        }
+        else if (index==TYPE_PCL_XL)
+        {
+            QString options("-sDEVICE=pxlcolor -dNOPAUSE -dBATCH -P- -dSAFER");
+            saveWithProgress (options, original, dst);
+
         }
         else if (index==TYPE_PS)
         {
