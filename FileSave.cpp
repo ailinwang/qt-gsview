@@ -215,6 +215,11 @@ void FileSave::saveAsText(QString dst, int type)
         out << QString("<body>\n");
     }
 
+    if (type==XML)
+    {
+        out << QString("<document>\n");
+    }
+
     //  write pages
     bool canceled = false;
     for (int i=0; i<nPages; i++)
@@ -237,6 +242,11 @@ void FileSave::saveAsText(QString dst, int type)
     {
         out << QString("</body>\n");
         out << QString("</html>\n");
+    }
+
+    if (type==XML)
+    {
+        out << QString("</document>\n");
     }
 
     //  close the file
@@ -336,11 +346,9 @@ void FileSave::onFinished(int exitCode)
     UNUSED(exitCode);
 
     //  are we canceled?
-    bool canceled = false;
     if (m_progressDialog->wasCanceled())
     {
         //  yes
-        canceled = true;
         MessagesDialog::addMessage("canceled.\n");
 
         //  remove temp file
