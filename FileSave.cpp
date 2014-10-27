@@ -12,6 +12,7 @@
 #include "QtUtil.h"
 #include "MessagesDialog.h"
 
+
 FileType fileTypes[] = {
     {"PDF",             "pdf" , "" },
     {"Linearizded PDF", "pdf" , "" },
@@ -26,9 +27,28 @@ FileType fileTypes[] = {
     {"XPS",             "xps" , "" },
     {"Text",            "txt" , "" },
     {"HTML",            "html", "" },
-    {"XML",             "xml" , "" }
+    {"XML",             "xml" , "" },
+    {"PostScript",      "ps"  , "" }
 };
-int numTypes = 14;
+int numTypes = 15;
+
+enum {
+    TYPE_PDF = 0,
+    TYPE_PDF_LINEAR,
+    TYPE_PDF_13,
+    TYPE_PDF_A1_RGB,
+    TYPE_PDF_A1_CMYK,
+    TYPE_PDF_A2_RGB,
+    TYPE_PDF_A2_CMYK,
+    TYPE_PDF_X3_GRAY,
+    TYPE_PDF_X3_CMYK,
+    TYPE_PCL_XL,
+    TYPE_XPS,
+    TYPE_TEXT,
+    TYPE_HTML,
+    TYPE_XML,
+    TYPE_PS
+};
 
 void FileSave::run()
 {
@@ -99,25 +119,45 @@ void FileSave::run()
         QString original = m_window->getPath();
         QString password;
 
-        if (index==0)
+        if (index==TYPE_PDF)
         {
             //  regular PDF - just copy the file
             if (QFile::exists(dst))
                 QFile::remove(dst);
             QFile::copy(original, dst);
         }
-        else if (index==1)
+        else if (index==TYPE_PDF_LINEAR)
         {
             //  linearized PDF
             if (QFile::exists(dst))
                 QFile::remove(dst);
             m_window->document()->PDFExtract (original.toStdString().c_str(), dst.toStdString().c_str(),
                                               password.toStdString().c_str(),
-                                            password.length()>0, true, -1, NULL);
+                                              password.length()>0, true, -1, NULL);
         }
-        else if (index==2)
+        else if (index==TYPE_PDF_13)
         {
-            QString options("-dCompatibilityLevel=1.3");
+            QString options("-dCompatibilityLevel=1.3 -sDEVICE=pdfwrite -dNOPAUSE -dBATCH");
+//            options += " -r72";
+            saveWithProgress (options, original, dst);
+        }
+        else if (index==TYPE_XPS)
+        {
+            QString options("-dNOCACHE -sDEVICE=xpswrite -dNOPAUSE -dBATCH");
+//            options += " -r72";
+            saveWithProgress (options, original, dst);
+        }
+        else if (index==TYPE_TEXT)
+        {
+
+        }
+        else if (index==TYPE_HTML)
+        {
+
+        }
+        else if (index==TYPE_PS)
+        {
+            QString options("-sDEVICE=ps2write -dNOPAUSE -dBATCH -P- -dSAFER");
 //            options += " -r72";
             saveWithProgress (options, original, dst);
         }
@@ -148,8 +188,7 @@ void FileSave::saveWithProgress (QString options, QString src, QString dst)
 
     //  construct the command
     QString command = "\"" + QtUtil::getGsPath() + "\"";
-    command += " -dNOPAUSE -dBATCH -sDEVICE=pdfwrite ";
-    command += options;
+    command += " " + options + " ";
     command += " -o \"" + m_tmp + "\"";
     command += " -f \"" + src + "\"";
 
