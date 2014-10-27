@@ -8,6 +8,7 @@
 #include <QProcess>
 #include <QProgressDialog>
 #include <QTemporaryFile>
+#include <QtPrintSupport>
 
 #include "QtUtil.h"
 #include "MessagesDialog.h"
@@ -17,12 +18,12 @@ FileType fileTypes[] = {
     {"PDF",             "pdf" , "" },
     {"Linearizded PDF", "pdf" , "" },
     {"PDF 1.3",         "pdf" , "" },
-    {"PDF/A-1 RGB",     "pdf" , "" },
-    {"PDF/A-1 CMYK",    "pdf" , "" },
-    {"PDF/A-2 RGB",     "pdf" , "" },
-    {"PDF/A-2 CMYK",    "pdf" , "" },
-    {"PDF/X-3 Gray",    "pdf" , "" },
-    {"PDF/X-3 CMYK",    "pdf" , "" },
+//    {"PDF/A-1 RGB",     "pdf" , "" },
+//    {"PDF/A-1 CMYK",    "pdf" , "" },
+//    {"PDF/A-2 RGB",     "pdf" , "" },
+//    {"PDF/A-2 CMYK",    "pdf" , "" },
+//    {"PDF/X-3 Gray",    "pdf" , "" },
+//    {"PDF/X-3 CMYK",    "pdf" , "" },
     {"PCL-XL",          "bin" , "" },
     {"XPS",             "xps" , "" },
     {"Text",            "txt" , "" },
@@ -30,18 +31,18 @@ FileType fileTypes[] = {
     {"XML",             "xml" , "" },
     {"PostScript",      "ps"  , "" }
 };
-int numTypes = 15;
+int numTypes = 9;
 
 enum {
     TYPE_PDF = 0,
     TYPE_PDF_LINEAR,
     TYPE_PDF_13,
-    TYPE_PDF_A1_RGB,
-    TYPE_PDF_A1_CMYK,
-    TYPE_PDF_A2_RGB,
-    TYPE_PDF_A2_CMYK,
-    TYPE_PDF_X3_GRAY,
-    TYPE_PDF_X3_CMYK,
+//    TYPE_PDF_A1_RGB,
+//    TYPE_PDF_A1_CMYK,
+//    TYPE_PDF_A2_RGB,
+//    TYPE_PDF_A2_CMYK,
+//    TYPE_PDF_X3_GRAY,
+//    TYPE_PDF_X3_CMYK,
     TYPE_PCL_XL,
     TYPE_XPS,
     TYPE_TEXT,
@@ -147,11 +148,15 @@ void FileSave::run()
         }
         else if (index==TYPE_TEXT)
         {
-
+            saveAsText (dst, TEXT);
         }
         else if (index==TYPE_HTML)
         {
-
+            saveAsText (dst, HTML);
+        }
+        else if (index==TYPE_XML)
+        {
+            saveAsText (dst, XML);
         }
         else if (index==TYPE_PS)
         {
@@ -176,6 +181,91 @@ void FileSave::setProgress (int val)
                     + QString::number(val) + QString(" of ")
                     + QString::number(m_window->document()->GetPageCount()) + QString(" pages...");
     m_progressDialog->setLabelText(s);
+}
+
+void FileSave::saveAsText(QString dst, int type)
+{
+    //  determine temp file
+    QString tmp = dst + ".temp";
+
+    //  remove previous temp
+    if (QFile::exists(tmp))
+        QFile::remove(tmp);
+
+    int nPages = m_window->document()->GetPageCount();
+
+    //  show a progress widget
+    m_progressDialog = new QProgressDialog(m_window);
+//    connect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
+    m_progressDialog->setMaximum(m_window->document()->GetPageCount());
+    setProgress(0);
+    m_progressDialog->show();
+    qApp->processEvents();
+
+    //  open the file
+    QFile file(tmp);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    if (type==HTML)
+    {
+        out << QString("<html>\n");
+        out << QString("<head>\n");
+        out << QString("</head>\n");
+        out << QString("<body>\n");
+    }
+
+    //  write pages
+    bool canceled = false;
+    for (int i=0; i<nPages; i++)
+    {
+        std::string str = m_window->document()->GetText(i,type);
+        QString qstr(str.c_str());
+        out << qstr;
+
+        setProgress(i+1);
+        qApp->processEvents();
+
+        if (m_progressDialog->wasCanceled())
+        {
+            canceled = true;
+            break;
+        }
+    }
+
+    if (type==HTML)
+    {
+        out << QString("</body>\n");
+        out << QString("</html>\n");
+    }
+
+    //  close the file
+    file.close();
+
+    //  take down progress widget
+    m_progressDialog->hide();
+    qApp->processEvents();
+//    disconnect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
+    delete m_progressDialog;
+
+    if (canceled)
+    {
+        //  remove temp
+        if (QFile::exists(tmp))
+            QFile::remove(tmp);
+        QMessageBox::information (m_window, "", "Canceled.");
+    }
+    else
+    {
+        //  remove destination file
+        if (QFile::exists(dst))
+            QFile::remove(dst);
+
+        //  put temp file in place
+        QFile::rename(tmp, dst);
+
+        QMessageBox::information (m_window, "", "Done.");
+    }
 }
 
 void FileSave::saveWithProgress (QString options, QString src, QString dst)

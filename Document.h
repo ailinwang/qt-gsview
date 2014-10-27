@@ -94,6 +94,11 @@ public:
 class Document
 {
 public:
+
+    static const int HTML=0;
+    static const int XML=1;
+    static const int TEXT=2;
+
     Document();
     ~Document();
 
@@ -125,6 +130,8 @@ public:
 
     void PDFExtract (const char *infile, const char *outfile, const char *password,
         bool has_password, bool linearize, int num_pages, int *pages);
+
+    std::string GetText(int page_num, int type);
 
 private:
 

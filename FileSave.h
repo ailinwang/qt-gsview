@@ -29,6 +29,7 @@ private slots:
 private:
     void saveWithProgress(QString options, QString src, QString dst);
     void setProgress (int val);
+    void saveAsText (QString dst, int type);
 
     Window *m_window;
     QProcess *m_process = NULL;

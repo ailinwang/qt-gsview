@@ -383,3 +383,11 @@ void Document::PDFExtract (const char *infile, const char *outfile,
     //  clean up
     delete(argv);
 }
+
+std::string Document::GetText(int page_num, int type)
+{
+    if (mu_ctx != NULL)
+        return mu_ctx->GetText(page_num, type);
+
+    return "";
+}
