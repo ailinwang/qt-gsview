@@ -138,13 +138,11 @@ void FileSave::run()
         else if (index==TYPE_PDF_13)
         {
             QString options("-dCompatibilityLevel=1.3 -sDEVICE=pdfwrite -dNOPAUSE -dBATCH");
-//            options += " -r72";
             saveWithProgress (options, original, dst);
         }
         else if (index==TYPE_XPS)
         {
             QString options("-dNOCACHE -sDEVICE=xpswrite -dNOPAUSE -dBATCH");
-//            options += " -r72";
             saveWithProgress (options, original, dst);
         }
         else if (index==TYPE_TEXT)
@@ -158,7 +156,6 @@ void FileSave::run()
         else if (index==TYPE_PS)
         {
             QString options("-sDEVICE=ps2write -dNOPAUSE -dBATCH -P- -dSAFER");
-//            options += " -r72";
             saveWithProgress (options, original, dst);
         }
         else
@@ -189,6 +186,7 @@ void FileSave::saveWithProgress (QString options, QString src, QString dst)
     //  construct the command
     QString command = "\"" + QtUtil::getGsPath() + "\"";
     command += " " + options + " ";
+//    command += " -r72 ";
     command += " -o \"" + m_tmp + "\"";
     command += " -f \"" + src + "\"";
 
