@@ -307,7 +307,7 @@ PrintWorker::PrintWorker(Window *window, QPrinter *printer, int fromPage, int to
     m_toPage = toPage;
     m_window = window;
 
-    qDebug("worker created");
+//    qDebug("worker created");
 }
 
 PrintWorker::~PrintWorker()
