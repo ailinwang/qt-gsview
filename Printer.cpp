@@ -323,8 +323,8 @@ void PrintWorker::process()
     double scalePrint = m_printer->resolution() / 72;
 
     //  begin printing
-    QPainter *painter = new QPainter();
-    painter->begin(m_printer);
+    QPainter painter;
+    painter.begin(m_printer);
 
     //  for each page
     int page = m_fromPage;
@@ -352,7 +352,7 @@ void PrintWorker::process()
 
         //  copy to printer
         QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
-        painter->drawImage(0, 0, *myImage);
+        painter.drawImage(0, 0, *myImage);
 
         delete myImage;
         delete bitmap;
@@ -367,12 +367,10 @@ void PrintWorker::process()
         emit pagePrinted(nPagesPrinted);
     }
 
+    painter.end();
+
     if (m_killed)
         m_printer->abort();
-
-    //  don't need the painter any more
-    delete painter;
-    painter = NULL;
 
     //  done!
 //    qDebug("worker emitting finished()");
