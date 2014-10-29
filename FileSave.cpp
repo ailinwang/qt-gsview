@@ -187,6 +187,7 @@ void FileSave::setProgress (int val)
                     + QString::number(val) + QString(" of ")
                     + QString::number(m_window->document()->GetPageCount()) + QString(" pages...");
     m_progressDialog->setLabelText(s);
+    qApp->processEvents();
 }
 
 void FileSave::saveAsText(QString dst, int type)
@@ -235,7 +236,6 @@ void FileSave::saveAsText(QString dst, int type)
         out << qstr;
 
         setProgress(i+1);
-        qApp->processEvents();
 
         if (m_progressDialog->wasCanceled())
         {
@@ -337,7 +337,6 @@ void FileSave::onReadyReadStandardOutput()
         {
             int val = m_progressDialog->value();
             setProgress(val+1);
-            qApp->processEvents();
         }
     }
 }
@@ -387,6 +386,8 @@ void FileSave::onFinished(int exitCode)
     //  disconnect/delete the process
     disconnect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
     disconnect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
+
+    //  this seems to be unnecessary.  Qt?
 //    delete m_process;
 //    m_process=NULL;
 
