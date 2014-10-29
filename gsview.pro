@@ -18,7 +18,7 @@ INCPATH+=../../include/
 #  proprocessor
 DEFINES += _QT
 macx: DEFINES += _QT_MAC
-unix: DEFINES += USE_CUPS
+#unix: DEFINES += USE_CUPS
 
 #  Qt configuration
 QT       += core gui

@@ -10,8 +10,6 @@
 #include <QPainter>
 #include <QProgressDialog>
 #include <QMessageBox>
-#include <QElapsedTimer>
-#include <QTimer>
 #include <QFileInfo>
 
 #ifdef USE_CUPS
@@ -63,8 +61,6 @@ ipp_jstate_t getJobState(int jobID)
     //  Free the job array
     cupsFreeJobs(num_jobs, jobs);
 
-//    qDebug("monitor: job %d is in state %s", jobID, jobStateName(job_state).toStdString().c_str());
-
     return job_state;
 }
 
@@ -73,8 +69,8 @@ ipp_jstate_t getJobState(int jobID)
 void Printer::print()
 {
     //  get the printer
-    QPrinter printer(QPrinter::HighResolution);
-    QPrintDialog *dialog = new QPrintDialog(&printer, m_window);
+    m_printer = new QPrinter(QPrinter::HighResolution);
+    QPrintDialog *dialog = new QPrintDialog(m_printer, m_window);
     dialog->setWindowTitle(QString("Print Document"));
     if (dialog->exec() != QDialog::Accepted)
         return;
@@ -83,10 +79,10 @@ void Printer::print()
     //  figure out printing range
     int fromPage = 1;
     int toPage = m_window->document()->GetPageCount();
-    if (printer.fromPage()>0)
-        fromPage = printer.fromPage();
-    if (printer.toPage()>0)
-        toPage = printer.toPage();
+    if (m_printer->fromPage()>0)
+        fromPage = m_printer->fromPage();
+    if (m_printer->toPage()>0)
+        toPage = m_printer->toPage();
     if (toPage>m_window->document()->GetPageCount())
         toPage = m_window->document()->GetPageCount();
 
@@ -96,9 +92,9 @@ void Printer::print()
     {
         //  print it as is
 #ifdef USE_CUPS
-        pdfPrint (&printer, m_window->getPath(), fromPage, toPage);
+        pdfPrint (m_printer, m_window->getPath(), fromPage, toPage);
 #else
-        bitmapPrint (&printer, fromPage, toPage);
+        bitmapPrint (m_printer, fromPage, toPage);
 #endif
     }
     else if (fileInfo.suffix().toLower() == QString("xps"))
@@ -121,16 +117,16 @@ void Printer::print()
         process->waitForFinished();
 
         //  print the new one
-        pdfPrint (&printer, newPath, fromPage, toPage);
+        pdfPrint (m_printer, newPath, fromPage, toPage);
 #else
-        bitmapPrint (&printer, fromPage, toPage);
+        bitmapPrint (m_printer, fromPage, toPage);
 #endif
     }
     else
     {
         //  TODO: convert to PDF.  But for now,
         //  do it with bitmaps.
-        bitmapPrint (&printer, fromPage, toPage);
+        bitmapPrint (m_printer, fromPage, toPage);
     }
 }
 
@@ -209,8 +205,9 @@ void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPag
         }
 
 #else
-        QMessageBox::information(m_window, "", "Print job created.");
+        //  non-mac.  Do nothing.
 #endif
+        QMessageBox::information(m_window, "", "Print job created.");
     }
     else
     {
@@ -221,62 +218,137 @@ void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPag
 
 void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
 {
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    QApplication::sendPostedEvents();
+    //  make a thread for printing, and a worker that runs ni the thread.
+    m_printThread = new QThread;
+    m_printWorker = new PrintWorker(m_window, printer, fromPage-1, toPage-1);  //  values given are  1-based
+    m_printWorker->moveToThread(m_printThread);
+
+    //  connect worker and thread signals
+    connect(m_printThread, SIGNAL(started()),  m_printWorker, SLOT(process()));
+    connect(m_printWorker, SIGNAL(finished()), m_printThread, SLOT(quit()));
+    connect(m_printWorker, SIGNAL(finished()), m_printWorker, SLOT(deleteLater()));
+    connect(m_printThread, SIGNAL(finished()), m_printThread, SLOT(deleteLater()));
+
+    //  connect worker signals to slots in this class
+    connect(m_printWorker, SIGNAL(finished()),       this, SLOT(printFinished()));
+    connect(m_printWorker, SIGNAL(pagePrinted(int)), this, SLOT(pagePrinted(int)));
+
+    //  put up a progress dialog
+    m_pagesToPrint = toPage-fromPage+1;
+    m_progress = new QProgressDialog ("Printing", "Cancel", 0, m_pagesToPrint, m_window);
+    connect (m_progress, SIGNAL(canceled()), this, SLOT(onCanceled()));
+    m_progress->setWindowModality(Qt::WindowModal);
+    setProgress(0);
+    m_progress->show();
+    qApp->processEvents();
+
+    //  start the thread
+//    qDebug("starting thread");
+    m_printThread->start();
+
+    m_killed = false;
+}
+
+void Printer::pagePrinted(int nPage)
+{
+//    qDebug("received pagePrinted(%d)", nPage);
+
+    //  update progress dialog
+    setProgress(nPage);
+}
+
+void Printer::printFinished()
+{
+//    qDebug("received printFinished()");
+
+    m_progress->hide();
+    delete m_progress;
+
+    if (m_killed)
+    {
+        QMessageBox::information(m_window, "", "Print job canceled.");
+    }
+    else
+    {
+        QMessageBox::information(m_window, "", "Print job created.");
+    }
+}
+
+void Printer::onCanceled()
+{
+//    qDebug("received onCanceled()");
+
+    m_printWorker->kill();  //  we should also receive printFinished
+    m_killed = true;
+}
+
+
+void Printer::setProgress (int val)
+{
+//    qDebug("received setProgress()");
+
+    m_progress->setValue(val);
+    QString s = QString("Printed ")
+                    + QString::number(val) + QString(" of ")
+                    + QString::number(m_pagesToPrint) + QString(" pages...");
+    m_progress->setLabelText(s);
+    qApp->processEvents();
+}
+
+
+//-------------------------------------------
+//-------------------------------------------
+//-------------------------------------------
+
+PrintWorker::PrintWorker(Window *window, QPrinter *printer, int fromPage, int toPage)
+{
+    m_printer = printer;
+    m_fromPage = fromPage;
+    m_toPage = toPage;
+    m_window = window;
+
+    qDebug("worker created");
+}
+
+PrintWorker::~PrintWorker()
+{
+//    qDebug("worker destroyed");
+}
+
+void PrintWorker::process()
+{
+//    qDebug("worker starting");
 
     //  get scale factor based on printer's resolution
-    double scalePrint = printer->resolution() / 72;
-
-    //  those were 1-based, so subtract
-    fromPage -= 1;
-    toPage -= 1;
+    double scalePrint = m_printer->resolution() / 72;
 
     //  begin printing
     QPainter *painter = new QPainter();
-    painter->begin(printer);
-
-    //    int numPages = toPage-fromPage+1;
-    //    QProgressDialog progress("Printing", "Cancel", 0, numPages, m_window);
-    //    progress.setWindowModality(Qt::WindowModal);
-    //    progress.show();
-    //    QApplication::sendPostedEvents();
-
-    bool cancelled = false;
-
-    //  for timing
-    //    QElapsedTimer timer;
-    //    qint64 nanoSec;
-    //    timer.start();
+    painter->begin(m_printer);
 
     //  for each page
-    int page = fromPage;
-    while (page <= toPage)
+    int page = m_fromPage;
+    int nPagesPrinted = 0;
+    while (page <= m_toPage)
     {
-        //        progress.setValue(page-fromPage+1);
-        //        QString message; message.sprintf("Printing %d of %d ...", page, numPages);
-        //        progress.setLabelText(message);
-        //        QApplication::sendPostedEvents();
-
-        //        if (progress.wasCanceled())
-        //        {
-        //            cancelled = true;
-        //            break;
-        //        }
+        if (m_killed)
+            break;
 
         //  if not the first page, start a new page
-        if (page != fromPage)
-            printer->newPage();
+        if (page != m_fromPage)
+            m_printer->newPage();
 
         //  compute page size
         point_t pageSize;
-        m_window->document()->GetPageSize(page, scalePrint, &pageSize);
-
-        //        timer.restart();  //  restart timer
+        m_window->document()->GetPageSize (page, scalePrint, &pageSize);
 
         //  render a bitmap
         int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
         Byte *bitmap = new Byte[numBytes];
         m_window->document()->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y, m_window->getShowAnnotations());
+
+        if (m_killed)
+            break;
 
         //  copy to printer
         QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
@@ -285,110 +357,25 @@ void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
         delete myImage;
         delete bitmap;
 
-        //        nanoSec = timer.nsecsElapsed();  //  get elapsed
-        //        double elapsed = double(nanoSec)/1000000000;  //  seconds
-        //        qDebug("printed page %d in %f", page, elapsed);
-
         page++;
+
+        if (m_killed)
+            break;
+
+        nPagesPrinted++;
+//        qDebug("worker emitting pagePrinted(%d)", nPagesPrinted);
+        emit pagePrinted(nPagesPrinted);
     }
 
-    //    progress.hide();
-    //    QApplication::sendPostedEvents();
-
-    QApplication::restoreOverrideCursor();
-    QApplication::sendPostedEvents();
-
-    //  end printing
-    if (cancelled)
-    {
-        QMessageBox::information(m_window, "", "Printing was cancelled.");
-    }
-    else
-    {
-        QMessageBox::information(m_window, "", "Printing is complete.");
-    }
-    painter->end();
+    if (m_killed)
+        m_printer->abort();
 
     //  don't need the painter any more
     delete painter;
     painter = NULL;
 
+    //  done!
+//    qDebug("worker emitting finished()");
+    emit finished();
 }
-
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------
-
-#if 0
-
-void Printer::print()
-{
-    //  get the printer
-    QPrinter printer(QPrinter::HighResolution);
-    QPrintDialog *dialog = new QPrintDialog(&printer, m_window);
-    dialog->setWindowTitle(QString("Print Document"));
-    if (dialog->exec() != QDialog::Accepted)
-        return;
-    dialog->hide();
-
-    //  figure out printing range
-    int fromPage = 1;
-    int toPage = m_window->document()->GetPageCount();
-    if (printer.fromPage()>0)
-        fromPage = printer.fromPage();
-    if (printer.toPage()>0)
-        toPage = printer.toPage();
-    if (toPage>m_window->document()->GetPageCount())
-        toPage = m_window->document()->GetPageCount();
-
-    //  get scale factor based on printer's resolution
-    double scalePrint = printer.resolution() / 72;
-
-    //  those were 1-based, so subtract
-    fromPage -= 1;
-    toPage -= 1;
-
-    //  begin printing
-    QPainter *painter = new QPainter();
-    painter->begin(&printer);
-
-    //  for each page
-    int page = fromPage;
-    while (page <= toPage)
-    {
-        //  if not the first page, start a new page
-        if (page != fromPage)
-            printer.newPage();
-
-        //  compute page size
-        point_t pageSize;
-        m_window->document()->GetPageSize(page, scalePrint, &pageSize);
-
-        //  render a bitmap
-        int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
-        Byte *bitmap = new Byte[numBytes];
-        m_window->document()->RenderPage(page, scalePrint, bitmap, pageSize.X, pageSize.Y, m_window->getShowAnnotations());
-
-        //  copy to printer
-        QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
-        painter->drawImage(0, 0, *myImage);
-
-        delete myImage;
-        delete bitmap;
-
-        page++;
-    }
-
-    //  end printing
-    painter->end();
-    delete painter;
-    painter = NULL;
-
-    QMessageBox::information(m_window, "", "Printing is complete.");
-}
-
-#endif
-
 
