@@ -319,9 +319,6 @@ bool Window::OpenFile (QString path)
         //  put the result into the temp folder
         QString newPath = QtUtil::getTempFolderPath() + fileInfo.fileName() + ".pdf";
 
-        //  create a process to do the conversion
-        QProcess *process = new QProcess(this);
-
         //  construct the command
         QString command = "\"" + QtUtil::getGsPath() + "\"";
         command += " -P- -dSAFER -q -P- -dNOPAUSE -dBATCH -sDEVICE=pdfwrite ";
@@ -330,7 +327,8 @@ bool Window::OpenFile (QString path)
         command += "-f \"" + path + "\"";
 //        qDebug("command is: %s", command.toStdString().c_str());
 
-        //  do it, and wait
+        //  create a process to do it, and wait
+        QProcess *process = new QProcess(this);
         process->start(command);
         process->waitForFinished();
 
