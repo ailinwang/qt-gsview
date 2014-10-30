@@ -454,11 +454,7 @@ void Window::open()
     QFileDialog dialog(NULL, tr("Open File"),
                        desktopLocations.isEmpty() ? QDir::currentPath() : desktopLocations.first());
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
-
-    //  INFO: It's hard to debug in the Qt IDE when we use the native file dialog.
-//    dialog.setOption(QFileDialog::DontUseNativeDialog, false);
-    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
-
+    dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz *.ps *.eps)"));
 

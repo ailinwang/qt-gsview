@@ -72,8 +72,7 @@ void FileSave::run()
     //  set up the dialog
     QFileDialog dialog(m_window, "Save", desktop);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
-    //  INFO: It's hard to debug in the Qt IDE when we use the native file dialog.
-    dialog.setOption(QFileDialog::DontUseNativeDialog, false);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     dialog.setNameFilter(types);
 
     //  get the name

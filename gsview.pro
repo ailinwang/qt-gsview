@@ -20,6 +20,9 @@ DEFINES += _QT
 macx: DEFINES += _QT_MAC
 #unix: DEFINES += USE_CUPS
 
+#  debugging can be easier if we don't use native file dialogs
+DEFINES += USE_NATIVE_FILE_DIALOGS=false
+
 #  Qt configuration
 QT       += core gui
 qtHaveModule(printsupport): QT += printsupport
