@@ -335,6 +335,28 @@ bool Window::OpenFile (QString path)
         //  now open the temp file.
         return OpenFile2(newPath);
     }
+    else if (fileInfo.suffix().toLower() == QString("xps") )
+    {
+        //  convert to PD first.
+
+        //  put the result into the temp folder
+        QString newPath = QtUtil::getTempFolderPath() + fileInfo.fileName() + ".pdf";
+
+        //  construct the command
+        QString command = "\"" + QtUtil::getGxpsPath() + "\"";
+        command += " -sDEVICE=pdfwrite ";
+        command += "-sOutputFile=\"" + newPath + "\"";
+        command += " -dNOPAUSE \"" + path + "\"";
+        qDebug("command is: %s", command.toStdString().c_str());
+
+        //  create a process to do it, and wait
+        QProcess *process = new QProcess(this);
+        process->start(command);
+        process->waitForFinished();
+
+        //  now open the temp file.
+        return OpenFile2(newPath);
+    }
     else
     {
         //  open directly
