@@ -119,6 +119,29 @@ void FileSave::run()
         QString original = m_window->getPath();
         QString password;
 
+
+        //  if the original is xps, convert tp pdf first.
+        if (QtUtil::extensionFromPath(original)==QString("xps"))
+        {
+            //  put the result into the temp folder
+            QFileInfo fileInfo (original);
+            QString newPath = QtUtil::getTempFolderPath() + fileInfo.fileName() + ".pdf";
+
+            //  construct the command
+            QString command = "\"" + QtUtil::getGxpsPath() + "\"";
+            command += " -sDEVICE=pdfwrite ";
+            command += "-sOutputFile=\"" + newPath + "\"";
+            command += " -dNOPAUSE \"" + original + "\"";
+            qDebug("command is: %s", command.toStdString().c_str());
+
+            //  create a process to do it, and wait
+            QProcess *process = new QProcess(this);
+            process->start(command);
+            process->waitForFinished();
+
+            original = newPath;
+        }
+
         if (index==TYPE_PDF)
         {
             //  regular PDF - just copy the file
