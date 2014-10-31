@@ -119,7 +119,6 @@ void FileSave::run()
         QString original = m_window->getPath();
         QString password;
 
-
         //  if the original is xps, convert tp pdf first.
         if (QtUtil::extensionFromPath(original)==QString("xps"))
         {
@@ -148,6 +147,7 @@ void FileSave::run()
             if (QFile::exists(dst))
                 QFile::remove(dst);
             QFile::copy(original, dst);
+            QMessageBox::information (NULL, "", "Finished.");
         }
         else if (index==TYPE_PDF_LINEAR)
         {
@@ -157,6 +157,7 @@ void FileSave::run()
             m_window->document()->PDFExtract (original.toStdString().c_str(), dst.toStdString().c_str(),
                                               password.toStdString().c_str(),
                                               password.length()>0, true, -1, NULL);
+            QMessageBox::information (NULL, "", "Finished.");
         }
         else if (index==TYPE_PDF_13)
         {
