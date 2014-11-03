@@ -334,6 +334,7 @@ void FileSave::saveWithProgress (QString options, QString src, QString dst)
     //  create a process to do the conversion.  During this time onReadyReadStandardOutput gets called;
     //  that's our opportunity to update the progress widget
     m_process = new QProcess(m_window);
+    m_process->setProcessChannelMode(QProcess::MergedChannels);
     connect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
     connect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
     m_process->start(command);

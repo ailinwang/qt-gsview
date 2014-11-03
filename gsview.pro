@@ -19,6 +19,7 @@ INCPATH+=../../include/
 DEFINES += _QT
 macx: DEFINES += _QT_MAC
 #unix: DEFINES += USE_CUPS
+win32: DEFINES += _QT_WIN
 
 #  debugging can be easier if we don't use native file dialogs
 DEFINES += USE_NATIVE_FILE_DIALOGS=false
@@ -107,3 +108,13 @@ macx {
     QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gs ./apps/gs $$escape_expand(\n\t))
     QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gxps ./apps/gxps $$escape_expand(\n\t))
 }
+
+#win32 {
+#    OTHER_FILES += \
+#        winApps/gs \
+#        winApps/gxps
+#    QMAKE_POST_LINK += $$quote(rmdir /S /Q apps $$escape_expand(\n\t))
+#    QMAKE_POST_LINK += $$quote(mkdir apps $$escape_expand(\n\t))
+#    QMAKE_POST_LINK += $$quote(xcopy $$PWD/winApps/gs apps/gs $$escape_expand(\n\t))
+#    QMAKE_POST_LINK += $$quote(xcopy $$PWD/winApps/gxps apps/gxps $$escape_expand(\n\t))
+#}
