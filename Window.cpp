@@ -58,6 +58,7 @@ Window::Window(QWidget *parent) :
     connect(ui->actionCopy_Text, SIGNAL(triggered()), this, SLOT(copyText()));
     connect(ui->actionDeselect_Text, SIGNAL(triggered()), this, SLOT(deselectText()));
     connect(ui->actionSelect_All_Text, SIGNAL(triggered()), this, SLOT(selectAllText()));
+    connect(ui->actionFind, SIGNAL(triggered()), this, SLOT(onFind()));
 
     //  view menu
     connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
@@ -803,6 +804,33 @@ void Window::ghostscriptMessages()
 {
     m_messagesDialog = new MessagesDialog();
     m_messagesDialog->show();
+}
+
+void Window::onFind()
+{
+    //  get text to find
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("Find Text"),
+                                      NULL, QLineEdit::Normal,
+                                      NULL, &ok);
+    if (ok && !text.isEmpty())
+    {
+        int numPages = m_document->GetPageCount();
+        for (int np=0; np<numPages; np++)
+        {
+            std::vector<SearchItem> *items =
+                    m_document->FindText (np, (char*)text.toStdString().c_str());
+
+            if (items != NULL)
+            {
+                for (int i=0; i<(int)items->size(); i++)
+                {
+                    SearchItem item = items->at(i);
+                    qDebug ("found: page=%d top=%d left=%d bottom=%d right=%d", item.pageNumber, item.top, item.left, item.bottom, item.right);
+                }
+            }
+        }
+    }
 }
 
 void Window::homeSlot()

@@ -237,6 +237,7 @@
     <addaction name="actionDeselect_Text"/>
     <addaction name="actionCopy_Text"/>
     <addaction name="actionSelect_All_Text"/>
+    <addaction name="actionFind"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -401,7 +402,7 @@
     <string>Full Screen</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+F</string>
+    <string>Ctrl+Shift+F</string>
    </property>
   </action>
   <action name="actionPrint">
@@ -586,6 +587,14 @@
   <action name="actionGhostscript_Messages">
    <property name="text">
     <string>Ghostscript Messages...</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="text">
+    <string>Find...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

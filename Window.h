@@ -80,6 +80,7 @@ private slots:
     void toggleContents();
     void setAA();
     void ghostscriptMessages();
+    void onFind();
 
 private:
     Ui::Window *ui;

@@ -397,3 +397,33 @@ void Document::SavePage(char *filename, int pagenum, int resolution, int type, b
     if (mu_ctx != NULL)
         mu_ctx->SavePage(filename, pagenum, resolution, type, append);
 }
+
+std::vector<SearchItem> *Document::FindText (int page_num, char *textToFind)
+{
+    if (mu_ctx != NULL)
+    {
+        //  get the hits
+        sh_vector_text text_smart_ptr_vec(new std::vector<sh_text>());
+        int hits = mu_ctx->GetTextSearch(page_num, textToFind, text_smart_ptr_vec);
+
+        //  reformat them.
+        std::vector<SearchItem> *items = new std::vector<SearchItem>();
+        for (int i=0; i<hits; i++)
+        {
+            sh_text result = text_smart_ptr_vec->at(i);
+
+            SearchItem *item = new SearchItem();
+            item->pageNumber = page_num;
+            item->left = result->upper_left.X;
+            item->top = result->upper_left.Y;
+            item->right = result->lower_right.X;
+            item->bottom = result->lower_right.Y;
+
+            items->push_back(*item);
+        }
+
+        return items;
+    }
+
+    return NULL;
+}

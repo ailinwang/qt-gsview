@@ -71,6 +71,16 @@ public:
     std::vector<TextLine> *line_list;
 };
 
+class SearchItem
+{
+public:
+    int pageNumber;
+    int left;
+    int top;
+    int right;
+    int bottom;
+};
+
 class Link
 {
 public:
@@ -140,6 +150,8 @@ public:
 
     void SavePage(char *filename, int pagenum, int resolution, int type,
         bool append);
+
+    std::vector<SearchItem> *FindText(int page_num, char *textToFind);
 
 private:
 
