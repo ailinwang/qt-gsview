@@ -5,6 +5,7 @@
 #include <QEvent>
 
 #include "muctx.h"
+#include "Document.h"
 
 class Document;
 class Link;
@@ -61,6 +62,9 @@ public:
     QString selectedText();
     void selectAllText();
 
+    void clearSearchText();
+    void showSearchText(SearchItem *item);
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -79,6 +83,8 @@ private:
     Document *m_document = NULL;
     Link *m_mouseInLink = NULL;
     std::vector<TextLine *> m_selected_lines;
+
+    SearchItem *m_searchItem = NULL;
 };
 
 #endif // IMAGEWIDGET_H

@@ -2,6 +2,7 @@
 #define PAGELIST_H
 
 #include "ScrollingImageList.h"
+#include "Document.h"
 
 class PageList : public ScrollingImageList
 {
@@ -14,6 +15,9 @@ public:
 
     int height() {return getScrollArea()->viewport()->height();}
     int width()  {return getScrollArea()->viewport()->width();}
+
+    void clearSearchText();
+    void showSearchText(SearchItem *item);
 
 private:
 

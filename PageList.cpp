@@ -43,6 +43,24 @@ void PageList::selectAllText()
     }
 }
 
+void PageList::clearSearchText()
+{
+    int nPages = document()->GetPageCount();
+    for (int i=0; i<nPages; i++)
+    {
+        images()[i].clearSearchText();
+    }
+}
+
+void PageList::showSearchText(SearchItem *item)
+{
+    clearSearchText();
+    images()[item->pageNumber].showSearchText(item);
+
+    //  TODO; scroll into view
+
+}
+
 void PageList::copyText()
 {
     QString allText;

@@ -826,7 +826,7 @@ void Window::onFind()
                 for (int i=0; i<(int)items->size(); i++)
                 {
                     SearchItem item = items->at(i);
-                    qDebug ("found: page=%d top=%d left=%d bottom=%d right=%d", item.pageNumber, item.top, item.left, item.bottom, item.right);
+//                    qDebug ("found: page=%d top=%d left=%d bottom=%d right=%d", item.pageNumber, item.top, item.left, item.bottom, item.right);
                 }
             }
         }

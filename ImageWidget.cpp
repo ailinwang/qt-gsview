@@ -83,6 +83,15 @@ void ImageWidget::paintEvent(QPaintEvent *event)
         }
     }
 
+    //  draw text search appearance
+    if (m_searchItem != NULL)
+    {
+        QRect crect3 ( QPoint(m_searchItem->left, m_searchItem->top),
+                      QPoint(m_searchItem->right, m_searchItem->bottom));
+        painter.fillRect(crect3, QBrush(QColor("#506EB3E8")));  //  transparent blue
+
+    }
+
 //    //  TESTTESTTEST:  hilight blocks.
 //    if (!thumbnail())
 //        HilightBlocks (&painter, m_scale, m_pageNumber, false, true, true);  // blocks, lines, chars
@@ -305,6 +314,26 @@ void ImageWidget::selectAllText()
             this->addToSelection(line);
         }
     }
+
+    update();
+}
+
+void ImageWidget::clearSearchText()
+{
+    if (m_searchItem != NULL)
+        delete m_searchItem;
+    m_searchItem = NULL;
+
+    update();
+}
+
+void ImageWidget::showSearchText(SearchItem *item)
+{
+    if (m_searchItem != NULL)
+        delete m_searchItem;
+    m_searchItem = new SearchItem;
+
+    *m_searchItem = *item;
 
     update();
 }
