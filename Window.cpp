@@ -808,15 +808,17 @@ void Window::ghostscriptMessages()
 
 void Window::onFind()
 {
+    //  clear existing search text
+    m_pages->clearSearchText();
+
     //  get text to find
     bool ok;
-    QString text = QInputDialog::getText(this, tr("Find Text"),
+    QString text = QInputDialog::getText (this, tr("Find Text"),
                                       NULL, QLineEdit::Normal,
                                       NULL, &ok);
-
-//    int x = 0;
     if (ok && !text.isEmpty())
     {
+        //  give each page its list of found items
         int numPages = m_document->GetPageCount();
         for (int np=0; np<numPages; np++)
         {
@@ -824,17 +826,7 @@ void Window::onFind()
                     m_document->FindText (np, (char*)text.toStdString().c_str());
 
             if (items != NULL)
-            {
-                for (int i=0; i<(int)items->size(); i++)
-                {
-                    SearchItem item = items->at(i);
-//                    qDebug ("found: page=%d top=%d left=%d bottom=%d right=%d", item.pageNumber, item.top, item.left, item.bottom, item.right);
-
-//                    x++;
-//                    if (x==1)
-//                        m_pages->showSearchText(&item);
-                 }
-            }
+                m_pages->setSearchText (np, items);
         }
     }
 }

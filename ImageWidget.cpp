@@ -83,13 +83,16 @@ void ImageWidget::paintEvent(QPaintEvent *event)
         }
     }
 
-    //  draw text search appearance
-    if (m_searchItem != NULL)
+    //  show found text
+    if (m_searchItems != NULL)
     {
-        QRect crect3 ( QPoint(m_scale*m_searchItem->left, m_scale*m_searchItem->top),
-                      QPoint(m_scale*m_searchItem->right, m_scale*m_searchItem->bottom));
-        painter.fillRect(crect3, QBrush(QColor("#506EB3E8")));  //  transparent blue
-
+        for (int i=0; i<(int)m_searchItems->size(); i++)
+        {
+            SearchItem item = m_searchItems->at(i);
+            QRect crect3 ( QPoint(m_scale*item.left, m_scale*item.top),
+                           QPoint(m_scale*item.right, m_scale*item.bottom));
+            painter.fillRect(crect3, QBrush(QColor("#506EB3E8")));  //  transparent blue
+        }
     }
 
 //    //  TESTTESTTEST:  hilight blocks.
@@ -318,23 +321,15 @@ void ImageWidget::selectAllText()
     update();
 }
 
-void ImageWidget::clearSearchText()
+void ImageWidget::setSearchText(std::vector<SearchItem> *items)
 {
-    if (m_searchItem != NULL)
-        delete m_searchItem;
-    m_searchItem = NULL;
-
+    m_searchItems = items;
     update();
 }
 
-void ImageWidget::showSearchText(SearchItem *item)
+void ImageWidget::clearSearchText()
 {
-    if (m_searchItem != NULL)
-        delete m_searchItem;
-    m_searchItem = new SearchItem;
-
-    *m_searchItem = *item;
-
+    m_searchItems = NULL;
     update();
 }
 

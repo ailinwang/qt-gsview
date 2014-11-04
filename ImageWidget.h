@@ -62,8 +62,8 @@ public:
     QString selectedText();
     void selectAllText();
 
+    void setSearchText (std::vector<SearchItem> *items);
     void clearSearchText();
-    void showSearchText(SearchItem *item);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -84,7 +84,7 @@ private:
     Link *m_mouseInLink = NULL;
     std::vector<TextLine *> m_selected_lines;
 
-    SearchItem *m_searchItem = NULL;
+    std::vector<SearchItem> *m_searchItems = NULL;
 };
 
 #endif // IMAGEWIDGET_H

@@ -43,22 +43,18 @@ void PageList::selectAllText()
     }
 }
 
+void PageList::setSearchText(int nPage, std::vector<SearchItem> *items)
+{
+    images()[nPage].setSearchText(items);
+}
+
 void PageList::clearSearchText()
 {
     int nPages = document()->GetPageCount();
-    for (int i=0; i<nPages; i++)
+    for (int np=0; np<nPages; np++)
     {
-        images()[i].clearSearchText();
+        images()[np].clearSearchText();
     }
-}
-
-void PageList::showSearchText(SearchItem *item)
-{
-    clearSearchText();
-    images()[item->pageNumber].showSearchText(item);
-
-    //  TODO; scroll into view
-
 }
 
 void PageList::copyText()

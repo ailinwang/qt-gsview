@@ -16,8 +16,8 @@ public:
     int height() {return getScrollArea()->viewport()->height();}
     int width()  {return getScrollArea()->viewport()->width();}
 
+    void setSearchText (int nPage, std::vector<SearchItem> *items);
     void clearSearchText();
-    void showSearchText(SearchItem *item);
 
 private:
 
