@@ -813,6 +813,8 @@ void Window::onFind()
     QString text = QInputDialog::getText(this, tr("Find Text"),
                                       NULL, QLineEdit::Normal,
                                       NULL, &ok);
+
+//    int x = 0;
     if (ok && !text.isEmpty())
     {
         int numPages = m_document->GetPageCount();
@@ -827,7 +829,11 @@ void Window::onFind()
                 {
                     SearchItem item = items->at(i);
 //                    qDebug ("found: page=%d top=%d left=%d bottom=%d right=%d", item.pageNumber, item.top, item.left, item.bottom, item.right);
-                }
+
+//                    x++;
+//                    if (x==1)
+//                        m_pages->showSearchText(&item);
+                 }
             }
         }
     }

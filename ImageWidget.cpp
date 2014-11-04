@@ -86,8 +86,8 @@ void ImageWidget::paintEvent(QPaintEvent *event)
     //  draw text search appearance
     if (m_searchItem != NULL)
     {
-        QRect crect3 ( QPoint(m_searchItem->left, m_searchItem->top),
-                      QPoint(m_searchItem->right, m_searchItem->bottom));
+        QRect crect3 ( QPoint(m_scale*m_searchItem->left, m_scale*m_searchItem->top),
+                      QPoint(m_scale*m_searchItem->right, m_scale*m_searchItem->bottom));
         painter.fillRect(crect3, QBrush(QColor("#506EB3E8")));  //  transparent blue
 
     }
