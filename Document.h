@@ -79,6 +79,21 @@ public:
     int top;
     int right;
     int bottom;
+
+    bool equals(SearchItem other)
+    {
+        if (this->pageNumber!=other.pageNumber)
+            return false;
+        if (this->left!=other.left)
+            return false;
+        if (this->top!=other.top)
+            return false;
+        if (this->right!=other.right)
+            return false;
+        if (this->bottom!=other.bottom)
+            return false;
+        return true;
+    }
 };
 
 class Link

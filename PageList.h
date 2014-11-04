@@ -18,6 +18,7 @@ public:
 
     void setSearchText (int nPage, std::vector<SearchItem> *items);
     void clearSearchText();
+    void hilightSearchText(SearchItem *item);
 
 private:
 

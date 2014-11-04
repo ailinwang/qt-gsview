@@ -601,6 +601,30 @@
     <string>Ctrl+F</string>
    </property>
   </action>
+  <action name="actionFind_Next">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/next.png</normaloff>:/new/prefix1/resources/next.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find Next</string>
+   </property>
+   <property name="shortcut">
+    <string>N</string>
+   </property>
+  </action>
+  <action name="actionFind_Previous">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/previous.png</normaloff>:/new/prefix1/resources/previous.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find Previous</string>
+   </property>
+   <property name="shortcut">
+    <string>P</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="resources.qrc"/>

@@ -149,7 +149,28 @@ void Window::setupToolbar()
     ui->toolBar->addAction(ui->actionAnnotations);
     ui->toolBar->addAction(ui->actionContents);
     ui->toolBar->addAction(ui->actionLinks);
-    ui->toolBar->addAction(ui->actionFind);
+
+    //  searching
+
+    ui->toolBar->addSeparator();
+//    ui->toolBar->addAction(ui->actionFind);
+    m_search = new QLineEdit();
+    m_search->setMaximumWidth(120);
+    ui->toolBar->insertWidget(NULL, m_search);
+
+    ui->toolBar->addAction(ui->actionFind_Previous);
+    ui->toolBar->addAction(ui->actionFind_Next);
+
+    ui->toolBar->widgetForAction(ui->actionFind_Previous)->setMinimumWidth(24);
+    ui->toolBar->widgetForAction(ui->actionFind_Previous)->setMaximumWidth(24);
+    ui->toolBar->widgetForAction(ui->actionFind_Next)->setMinimumWidth(24);
+    ui->toolBar->widgetForAction(ui->actionFind_Next)->setMaximumWidth(24);
+
+    m_searchLabel = new QLabel();  m_searchLabel->setText(tr(""));
+    ui->toolBar->insertWidget(NULL, m_searchLabel);
+    connect ( m_search, SIGNAL(textChanged(const QString &)), SLOT(onFind()));
+    connect(ui->actionFind_Next, SIGNAL(triggered()), this, SLOT(findNext()));
+    connect(ui->actionFind_Previous, SIGNAL(triggered()), this, SLOT(findPrevious()));
 }
 
 Window::~Window()
@@ -811,15 +832,18 @@ void Window::onFind()
 {
     //  clear existing search text
     m_pages->clearSearchText();
+    m_searchLabel->setText(tr(""));
+    m_searchItems.clear();
 
     //  get text to find
-    bool ok;
-    QString text = QInputDialog::getText (this, tr("Find Text"),
-                                      NULL, QLineEdit::Normal,
-                                      NULL, &ok);
-    if (ok && !text.isEmpty())
+    QString text = m_search->text();
+
+    m_searchHits = 0;
+    m_searchCounter = 0;
+    if (!text.isEmpty())
     {
         //  give each page its list of found items
+        //  and make a copy for ourselves.
         int numPages = m_document->GetPageCount();
         for (int np=0; np<numPages; np++)
         {
@@ -827,8 +851,48 @@ void Window::onFind()
                     m_document->FindText (np, (char*)text.toStdString().c_str());
 
             if (items != NULL)
+            {
                 m_pages->setSearchText (np, items);
+                m_searchHits += items->size();
+
+                if (items->size()>0)
+                {
+                    for (int i=0;i<(int)items->size();i++)
+                    {
+                        m_searchItems.push_back(items->at(i));
+                    }
+                }
+            }
         }
+    }
+
+    if (m_searchHits>0)
+    {
+        hilightCurrentSearchText();
+    }
+}
+
+void Window::hilightCurrentSearchText()
+{
+    m_searchLabel->setText(QString::number(m_searchCounter+1)+tr("/")+QString::number(m_searchHits));
+    m_pages->hilightSearchText(&(m_searchItems.at(m_searchCounter)));
+}
+
+void Window::findNext()
+{
+    if (m_searchCounter+1 < m_searchHits)
+    {
+        m_searchCounter++;
+        hilightCurrentSearchText();
+    }
+}
+
+void Window::findPrevious()
+{
+    if (m_searchCounter > 0)
+    {
+        m_searchCounter--;
+        hilightCurrentSearchText();
     }
 }
 

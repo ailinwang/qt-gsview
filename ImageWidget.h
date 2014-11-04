@@ -64,6 +64,7 @@ public:
 
     void setSearchText (std::vector<SearchItem> *items);
     void clearSearchText();
+    void hilightSearchText(SearchItem *item);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -85,6 +86,7 @@ private:
     std::vector<TextLine *> m_selected_lines;
 
     std::vector<SearchItem> *m_searchItems = NULL;
+    SearchItem *m_hilightedItem = NULL;
 };
 
 #endif // IMAGEWIDGET_H

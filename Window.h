@@ -81,6 +81,8 @@ private slots:
     void setAA();
     void ghostscriptMessages();
     void onFind();
+    void findNext();
+    void findPrevious();
 
 private:
     Ui::Window *ui;
@@ -95,6 +97,8 @@ private:
     bool handlePassword();
 
     void zoom(double scale);
+
+    void hilightCurrentSearchText();
 
     //  pages
     double m_scalePage = 1.0;
@@ -113,6 +117,7 @@ private:
     QLineEdit *m_pageNumber = NULL;
     QLabel *m_totalPages = NULL;
     QLineEdit *m_percentage = NULL;
+    QLineEdit *m_search = NULL;
 
     //  document that contains all of the mupDF functionality
     Document *m_document = NULL;
@@ -138,6 +143,12 @@ private:
     FileSave *m_fileSave;
 
     MessagesDialog *m_messagesDialog=NULL;
+
+    int m_searchHits = 0;
+    int m_searchCounter = 0;
+    QLabel *m_searchLabel = NULL;
+    std::vector<SearchItem> m_searchItems;
+
 };
 
 #endif  //  WINDOW_H
