@@ -92,6 +92,8 @@ void ImageWidget::paintEvent(QPaintEvent *event)
             QRect crect3 ( QPoint(m_scale*item.left, m_scale*item.top),
                            QPoint(m_scale*item.right, m_scale*item.bottom));
             painter.fillRect(crect3, QBrush(QColor("#506EB3E8")));  //  transparent blue
+            painter.setPen(QPen(QColor("#000000"), 1));
+            painter.drawRect(crect3);
         }
     }
 

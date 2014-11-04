@@ -149,6 +149,7 @@ void Window::setupToolbar()
     ui->toolBar->addAction(ui->actionAnnotations);
     ui->toolBar->addAction(ui->actionContents);
     ui->toolBar->addAction(ui->actionLinks);
+    ui->toolBar->addAction(ui->actionFind);
 }
 
 Window::~Window()
