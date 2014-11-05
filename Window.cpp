@@ -58,7 +58,7 @@ Window::Window(QWidget *parent) :
     connect(ui->actionCopy_Text, SIGNAL(triggered()), this, SLOT(copyText()));
     connect(ui->actionDeselect_Text, SIGNAL(triggered()), this, SLOT(deselectText()));
     connect(ui->actionSelect_All_Text, SIGNAL(triggered()), this, SLOT(selectAllText()));
-    connect(ui->actionFind, SIGNAL(triggered()), this, SLOT(onFind()));
+//    connect(ui->actionFind, SIGNAL(triggered()), this, SLOT(onFind()));
 
     //  view menu
     connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
@@ -828,8 +828,28 @@ void Window::ghostscriptMessages()
     m_messagesDialog->show();
 }
 
+QTimer *timer = NULL;
+
 void Window::onFind()
 {
+    if (timer == NULL)
+    {
+        timer = new QTimer(this);
+        connect(timer, SIGNAL(timeout()), this, SLOT(onFindTimer()));
+    }
+
+    timer->stop();
+    timer->start(750);
+}
+
+void Window::onFindTimer()
+{
+    if (timer != NULL)
+        timer->stop();
+
+    m_searchLabel->setText(tr("searching..."));
+    qApp->processEvents();
+
     //  clear existing search text
     m_pages->clearSearchText();
     m_searchLabel->setText(tr(""));
@@ -870,6 +890,8 @@ void Window::onFind()
     {
         hilightCurrentSearchText();
     }
+    else
+        m_searchLabel->setText(tr(""));
 }
 
 void Window::hilightCurrentSearchText()

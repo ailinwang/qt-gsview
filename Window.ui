@@ -237,7 +237,6 @@
     <addaction name="actionDeselect_Text"/>
     <addaction name="actionCopy_Text"/>
     <addaction name="actionSelect_All_Text"/>
-    <addaction name="actionFind"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
