@@ -153,7 +153,7 @@ void Window::setupToolbar()
     //  searching
 
     ui->toolBar->addSeparator();
-//    ui->toolBar->addAction(ui->actionFind);
+    ui->toolBar->addAction(ui->actionFindDialog);
     m_search = new QLineEdit();
     m_search->setMaximumWidth(120);
     ui->toolBar->insertWidget(NULL, m_search);
