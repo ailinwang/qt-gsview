@@ -887,7 +887,7 @@ void Window::onFindTimer()
         for (int np=0; np<numPages; np++)
         {
             std::vector<SearchItem> *items =
-                    m_document->FindText (np, (char*)text.toStdString().c_str());
+                    m_document->SearchText (np, (char*)text.toStdString().c_str());
 
             if (items != NULL)
             {

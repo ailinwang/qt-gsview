@@ -398,7 +398,7 @@ void Document::SavePage(char *filename, int pagenum, int resolution, int type, b
         mu_ctx->SavePage(filename, pagenum, resolution, type, append);
 }
 
-std::vector<SearchItem> *Document::FindText (int page_num, char *textToFind)
+std::vector<SearchItem> *Document::SearchText (int page_num, char *textToFind)
 {
     if (mu_ctx != NULL)
     {
