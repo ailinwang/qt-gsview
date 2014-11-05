@@ -161,10 +161,10 @@ void Window::setupToolbar()
     ui->toolBar->addAction(ui->actionFind_Previous);
     ui->toolBar->addAction(ui->actionFind_Next);
 
-    ui->toolBar->widgetForAction(ui->actionFind_Previous)->setMinimumWidth(24);
-    ui->toolBar->widgetForAction(ui->actionFind_Previous)->setMaximumWidth(24);
-    ui->toolBar->widgetForAction(ui->actionFind_Next)->setMinimumWidth(24);
-    ui->toolBar->widgetForAction(ui->actionFind_Next)->setMaximumWidth(24);
+    ui->toolBar->widgetForAction(ui->actionFind_Previous)->setMinimumWidth(16);
+    ui->toolBar->widgetForAction(ui->actionFind_Previous)->setMaximumWidth(16);
+    ui->toolBar->widgetForAction(ui->actionFind_Next)->setMinimumWidth(16);
+    ui->toolBar->widgetForAction(ui->actionFind_Next)->setMaximumWidth(16);
 
     m_searchLabel = new QLabel();  m_searchLabel->setText(tr(""));
     ui->toolBar->insertWidget(NULL, m_searchLabel);
@@ -502,8 +502,14 @@ void Window::open()
         dialog.hide();
         qApp->processEvents();
 
-        //  attempt to load the file
+        //  show the window at 85%
+        QDesktopWidget dw;
+        int x=dw.width()*0.85;
+        int y=dw.height()*0.85;
+        newWindow->setFixedSize(x,y);
         newWindow->show();
+
+        //  attempt to load the file
         if (newWindow->OpenFile(dialog.selectedFiles().first()))
         {
             //  success

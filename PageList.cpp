@@ -72,7 +72,7 @@ void PageList::hilightSearchText(SearchItem *item)
     QWidget *thePage = &(images()[pageNumber]);
     QPoint p(getScale()*item->left, getScale()*item->top);
     p = thePage->mapToParent(p);
-    getScrollArea()->ensureVisible(p.x(), p.y());
+    getScrollArea()->ensureVisible(p.x(), p.y(), 50, 200);
 }
 
 void PageList::copyText()
