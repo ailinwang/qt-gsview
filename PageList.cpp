@@ -59,17 +59,20 @@ void PageList::clearSearchText()
 
 void PageList::hilightSearchText(SearchItem *item)
 {
+    //  tell each page to hilight the item.
+    //  only one page will actually do it.
     int nPages = document()->GetPageCount();
     for (int np=0; np<nPages; np++)
     {
         images()[np].hilightSearchText(item);
     }
 
-    //  TODO: scroll so the hilighted search term is in view
-    //  right now we'll just go to page.
+    //  scroll to put the item in view
     int pageNumber = item->pageNumber;
-    this->goToPage(pageNumber);
-
+    QWidget *thePage = &(images()[pageNumber]);
+    QPoint p(getScale()*item->left, getScale()*item->top);
+    p = thePage->mapToParent(p);
+    getScrollArea()->ensureVisible(p.x(), p.y());
 }
 
 void PageList::copyText()

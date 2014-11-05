@@ -96,6 +96,8 @@ void ImageWidget::paintEvent(QPaintEvent *event)
             //  hilight the current one
             if (m_hilightedItem!=NULL && m_hilightedItem->equals(item))
             {
+                crect3.setLeft(crect3.left()-1);
+                crect3.setTop(crect3.top()-1);
                 painter.setPen(QPen(QColor("#000000"), 1));
                 painter.drawRect(crect3);
             }
