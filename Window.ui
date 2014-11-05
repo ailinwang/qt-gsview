@@ -237,6 +237,7 @@
     <addaction name="actionDeselect_Text"/>
     <addaction name="actionCopy_Text"/>
     <addaction name="actionSelect_All_Text"/>
+    <addaction name="actionFindDialog"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -622,6 +623,18 @@
    </property>
    <property name="shortcut">
     <string>P</string>
+   </property>
+  </action>
+  <action name="actionFindDialog">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/search.png</normaloff>:/new/prefix1/resources/search.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

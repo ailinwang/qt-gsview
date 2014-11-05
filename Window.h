@@ -81,6 +81,7 @@ private slots:
     void setAA();
     void ghostscriptMessages();
     void onFind();
+    void onFindDialog();
     void onFindTimer();
     void findNext();
     void findPrevious();

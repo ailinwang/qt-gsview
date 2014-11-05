@@ -58,7 +58,7 @@ Window::Window(QWidget *parent) :
     connect(ui->actionCopy_Text, SIGNAL(triggered()), this, SLOT(copyText()));
     connect(ui->actionDeselect_Text, SIGNAL(triggered()), this, SLOT(deselectText()));
     connect(ui->actionSelect_All_Text, SIGNAL(triggered()), this, SLOT(selectAllText()));
-//    connect(ui->actionFind, SIGNAL(triggered()), this, SLOT(onFind()));
+    connect(ui->actionFindDialog, SIGNAL(triggered()), this, SLOT(onFindDialog()));
 
     //  view menu
     connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
@@ -846,6 +846,19 @@ void Window::onFind()
 
     timer->stop();
     timer->start(750);
+}
+
+void Window::onFindDialog()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, NULL,
+                                              tr("Text to find:"), QLineEdit::Normal,
+                                              NULL, &ok);
+    if (ok && !text.isEmpty())
+    {
+        m_search->setText(text);
+        onFindTimer();
+    }
 }
 
 void Window::onFindTimer()
