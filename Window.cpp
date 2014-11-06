@@ -497,10 +497,8 @@ void Window::open()
         if (result != QDialog::Accepted)
             break;
 
-        //  hide the dialog and process events so it really
-        //  disappears before the window appears.
+        //  hide the dialog
         dialog.hide();
-        qApp->processEvents();
 
         //  show the window at 85%
         QDesktopWidget dw;

@@ -9,12 +9,7 @@
 GSViewApp::GSViewApp ( int &argc, char **argv ) : QApplication(argc, argv)
 {
     QGuiApplication::setApplicationDisplayName(tr("gsview"));
-
-    QEvent *e = new QEvent(QEvent::ApplicationActivated);
-    this->postEvent(this, e);
 }
-
-bool activatedOnce = false;
 
 bool GSViewApp::event(QEvent *ev)
 {
@@ -25,9 +20,6 @@ bool GSViewApp::event(QEvent *ev)
     {
         case QEvent::FileOpen: {
             m_fileToOpen = static_cast<QFileOpenEvent *>(ev)->file();
-//            Window *newWindow = new Window();
-//            newWindow->OpenFile(m_fileToOpen);
-//            newWindow->show();
             handled = true;
             break;
         }
@@ -41,9 +33,14 @@ bool GSViewApp::event(QEvent *ev)
     return handled;
 }
 
-QString GSViewApp::m_fileToOpen("");
-
 int GSViewApp::exec()
+{
+    QTimer::singleShot(100, gsviewApplication, SLOT(onStarted()));
+
+    return QApplication::exec();
+}
+
+void GSViewApp::onStarted()
 {
     if (!m_fileToOpen.isEmpty())
     {
@@ -53,16 +50,14 @@ int GSViewApp::exec()
         {
             //  loaded, so show and run
             newWindow->show();
-            return QApplication::exec();
+            return;
         }
 
         //  not loaded.  Error message and exit.
         delete newWindow;
-        return 0;
+        exit();
     }
 
     //  ask for a new file to open
     Window::open();
-
-    return QApplication::exec();
 }

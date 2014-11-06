@@ -17,12 +17,13 @@ public:
 signals:
 
 public slots:
+    void onStarted();
 
 protected:
     bool event(QEvent *ev);
 
 private:
-    static QString m_fileToOpen;
+    QString m_fileToOpen;
 
 };
 
