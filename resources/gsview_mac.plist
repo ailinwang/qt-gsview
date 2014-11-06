@@ -7,14 +7,36 @@
 
         <key>CFBundleDocumentTypes</key>
             <array>
-                <dict>
-                    <key>CFBundleTypeExtensions</key>
-                    <array>
-                        <string>pdf</string>
-                    </array>
-                    <key>CFBundleTypeRole</key>
+            <dict>
+                <key>CFBundleTypeExtensions</key>
+                    <array><string>pdf</string></array>
+                <key>CFBundleTypeRole</key>
                     <string>Viewer</string>
-                </dict>
+            </dict>
+            <dict>
+                <key>CFBundleTypeExtensions</key>
+                    <array><string>ps</string></array>
+                <key>CFBundleTypeRole</key>
+                    <string>Viewer</string>
+            </dict>
+            <dict>
+                <key>CFBundleTypeExtensions</key>
+                    <array><string>eps</string></array>
+                <key>CFBundleTypeRole</key>
+                    <string>Viewer</string>
+            </dict>
+            <dict>
+                <key>CFBundleTypeExtensions</key>
+                    <array><string>xps</string></array>
+                <key>CFBundleTypeRole</key>
+                    <string>Viewer</string>
+            </dict>
+            <dict>
+                <key>CFBundleTypeExtensions</key>
+                    <array><string>cbz</string></array>
+                <key>CFBundleTypeRole</key>
+                    <string>Viewer</string>
+            </dict>
             </array>
 
 	<key>CFBundleExecutable</key>
