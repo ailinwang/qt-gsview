@@ -4,7 +4,6 @@
 #
 #-------------------------------------------------
 
-macx: ICON = resources/gsview_app.icns
 
 #  C and C++ compiler configuration
 CONFIG += c++11
@@ -49,7 +48,8 @@ HEADERS       = \
     FileInfoDialog.h \
     ContentsList.h \
     FileSave.h \
-    MessagesDialog.h
+    MessagesDialog.h \
+    GSViewApp.h
 
 SOURCES       = \
     main.cpp \
@@ -69,7 +69,8 @@ SOURCES       = \
     ContentsList.cpp \
     FileSave.cpp \
     ../../source/tools/pdfclean.c \
-    MessagesDialog.cpp
+    MessagesDialog.cpp \
+    GSViewApp.cpp
 
 FORMS += \
     Window.ui \
@@ -118,3 +119,10 @@ macx {
 #    QMAKE_POST_LINK += $$quote(xcopy $$PWD/winApps/gs apps/gs $$escape_expand(\n\t))
 #    QMAKE_POST_LINK += $$quote(xcopy $$PWD/winApps/gxps apps/gxps $$escape_expand(\n\t))
 #}
+
+macx {
+    OTHER_FILES += resources/gsview_app.icns
+    ICON = resources/gsview_app.icns
+    OTHER_FILES += resources/gsview_mac.plist
+    QMAKE_INFO_PLIST = '''resources/gsview_mac.plist'''
+}
