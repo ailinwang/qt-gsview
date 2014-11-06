@@ -13,12 +13,11 @@ GSViewApp::GSViewApp ( int &argc, char **argv ) : QApplication(argc, argv)
 
 bool GSViewApp::event(QEvent *ev)
 {
-    qDebug() << "app event: " << QtUtil::eventTypeName(ev);
-
     bool handled = false;
     switch (ev->type())
     {
         case QEvent::FileOpen: {
+            //  remember the file we should open.
             m_fileToOpen = static_cast<QFileOpenEvent *>(ev)->file();
             handled = true;
             break;
@@ -35,6 +34,9 @@ bool GSViewApp::event(QEvent *ev)
 
 int GSViewApp::exec()
 {
+    //  start a timer to defer asking for the first file a bit.
+    //  this is to give time for a QEvent::FileOpen to be delivered,
+    //  if it's going to be.
     QTimer::singleShot(100, gsviewApplication, SLOT(onStarted()));
 
     return QApplication::exec();
@@ -42,20 +44,21 @@ int GSViewApp::exec()
 
 void GSViewApp::onStarted()
 {
+    //  were we asked to load a file?
     if (!m_fileToOpen.isEmpty())
     {
-        //  we were, try and load the file
+        //  we were, try and load it
         Window *newWindow = new Window();
         if (newWindow->OpenFile(m_fileToOpen))
         {
-            //  loaded, so show and run
+            //  success
             newWindow->show();
             return;
         }
 
-        //  not loaded.  Error message and exit.
+        //  error
         delete newWindow;
-        exit();
+        QMessageBox::information(NULL, tr(""), tr("Error opening ") + m_fileToOpen);
     }
 
     //  ask for a new file to open
