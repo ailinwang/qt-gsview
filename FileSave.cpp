@@ -53,6 +53,15 @@ enum {
 
 void FileSave::run()
 {
+    QString original = m_window->getPath();
+
+    //  if the original is CBZ, convert to PDF first?
+    if (QtUtil::extensionFromPath(original)==QString("cbz"))
+    {
+        QMessageBox::information (m_window, "", "Saving CBZ files is not yet supported.");
+        return;
+    }
+
     //  where is the desktop?
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
     QString desktop = desktopLocations.first();
@@ -116,7 +125,7 @@ void FileSave::run()
         //  in all cases, the file dialog has asked the user about overwriting,
         //  so it's OK not to ask here.
 
-        QString original = m_window->getPath();
+//        QString original = m_window->getPath();
         QString password;
 
         //  if the original is xps, convert tp pdf first.
