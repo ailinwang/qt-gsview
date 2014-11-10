@@ -49,7 +49,8 @@ HEADERS       = \
     ContentsList.h \
     FileSave.h \
     MessagesDialog.h \
-    GSViewApp.h
+    GSViewApp.h \
+    FileSaveDialog.h
 
 SOURCES       = \
     main.cpp \
@@ -70,7 +71,8 @@ SOURCES       = \
     FileSave.cpp \
     ../../source/tools/pdfclean.c \
     MessagesDialog.cpp \
-    GSViewApp.cpp
+    GSViewApp.cpp \
+    FileSaveDialog.cpp
 
 FORMS += \
     Window.ui \

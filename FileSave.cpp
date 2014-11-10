@@ -2,9 +2,9 @@
 
 #include <QString>
 #include <QStringList>
-#include <QFileDialog>
 #include <QStandardPaths>
 #include <QMessageBox>
+#include <QFileDialog>
 #include <QProcess>
 #include <QProgressDialog>
 #include <QTemporaryFile>
@@ -12,7 +12,7 @@
 
 #include "QtUtil.h"
 #include "MessagesDialog.h"
-
+#include "FileSaveDialog.h"
 
 FileType fileTypes[] = {
     {"PDF",             "pdf" , "" },
@@ -79,7 +79,7 @@ void FileSave::run()
     }
 
     //  set up the dialog
-    QFileDialog dialog(m_window, "Save", desktop);
+    FileSaveDialog dialog(m_window, "Save", desktop);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     dialog.setNameFilter(types);
