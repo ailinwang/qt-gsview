@@ -14,6 +14,7 @@ class Window;
 #include "PageList.h"
 #include "ThumbnailList.h"
 #include "ContentsList.h"
+#include "ExtractPagesDialog.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -85,6 +86,7 @@ private slots:
     void onFindTimer();
     void findNext();
     void findPrevious();
+    void extractPages();
 
 private:
     Ui::Window *ui;
@@ -150,6 +152,8 @@ private:
     int m_searchCounter = 0;
     QLabel *m_searchLabel = NULL;
     std::vector<SearchItem> m_searchItems;
+
+    ExtractPagesDialog *m_extractDlg=NULL;
 
 };
 

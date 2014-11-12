@@ -11,6 +11,7 @@
 #include "FileSave.h"
 #include "AboutDialog.h"
 #include "MessagesDialog.h"
+#include "ExtractPagesDialog.h"
 
 Window::Window(QWidget *parent) :
     QMainWindow(parent),
@@ -53,6 +54,7 @@ Window::Window(QWidget *parent) :
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
     connect(ui->actionInfo, SIGNAL(triggered()), this, SLOT(fileInfo()));
     connect(ui->actionGhostscript_Messages, SIGNAL(triggered()), this, SLOT(ghostscriptMessages()));
+    connect(ui->actionExract_Pages, SIGNAL(triggered()), this, SLOT(extractPages()));
 
     //  edit menu
     connect(ui->actionCopy_Text, SIGNAL(triggered()), this, SLOT(copyText()));
@@ -933,6 +935,16 @@ void Window::findPrevious()
         m_searchCounter--;
         hilightCurrentSearchText();
     }
+}
+
+void Window::extractPages()
+{
+    //  create and show the dialog.
+    //  it will delete itself when closed.
+
+    m_extractDlg = new ExtractPagesDialog();
+    m_extractDlg->run (this);
+
 }
 
 void Window::homeSlot()

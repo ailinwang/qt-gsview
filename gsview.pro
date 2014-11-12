@@ -50,7 +50,8 @@ HEADERS       = \
     FileSave.h \
     MessagesDialog.h \
     GSViewApp.h \
-    FileSaveDialog.h
+    FileSaveDialog.h \
+    ExtractPagesDialog.h
 
 SOURCES       = \
     main.cpp \
@@ -72,13 +73,15 @@ SOURCES       = \
     ../../source/tools/pdfclean.c \
     MessagesDialog.cpp \
     GSViewApp.cpp \
-    FileSaveDialog.cpp
+    FileSaveDialog.cpp \
+    ExtractPagesDialog.cpp
 
 FORMS += \
     Window.ui \
     AboutDialog.ui \
     FileInfoDialog.ui \
-    MessagesDialog.ui
+    MessagesDialog.ui \
+    ExtractPagesDialog.ui
 
 RESOURCES += \
     resources.qrc

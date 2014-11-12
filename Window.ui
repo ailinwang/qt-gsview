@@ -192,6 +192,7 @@
     <addaction name="actionOpen"/>
     <addaction name="actionClose"/>
     <addaction name="actionSave"/>
+    <addaction name="actionExract_Pages"/>
     <addaction name="separator"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
@@ -448,7 +449,7 @@
      <normaloff>:/new/prefix1/resources/save.png</normaloff>:/new/prefix1/resources/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>Save...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -635,6 +636,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionExract_Pages">
+   <property name="text">
+    <string>Exract Pages...</string>
    </property>
   </action>
  </widget>
