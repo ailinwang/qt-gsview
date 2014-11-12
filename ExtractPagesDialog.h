@@ -5,6 +5,15 @@
 
 class Window;
 
+class device_t
+{
+public:
+    int index;
+    QString name;
+    QString label;
+    QString extension;
+};
+
 namespace Ui {
 class ExtractPagesDialog;
 }
@@ -28,10 +37,14 @@ private slots:
     void on_noneButton_clicked();
 
 private:
+    void doSave();
+
     Ui::ExtractPagesDialog *ui;
     Window *m_window=NULL;
     QString m_options;
     QString m_resolution;
+    device_t m_device;
+    QString m_destination;
 };
 
 #endif // EXTRACTPAGESDIALOG_H

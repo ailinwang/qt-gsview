@@ -124,7 +124,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Format</string>
+    <string>Devices:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -137,7 +137,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Pages</string>
+    <string>Pages:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
@@ -163,7 +163,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>GhostScript options</string>
+    <string>GhostScript options:</string>
    </property>
   </widget>
   <widget class="QPlainTextEdit" name="ghostscriptOptions">
@@ -181,12 +181,12 @@
     <rect>
      <x>320</x>
      <y>170</y>
-     <width>91</width>
+     <width>131</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Resolution</string>
+    <string>muPDF Resolution:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="resolution">

@@ -2,61 +2,58 @@
 #include "ui_ExtractPagesDialog.h"
 #include "Window.h"
 
+#include <QFileDialog>
 #include <QMessageBox>
-
-class device_t
-{
-public:
-    int index;
-    QString name;
-    QString label;
-};
+#include <QStandardPaths>
 
 std::vector<device_t> devices = {
-    {0,"svg","svg"},
-    {1,"pnm","pnm"},
-    {2,"pclbitmap","pclbitmap"},
-    {3,"pwg","pwg"},
-    {4,"bmp16","bmp16"},            /* Add mupdf devices before this one */
-    {5,"bmp16m","bmp16m"},
-    {6,"bmp256","bmp256"},
-    {7,"bmp32b","bmp32b"},
-    {8,"bmpgray","bmpgray"},
-    {9,"bmpmono","bmpmono"},
-    {10,"eps2write","eps2write"},
-    {11,"jpeg","jpeg"},
-    {12,"jpegcmyk","jpegcmyk"},
-    {13,"jpeggray","jpeggray"},
-    {14,"pamcmyk32","pamcmyk32"},
-    {15,"pamcmyk4","pamcmyk4"},
-    {16,"pbm","pbm"},
-    {17,"pgm","pgm"},
-    {18,"png16","png16"},
-    {19,"png16m","png16m"},
-    {20,"png256","png256"},
-    {21,"pngalpha","pngalpha"},
-    {22,"pnggray","pnggray"},
-    {23,"pngmono","pngmono"},
-    {24,"psdcmyk","psdcmyk"},
-    {25,"psdrgb  ","psdrgb  "},         /* Add single page gs devices before this device */
-    {26,"pdfwrite","pdfwrite"},
-    {27,"ps2write","ps2write"},
-    {28,"pxlcolor","pxlcolor"},
-    {29,"pxlmono","pxlmono"},
-    {30,"tiff12nc","tiff12nc"},
-    {31,"tiff24nc","tiff24nc"},
-    {32,"tiff32nc","tiff32nc"},
-    {33,"tiff64nc","tiff64nc"},
-    {34,"tiffcrle","tiffcrle"},
-    {35,"tiffg3","tiffg3"},
-    {36,"tiffg32d","tiffg32d"},
-    {37,"tiffg4","tiffg4"},
-    {38,"tiffgray","tiffgray"},
-    {39,"tifflzw","tifflzw"},
-    {40,"tiffpack","tiffpack"},
-    {41,"tiffsep","tiffsep"},
-    {42,"txtwrite","txtwrite"},
-    {43,"xpswrite","xpswrite"},
+
+    {0,"svg","svg","svg"},
+    {1,"pnm","pnm","pnm"},
+    {2,"pclbitmap","pclbitmap","pcl"},
+    {3,"pwg","pwg","pwg"},
+    {4,"bmp16","bmp16","bmp"},              /* Add mupdf devices before this one */
+    {5,"bmp16m","bmp16m","bmp"},
+    {6,"bmp256","bmp256","bmp"},
+    {7,"bmp32b","bmp32b","bmp"},
+    {8,"bmpgray","bmpgray","bmp"},
+    {9,"bmpmono","bmpmono","bmp"},
+    {10,"eps2write","eps2write","eps"},
+    {11,"jpeg","jpeg","jpg"},
+    {12,"jpegcmyk","jpegcmyk","jpg"},
+    {13,"jpeggray","jpeggray","jpg"},
+    {14,"pamcmyk32","pamcmyk32","pam"},
+    {15,"pamcmyk4","pamcmyk4","pam"},
+    {16,"pbm","pbm","pbm"},
+    {17,"pgm","pgm","pgm"},
+    {18,"png16","png16","png"},
+    {19,"png16m","png16m","png"},
+    {20,"png256","png256","png"},
+    {21,"pngalpha","pngalpha","png"},
+    {22,"pnggray","pnggray","png"},
+    {23,"pngmono","pngmono","png"},
+    {24,"psdcmyk","psdcmyk","psd"},
+    {25,"psdrgb  ","psdrgb  ","psd"},               /* Add single page gs devices before this device */
+    {26,"pdfwrite","pdfwrite","pdf"},
+    {27,"ps2write","ps2write","ps"},
+    {28,"pxlcolor","pxlcolor","pxl"},
+    {29,"pxlmono","pxlmono","pxl"},
+    {30,"tiff12nc","tiff12nc","tiff"},
+    {31,"tiff24nc","tiff24nc","tiff"},
+    {32,"tiff32nc","tiff32nc","tiff"},
+    {33,"tiff64nc","tiff64nc","tiff"},
+    {34,"tiffcrle","tiffcrle","tiff"},
+    {35,"tiffg3","tiffg3","tiff"},
+    {36,"tiffg32d","tiffg32d","tiff"},
+    {37,"tiffg4","tiffg4","tiff"},
+    {38,"tiffgray","tiffgray","tiff"},
+    {39,"tifflzw","tifflzw","tiff"},
+    {40,"tiffpack","tiffpack","tiff"},
+    {41,"tiffsep","tiffsep","tiff"},
+    {42,"txtwrite","txtwrite","txt"},
+    {43,"xpswrite","xpswrite","xps"},
+
+
 };
 
 ExtractPagesDialog::ExtractPagesDialog(QWidget *parent) :
@@ -89,6 +86,8 @@ void ExtractPagesDialog::run(Window *win)
         device_t device = devices.at(i);
         ui->formatList->addItem(QString(device.label));
     }
+
+    this->setWindowModality(Qt::ApplicationModal);
 
     show();
 }
@@ -140,11 +139,54 @@ void ExtractPagesDialog::on_extractButton_clicked()
     //  must have a format selected
     if (ui->formatList->selectedItems().size()<=0)
     {
-        QMessageBox::information(NULL, tr(""), tr("You must select a format."));
+        QMessageBox::information(NULL, tr(""), tr("You must select a device."));
         return;
+    }
+
+    //  get selected device
+    m_device = devices[ui->formatList->currentIndex().row()];
+
+    //  from 4-25, can only do one page
+    if (ui->pageList->selectedItems().size()>1)
+    {
+        if (m_device.index>=4 && m_device.index<=25)
+        {
+            QMessageBox::information(NULL, tr(""), tr("You can only extract one page at a time with the selected device."));
+            return;
+        }
     }
 
     //  get resolution and options
     m_options = ui->ghostscriptOptions->toPlainText();
     m_resolution = ui->resolution->text();
+
+    doSave();
 }
+
+void ExtractPagesDialog::doSave()
+{
+    //  where is the desktop?
+    const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
+    QString desktop = desktopLocations.first();
+
+    //  set up the dialog
+    QFileDialog dialog(m_window, "Save", desktop);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
+    QString theFilter = m_device.label + QString(" files (*.") + m_device.extension + QString(")");
+    dialog.setNameFilter(theFilter);
+
+    //  get the name
+    dialog.setWindowModality(Qt::ApplicationModal);
+    dialog.show();
+    int result = dialog.exec();
+    if (result == QDialog::Accepted)
+    {
+        m_destination = dialog.selectedFiles().first();
+    }
+    else
+    {
+
+    }
+}
+
