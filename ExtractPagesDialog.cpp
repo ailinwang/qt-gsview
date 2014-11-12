@@ -183,10 +183,25 @@ void ExtractPagesDialog::doSave()
     if (result == QDialog::Accepted)
     {
         m_destination = dialog.selectedFiles().first();
-    }
-    else
-    {
 
+        if (m_device.index<4)
+        {
+            doSaveMupdf();
+        }
+        else
+        {
+            doSaveGs();
+        }
     }
 }
 
+void ExtractPagesDialog::doSaveMupdf()
+{
+
+}
+
+
+void ExtractPagesDialog::doSaveGs()
+{
+
+}

@@ -38,6 +38,8 @@ private slots:
 
 private:
     void doSave();
+    void doSaveMupdf();
+    void doSaveGs();
 
     Ui::ExtractPagesDialog *ui;
     Window *m_window=NULL;
