@@ -21,20 +21,17 @@ public:
 
 private slots:
     void on_cancelButton_clicked();
-
     void on_extractButton_clicked();
-
     void on_allButton_clicked();
-
     void on_evenButton_clicked();
-
     void on_oddButton_clicked();
-
     void on_noneButton_clicked();
 
 private:
     Ui::ExtractPagesDialog *ui;
     Window *m_window=NULL;
+    QString m_options;
+    QString m_resolution;
 };
 
 #endif // EXTRACTPAGESDIALOG_H

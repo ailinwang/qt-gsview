@@ -136,4 +136,7 @@ void ExtractPagesDialog::on_extractButton_clicked()
         return;
     }
 
+    //  get resolution and options
+    m_options = ui->ghostscriptOptions->toPlainText();
+    m_resolution = ui->resolution->text();
 }

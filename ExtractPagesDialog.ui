@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>516</width>
+    <width>490</width>
     <height>443</height>
    </rect>
   </property>
@@ -16,7 +16,7 @@
   <widget class="QPushButton" name="extractButton">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>390</x>
      <y>410</y>
      <width>91</width>
      <height>32</height>
@@ -29,7 +29,7 @@
   <widget class="QPushButton" name="cancelButton">
    <property name="geometry">
     <rect>
-     <x>340</x>
+     <x>310</x>
      <y>410</y>
      <width>81</width>
      <height>32</height>
@@ -45,7 +45,7 @@
      <x>180</x>
      <y>30</y>
      <width>111</width>
-     <height>371</height>
+     <height>361</height>
     </rect>
    </property>
   </widget>
@@ -55,7 +55,7 @@
      <x>20</x>
      <y>30</y>
      <width>71</width>
-     <height>371</height>
+     <height>361</height>
     </rect>
    </property>
    <property name="selectionMode">
@@ -117,7 +117,7 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>180</x>
      <y>10</y>
      <width>59</width>
      <height>16</height>
@@ -130,7 +130,7 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>10</y>
      <width>59</width>
      <height>16</height>
@@ -151,6 +151,52 @@
    </property>
    <property name="text">
     <string>Select:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>10</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>GhostScript options</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="ghostscriptOptions">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>30</y>
+     <width>151</width>
+     <height>91</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>170</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Resolution</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="resolution">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>190</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
    </property>
   </widget>
  </widget>
