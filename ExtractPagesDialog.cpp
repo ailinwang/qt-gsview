@@ -65,6 +65,9 @@ ExtractPagesDialog::ExtractPagesDialog(QWidget *parent) :
     ui->setupUi(this);
 
     setAttribute(Qt::WA_DeleteOnClose);
+
+    //  default value for resolution
+    ui->resolution->setText("300");
 }
 
 ExtractPagesDialog::~ExtractPagesDialog()
@@ -220,42 +223,65 @@ void ExtractPagesDialog::doSaveMupdf()
 
 void ExtractPagesDialog::doSaveGs()
 {
-    //  command
-    QString command;
+    m_commands.clear();
+    m_currentCommand = 0;
 
-    command = "\"" + QtUtil::getGsPath() + "\"";
+    //  save a file for each page
+    for (int i=0; i<m_window->document()->GetPageCount(); i++)
+    {
+        if (ui->pageList->item(i)->isSelected())
+        {
+            //  make a command for this page
+            QString page = QString::number(i+1);
 
-//    QString six("6");
-//    command += " -dFirstPage=" + six + " ";
-//    command += " -dLastPage=" + six + " ";
+            QString command;
+            command = "\"" + QtUtil::getGsPath() + "\"";
+            command += " -dFirstPage=" + page + " ";
+            command += " -dLastPage=" + page + " ";
+            if (!m_options.isEmpty())
+                command += " " + m_options + " ";
+            command += " -dNOPAUSE -dBATCH ";
+            command += " -sDEVICE=" + m_device.name + " ";
+            if (!m_resolution.isEmpty())
+                command += " -r" + m_resolution + " ";
 
-    if (!m_options.isEmpty())
-        command += " " + m_options + " ";
-    command += " -dNOPAUSE -dBATCH ";
-    command += " -sDEVICE=" + m_device.name + " ";
-    if (!m_resolution.isEmpty())
-        command += " -r" + m_resolution + " ";
-    command += " -o \"" + m_destination + "\"";
-    command += " -f \"" + m_window->getPath() + "\"";
+            //  make a page-numbered file name
+            QFileInfo original(m_destination);
+            QString newPath = original.absoluteDir().path() + QDir::separator() +
+                    original.baseName() + "-page" + page;
+            if (!original.completeSuffix().isEmpty())
+                newPath += "." + original.completeSuffix();
+            else
+                newPath += "." + m_device.extension;
+            command += " -o \"" + newPath + "\"";
 
-    MessagesDialog::addMessage("\n");
-    MessagesDialog::addMessage("starting\n");
-    MessagesDialog::addMessage(command+"\n\n");
+            command += " -f \"" + m_window->getPath() + "\"";
 
+            m_commands.push_back(command);
+        }
+    }
+
+    doSave2();
+}
+
+void ExtractPagesDialog::doSave2()
+{
     //  show a progress widget
     m_progressDialog = new QProgressDialog(m_window);
     connect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
-    m_progressDialog->setMaximum(m_window->document()->GetPageCount());
+    m_progressDialog->setMaximum(m_commands.size());
     setProgress(0);
     m_progressDialog->show();
     qApp->processEvents();
 
-    //  create process to do it
+    //  create process to do the commands
     m_process = new QProcess(m_window);
     m_process->setProcessChannelMode(QProcess::MergedChannels);
     connect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
     connect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
-    m_process->start(command);
+
+    //  start the first command
+    startCommand(m_commands.at(m_currentCommand));
 }
 
 void ExtractPagesDialog::onReadyReadStandardOutput()
@@ -297,7 +323,17 @@ void ExtractPagesDialog::onFinished(int exitCode)
     }
     else
     {
-        //  no
+        //  not canceled
+
+        //  more commands?  Keep going
+        m_currentCommand++;
+        if (m_currentCommand<m_commands.size())
+        {
+            startCommand(m_commands.at(m_currentCommand));
+            return;
+        }
+
+        //  we're done
         MessagesDialog::addMessage("finished.\n");
         QMessageBox::information (NULL, "", "Finished.");
     }
@@ -317,11 +353,22 @@ void ExtractPagesDialog::onFinished(int exitCode)
 
 void ExtractPagesDialog::setProgress (int val)
 {
+    int total = m_commands.size();
+
     m_progressDialog->setValue(val);
     QString s = QString("Processed ")
                     + QString::number(val) + QString(" of ")
-                    + QString::number(m_window->document()->GetPageCount()) + QString(" pages...");
+                    + QString::number(total) + QString(" pages...");
     m_progressDialog->setLabelText(s);
     qApp->processEvents();
+}
+
+void ExtractPagesDialog::startCommand(QString command)
+{
+    MessagesDialog::addMessage("\n");
+    MessagesDialog::addMessage("starting\n");
+    MessagesDialog::addMessage(command+"\n\n");
+
+    m_process->start(command);
 }
 

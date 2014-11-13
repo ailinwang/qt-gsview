@@ -186,7 +186,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>muPDF Resolution:</string>
+    <string>Resolution:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="resolution">

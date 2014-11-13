@@ -48,7 +48,9 @@ private:
     void doSave();
     void doSaveMupdf();
     void doSaveGs();
+    void doSave2();
     void setProgress (int val);
+    void startCommand(QString command);
 
     Ui::ExtractPagesDialog *ui;
     Window *m_window=NULL;
@@ -58,6 +60,8 @@ private:
     QString m_destination;
     QProcess *m_process=NULL;
     QProgressDialog *m_progressDialog=NULL;
+    std::vector<QString> m_commands;
+    int m_currentCommand;
 };
 
 #endif // EXTRACTPAGESDIALOG_H
