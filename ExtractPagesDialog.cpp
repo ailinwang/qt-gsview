@@ -1,10 +1,14 @@
 #include "ExtractPagesDialog.h"
 #include "ui_ExtractPagesDialog.h"
 #include "Window.h"
+#include "QtUtil.h"
+#include "MessagesDialog.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStandardPaths>
+#include <QProcess>
+#include <QProgressDialog>
 
 std::vector<device_t> devices = {
 
@@ -52,7 +56,6 @@ std::vector<device_t> devices = {
     {41,"tiffsep","tiffsep","tiff"},
     {42,"txtwrite","txtwrite","txt"},
     {43,"xpswrite","xpswrite","xps"},
-
 
 };
 
@@ -182,7 +185,16 @@ void ExtractPagesDialog::doSave()
     int result = dialog.exec();
     if (result == QDialog::Accepted)
     {
+        hide();
         m_destination = dialog.selectedFiles().first();
+
+        //  if the user gave no extension, use the filter
+        QString fileExt = QtUtil::extensionFromPath(m_destination);
+        if (fileExt.length()==0)
+        {
+            m_destination += ".";
+            m_destination += m_device.extension;
+        }
 
         if (m_device.index<4)
         {
@@ -197,11 +209,114 @@ void ExtractPagesDialog::doSave()
 
 void ExtractPagesDialog::doSaveMupdf()
 {
-
+    QMessageBox::information (NULL, "", "Not yet implemented.");
 }
-
 
 void ExtractPagesDialog::doSaveGs()
 {
+    //  command
+    QString command;
 
+    command = "\"" + QtUtil::getGsPath() + "\"";
+
+//    QString six("6");
+//    command += " -dFirstPage=" + six + " ";
+//    command += " -dLastPage=" + six + " ";
+
+    if (!m_options.isEmpty())
+        command += " " + m_options + " ";
+    command += " -dNOPAUSE -dBATCH ";
+    command += " -sDEVICE=" + m_device.name + " ";
+    if (!m_resolution.isEmpty())
+        command += " -r" + m_resolution + " ";
+    command += " -o \"" + m_destination + "\"";
+    command += " -f \"" + m_window->getPath() + "\"";
+
+    MessagesDialog::addMessage("\n");
+    MessagesDialog::addMessage("starting\n");
+    MessagesDialog::addMessage(command+"\n\n");
+
+    //  show a progress widget
+    m_progressDialog = new QProgressDialog(m_window);
+    connect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
+    m_progressDialog->setMaximum(m_window->document()->GetPageCount());
+    setProgress(0);
+    m_progressDialog->show();
+    qApp->processEvents();
+
+    //  create process to do it
+    m_process = new QProcess(m_window);
+    m_process->setProcessChannelMode(QProcess::MergedChannels);
+    connect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
+    connect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
+    m_process->start(command);
 }
+
+
+void ExtractPagesDialog::onReadyReadStandardOutput()
+{
+    char data[10000];
+    while (m_process->canReadLine())
+    {
+        int nc = m_process->readLine(data, 10000);
+        data[nc] = 0;
+
+        //  add to messages
+        MessagesDialog::addMessage(QString(data));
+
+        //  every time we see "Page", crank the progress
+        QString s(data);
+        if (s.left(4).compare(QString("Page"))==0)
+        {
+            int val = m_progressDialog->value();
+            setProgress(val+1);
+        }
+    }
+}
+
+void ExtractPagesDialog::onCanceled()
+{
+    m_process->terminate();
+}
+
+void ExtractPagesDialog::onFinished(int exitCode)
+{
+    UNUSED(exitCode);
+
+    //  are we canceled?
+    if (m_progressDialog->wasCanceled())
+    {
+        //  yes
+        MessagesDialog::addMessage("canceled.\n");
+        QMessageBox::information (NULL, "", "Canceled.");
+    }
+    else
+    {
+        //  no
+        MessagesDialog::addMessage("finished.\n");
+        QMessageBox::information (NULL, "", "Finished.");
+    }
+
+    //  take down progress widget
+    m_progressDialog->hide();
+    qApp->processEvents();
+    disconnect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
+    delete m_progressDialog;
+
+    //  disconnect/delete the process
+    disconnect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
+    disconnect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
+
+    close();
+}
+
+void ExtractPagesDialog::setProgress (int val)
+{
+    m_progressDialog->setValue(val);
+    QString s = QString("Processed ")
+                    + QString::number(val) + QString(" of ")
+                    + QString::number(m_window->document()->GetPageCount()) + QString(" pages...");
+    m_progressDialog->setLabelText(s);
+    qApp->processEvents();
+}
+

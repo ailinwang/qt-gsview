@@ -4,6 +4,8 @@
 #include <QDialog>
 
 class Window;
+class QProcess;
+class QProgressDialog;
 
 class device_t
 {
@@ -36,10 +38,15 @@ private slots:
     void on_oddButton_clicked();
     void on_noneButton_clicked();
 
+    void onReadyReadStandardOutput();
+    void onCanceled();
+    void onFinished(int exitCode);
+
 private:
     void doSave();
     void doSaveMupdf();
     void doSaveGs();
+    void setProgress (int val);
 
     Ui::ExtractPagesDialog *ui;
     Window *m_window=NULL;
@@ -47,6 +54,8 @@ private:
     QString m_resolution;
     device_t m_device;
     QString m_destination;
+    QProcess *m_process=NULL;
+    QProgressDialog *m_progressDialog=NULL;
 };
 
 #endif // EXTRACTPAGESDIALOG_H
