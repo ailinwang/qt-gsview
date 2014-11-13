@@ -12,51 +12,50 @@
 
 std::vector<device_t> devices = {
 
-    {0,"svg","svg","svg"},
-    {1,"pnm","pnm","pnm"},
-    {2,"pclbitmap","pclbitmap","pcl"},
-    {3,"pwg","pwg","pwg"},
-    {4,"bmp16","bmp16","bmp"},              /* Add mupdf devices before this one */
-    {5,"bmp16m","bmp16m","bmp"},
-    {6,"bmp256","bmp256","bmp"},
-    {7,"bmp32b","bmp32b","bmp"},
-    {8,"bmpgray","bmpgray","bmp"},
-    {9,"bmpmono","bmpmono","bmp"},
-    {10,"eps2write","eps2write","eps"},
-    {11,"jpeg","jpeg","jpg"},
-    {12,"jpegcmyk","jpegcmyk","jpg"},
-    {13,"jpeggray","jpeggray","jpg"},
-    {14,"pamcmyk32","pamcmyk32","pam"},
-    {15,"pamcmyk4","pamcmyk4","pam"},
-    {16,"pbm","pbm","pbm"},
-    {17,"pgm","pgm","pgm"},
-    {18,"png16","png16","png"},
-    {19,"png16m","png16m","png"},
-    {20,"png256","png256","png"},
-    {21,"pngalpha","pngalpha","png"},
-    {22,"pnggray","pnggray","png"},
-    {23,"pngmono","pngmono","png"},
-    {24,"psdcmyk","psdcmyk","psd"},
-    {25,"psdrgb  ","psdrgb  ","psd"},               /* Add single page gs devices before this device */
-    {26,"pdfwrite","pdfwrite","pdf"},
-    {27,"ps2write","ps2write","ps"},
-    {28,"pxlcolor","pxlcolor","pxl"},
-    {29,"pxlmono","pxlmono","pxl"},
-    {30,"tiff12nc","tiff12nc","tiff"},
-    {31,"tiff24nc","tiff24nc","tiff"},
-    {32,"tiff32nc","tiff32nc","tiff"},
-    {33,"tiff64nc","tiff64nc","tiff"},
-    {34,"tiffcrle","tiffcrle","tiff"},
-    {35,"tiffg3","tiffg3","tiff"},
-    {36,"tiffg32d","tiffg32d","tiff"},
-    {37,"tiffg4","tiffg4","tiff"},
-    {38,"tiffgray","tiffgray","tiff"},
-    {39,"tifflzw","tifflzw","tiff"},
-    {40,"tiffpack","tiffpack","tiff"},
-    {41,"tiffsep","tiffsep","tiff"},
-    {42,"txtwrite","txtwrite","txt"},
-    {43,"xpswrite","xpswrite","xps"},
-
+    {0,"svg","svg","svg","mupdf","single"},
+    {1,"pnm","pnm","pnm","mupdf","single"},
+    {2,"pclbitmap","pclbitmap","pcl","mupdf","single"},
+    {3,"pwg","pwg","pwg","mupdf","single"},
+    {4,"bmp16","bmp16","bmp","gs","single"},
+    {5,"bmp16m","bmp16m","bmp","gs","single"},
+    {6,"bmp256","bmp256","bmp","gs","single"},
+    {7,"bmp32b","bmp32b","bmp","gs","single"},
+    {8,"bmpgray","bmpgray","bmp","gs","single"},
+    {9,"bmpmono","bmpmono","bmp","gs","single"},
+    {10,"eps2write","eps2write","eps","gs","single"},
+    {11,"jpeg","jpeg","jpg","gs","single"},
+    {12,"jpegcmyk","jpegcmyk","jpg","gs","single"},
+    {13,"jpeggray","jpeggray","jpg","gs","single"},
+    {14,"pamcmyk32","pamcmyk32","pam","gs","single"},
+    {15,"pamcmyk4","pamcmyk4","pam","gs","single"},
+    {16,"pbm","pbm","pbm","gs","single"},
+    {17,"pgm","pgm","pgm","gs","single"},
+    {18,"png16","png16","png","gs","single"},
+    {19,"png16m","png16m","png","gs","single"},
+    {20,"png256","png256","png","gs","single"},
+    {21,"pngalpha","pngalpha","png","gs","single"},
+    {22,"pnggray","pnggray","png","gs","single"},
+    {23,"pngmono","pngmono","png","gs","single"},
+    {24,"psdcmyk","psdcmyk","psd","gs","single"},
+    {25,"psdrgb  ","psdrgb  ","psd","gs","multi"},
+    {26,"pdfwrite","pdfwrite","pdf","gs","multi"},
+    {27,"ps2write","ps2write","ps","gs","multi"},
+    {28,"pxlcolor","pxlcolor","pxl","gs","multi"},
+    {29,"pxlmono","pxlmono","pxl","gs","multi"},
+    {30,"tiff12nc","tiff12nc","tiff","gs","multi"},
+    {31,"tiff24nc","tiff24nc","tiff","gs","multi"},
+    {32,"tiff32nc","tiff32nc","tiff","gs","multi"},
+    {33,"tiff64nc","tiff64nc","tiff","gs","multi"},
+    {34,"tiffcrle","tiffcrle","tiff","gs","multi"},
+    {35,"tiffg3","tiffg3","tiff","gs","multi"},
+    {36,"tiffg32d","tiffg32d","tiff","gs","multi"},
+    {37,"tiffg4","tiffg4","tiff","gs","multi"},
+    {38,"tiffgray","tiffgray","tiff","gs","multi"},
+    {39,"tifflzw","tifflzw","tiff","gs","multi"},
+    {40,"tiffpack","tiffpack","tiff","gs","multi"},
+    {41,"tiffsep","tiffsep","tiff","gs","multi"},
+    {42,"txtwrite","txtwrite","txt","gs","multi"},
+    {43,"xpswrite","xpswrite","xps","gs","multi"},
 };
 
 ExtractPagesDialog::ExtractPagesDialog(QWidget *parent) :
@@ -149,14 +148,21 @@ void ExtractPagesDialog::on_extractButton_clicked()
     //  get selected device
     m_device = devices[ui->formatList->currentIndex().row()];
 
-    //  from 4-25, can only do one page
-    if (ui->pageList->selectedItems().size()>1)
+//    //  from 4-25, can only do one page
+//    if (ui->pageList->selectedItems().size()>1)
+//    {
+//        if (m_device.index>=4 && m_device.index<=25)
+//        {
+//            QMessageBox::information(NULL, tr(""), tr("You can only extract one page at a time with the selected device."));
+//            return;
+//        }
+//    }
+
+    //  TODO: no mupdf yet
+    if (m_device.command.compare("mupdf")==0)
     {
-        if (m_device.index>=4 && m_device.index<=25)
-        {
-            QMessageBox::information(NULL, tr(""), tr("You can only extract one page at a time with the selected device."));
-            return;
-        }
+        QMessageBox::information(NULL, tr(""), tr("That device is not yet implemented"));
+        return;
     }
 
     //  get resolution and options
@@ -196,11 +202,11 @@ void ExtractPagesDialog::doSave()
             m_destination += m_device.extension;
         }
 
-        if (m_device.index<4)
+        if (m_device.command.compare("mupdf")==0)
         {
             doSaveMupdf();
         }
-        else
+        else if (m_device.command.compare("gs")==0)
         {
             doSaveGs();
         }
@@ -251,7 +257,6 @@ void ExtractPagesDialog::doSaveGs()
     connect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
     m_process->start(command);
 }
-
 
 void ExtractPagesDialog::onReadyReadStandardOutput()
 {

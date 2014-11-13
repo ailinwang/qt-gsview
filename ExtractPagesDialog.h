@@ -14,6 +14,8 @@ public:
     QString name;
     QString label;
     QString extension;
+    QString command;
+    QString paging;
 };
 
 namespace Ui {
