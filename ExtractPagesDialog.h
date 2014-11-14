@@ -16,6 +16,7 @@ public:
     QString extension;
     QString command;
     QString paging;
+    int type;
 };
 
 namespace Ui {

@@ -12,50 +12,52 @@
 
 std::vector<device_t> devices = {
 
-    {0,"svg","svg","svg","mupdf","single"},
-    {1,"pnm","pnm","pnm","mupdf","single"},
-    {2,"pclbitmap","pclbitmap","pcl","mupdf","single"},
-    {3,"pwg","pwg","pwg","mupdf","single"},
-    {4,"bmp16","bmp16","bmp","gs","single"},
-    {5,"bmp16m","bmp16m","bmp","gs","single"},
-    {6,"bmp256","bmp256","bmp","gs","single"},
-    {7,"bmp32b","bmp32b","bmp","gs","single"},
-    {8,"bmpgray","bmpgray","bmp","gs","single"},
-    {9,"bmpmono","bmpmono","bmp","gs","single"},
-    {10,"eps2write","eps2write","eps","gs","single"},
-    {11,"jpeg","jpeg","jpg","gs","single"},
-    {12,"jpegcmyk","jpegcmyk","jpg","gs","single"},
-    {13,"jpeggray","jpeggray","jpg","gs","single"},
-    {14,"pamcmyk32","pamcmyk32","pam","gs","single"},
-    {15,"pamcmyk4","pamcmyk4","pam","gs","single"},
-    {16,"pbm","pbm","pbm","gs","single"},
-    {17,"pgm","pgm","pgm","gs","single"},
-    {18,"png16","png16","png","gs","single"},
-    {19,"png16m","png16m","png","gs","single"},
-    {20,"png256","png256","png","gs","single"},
-    {21,"pngalpha","pngalpha","png","gs","single"},
-    {22,"pnggray","pnggray","png","gs","single"},
-    {23,"pngmono","pngmono","png","gs","single"},
-    {24,"psdcmyk","psdcmyk","psd","gs","single"},
-    {25,"psdrgb  ","psdrgb  ","psd","gs","multi"},
-    {26,"pdfwrite","pdfwrite","pdf","gs","multi"},
-    {27,"ps2write","ps2write","ps","gs","multi"},
-    {28,"pxlcolor","pxlcolor","pxl","gs","multi"},
-    {29,"pxlmono","pxlmono","pxl","gs","multi"},
-    {30,"tiff12nc","tiff12nc","tiff","gs","multi"},
-    {31,"tiff24nc","tiff24nc","tiff","gs","multi"},
-    {32,"tiff32nc","tiff32nc","tiff","gs","multi"},
-    {33,"tiff64nc","tiff64nc","tiff","gs","multi"},
-    {34,"tiffcrle","tiffcrle","tiff","gs","multi"},
-    {35,"tiffg3","tiffg3","tiff","gs","multi"},
-    {36,"tiffg32d","tiffg32d","tiff","gs","multi"},
-    {37,"tiffg4","tiffg4","tiff","gs","multi"},
-    {38,"tiffgray","tiffgray","tiff","gs","multi"},
-    {39,"tifflzw","tifflzw","tiff","gs","multi"},
-    {40,"tiffpack","tiffpack","tiff","gs","multi"},
-    {41,"tiffsep","tiffsep","tiff","gs","multi"},
-    {42,"txtwrite","txtwrite","txt","gs","multi"},
-    {43,"xpswrite","xpswrite","xps","gs","multi"},
+    {0,"svg","svg","svg","mupdf","single",SVG_OUT},
+    {1,"pnm","pnm","pnm","mupdf","single",PNM_OUT},
+    {2,"pclbitmap","pclbitmap","pcl","mupdf","single",PCL_OUT},
+    {3,"pwg","pwg","pwg","mupdf","single",PWG_OUT},
+
+    {4,"bmp16","bmp16","bmp","gs","single",0},
+    {5,"bmp16m","bmp16m","bmp","gs","single",0},
+    {6,"bmp256","bmp256","bmp","gs","single",0},
+    {7,"bmp32b","bmp32b","bmp","gs","single",0},
+    {8,"bmpgray","bmpgray","bmp","gs","single",0},
+    {9,"bmpmono","bmpmono","bmp","gs","single",0},
+    {10,"eps2write","eps2write","eps","gs","single",0},
+    {11,"jpeg","jpeg","jpg","gs","single",0},
+    {12,"jpegcmyk","jpegcmyk","jpg","gs","single",0},
+    {13,"jpeggray","jpeggray","jpg","gs","single",0},
+    {14,"pamcmyk32","pamcmyk32","pam","gs","single",0},
+    {15,"pamcmyk4","pamcmyk4","pam","gs","single",0},
+    {16,"pbm","pbm","pbm","gs","single",0},
+    {17,"pgm","pgm","pgm","gs","single",0},
+    {18,"png16","png16","png","gs","single",0},
+    {19,"png16m","png16m","png","gs","single",0},
+    {20,"png256","png256","png","gs","single",0},
+    {21,"pngalpha","pngalpha","png","gs","single",0},
+    {22,"pnggray","pnggray","png","gs","single",0},
+    {23,"pngmono","pngmono","png","gs","single",0},
+    {24,"psdcmyk","psdcmyk","psd","gs","single",0},
+
+    {25,"psdrgb  ","psdrgb  ","psd","gs","multi",0},
+    {26,"pdfwrite","pdfwrite","pdf","gs","multi",0},
+    {27,"ps2write","ps2write","ps","gs","multi",0},
+    {28,"pxlcolor","pxlcolor","pxl","gs","multi",0},
+    {29,"pxlmono","pxlmono","pxl","gs","multi",0},
+    {30,"tiff12nc","tiff12nc","tiff","gs","multi",0},
+    {31,"tiff24nc","tiff24nc","tiff","gs","multi",0},
+    {32,"tiff32nc","tiff32nc","tiff","gs","multi",0},
+    {33,"tiff64nc","tiff64nc","tiff","gs","multi",0},
+    {34,"tiffcrle","tiffcrle","tiff","gs","multi",0},
+    {35,"tiffg3","tiffg3","tiff","gs","multi",0},
+    {36,"tiffg32d","tiffg32d","tiff","gs","multi",0},
+    {37,"tiffg4","tiffg4","tiff","gs","multi",0},
+    {38,"tiffgray","tiffgray","tiff","gs","multi",0},
+    {39,"tifflzw","tifflzw","tiff","gs","multi",0},
+    {40,"tiffpack","tiffpack","tiff","gs","multi",0},
+    {41,"tiffsep","tiffsep","tiff","gs","multi",0},
+    {42,"txtwrite","txtwrite","txt","gs","multi",0},
+    {43,"xpswrite","xpswrite","xps","gs","multi",0},
 };
 
 ExtractPagesDialog::ExtractPagesDialog(QWidget *parent) :
@@ -151,13 +153,6 @@ void ExtractPagesDialog::on_extractButton_clicked()
     //  get selected device
     m_device = devices[ui->formatList->currentIndex().row()];
 
-    //  TODO: no mupdf yet
-    if (m_device.command.compare("mupdf")==0)
-    {
-        QMessageBox::information(NULL, tr(""), tr("That device is not yet implemented"));
-        return;
-    }
-
     //  get resolution and options
     m_options = ui->ghostscriptOptions->toPlainText();
     m_resolution = ui->resolution->text();
@@ -233,7 +228,79 @@ void ExtractPagesDialog::doSave()
 
 void ExtractPagesDialog::doSaveMupdf()
 {
-    QMessageBox::information (NULL, "", "Not yet implemented.");
+    //  TODO:  use a thread
+
+    //  count pages
+    int nPages = 0;
+    for (int i=0; i<m_window->document()->GetPageCount(); i++)
+        if (ui->pageList->item(i)->isSelected())
+            nPages++;
+
+    //  show progress
+    //  show a progress widget
+    m_progressDialog = new QProgressDialog(m_window);
+    m_progressDialog->setMaximum(nPages);
+    setProgress(0);
+    m_progressDialog->show();
+    qApp->processEvents();
+
+    //  save a file for each page
+    int np = 0;
+    for (int i=0; i<m_window->document()->GetPageCount(); i++)
+    {
+        //  cancelled?
+        if (m_progressDialog->wasCanceled())
+            break;
+
+        if (ui->pageList->item(i)->isSelected())
+        {
+            np++;
+            setProgress(np);
+
+            //  make a command for this page
+            QString page = QString::number(i+1);
+
+            //  make a page-numbered file name
+            QFileInfo original(m_destination);
+            QString newPath = original.absoluteDir().path() + QDir::separator() +
+                    original.baseName() + "-page" + page;
+            if (!original.completeSuffix().isEmpty())
+                newPath += "." + original.completeSuffix();
+            else
+                newPath += "." + m_device.extension;
+
+            int res = 300;
+            if (!m_resolution.isEmpty())
+            {
+                bool bOK;
+                int res2 = m_resolution.toInt(&bOK);
+                if (bOK)
+                    res = res2;
+            }
+
+            MessagesDialog::addMessage("saving page: ");
+            MessagesDialog::addMessage(newPath);
+            MessagesDialog::addMessage("\n");
+            m_window->document()->SavePage((char *)newPath.toStdString().c_str(), i, res, m_device.type, false);
+        }
+    }
+
+    //  take down progress widget
+    m_progressDialog->hide();
+    qApp->processEvents();
+    delete m_progressDialog;
+
+    if (m_progressDialog->wasCanceled())
+    {
+        MessagesDialog::addMessage("canceled.\n");
+        QMessageBox::information (NULL, "", "Canceled.");
+    }
+    else
+    {
+        MessagesDialog::addMessage("finished.\n");
+        QMessageBox::information (NULL, "", "Finished.");
+    }
+
 }
 
 void ExtractPagesDialog::doSaveGs()
@@ -393,12 +460,10 @@ void ExtractPagesDialog::onFinished(int exitCode)
 
 void ExtractPagesDialog::setProgress (int val)
 {
-    int total = m_commands.size();
-
     m_progressDialog->setValue(val);
     QString s = QString("Processed ")
                     + QString::number(val) + QString(" of ")
-                    + QString::number(total) + QString(" pages...");
+                    + QString::number(m_progressDialog->maximum()) + QString(" pages...");
     m_progressDialog->setLabelText(s);
     qApp->processEvents();
 }
