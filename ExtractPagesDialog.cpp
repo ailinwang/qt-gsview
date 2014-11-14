@@ -308,6 +308,30 @@ void ExtractPagesDialog::doSaveGs()
     m_commands.clear();
     m_currentCommand = 0;
 
+    QString originalPath(m_window->getPath());
+
+    //  if the original is xps, convert tp pdf first.
+    if (QtUtil::extensionFromPath(originalPath)==QString("xps"))
+    {
+        //  put the result into the temp folder
+        QFileInfo fileInfo (originalPath);
+        QString newPath = QtUtil::getTempFolderPath() + fileInfo.fileName() + ".pdf";
+
+        //  construct the command
+        QString command = "\"" + QtUtil::getGxpsPath() + "\"";
+        command += " -sDEVICE=pdfwrite ";
+        command += "-sOutputFile=\"" + newPath + "\"";
+        command += " -dNOPAUSE \"" + originalPath + "\"";
+        qDebug("command is: %s", command.toStdString().c_str());
+
+        //  create a process to do it, and wait
+        QProcess *process = new QProcess(this);
+        process->start(command);
+        process->waitForFinished();
+
+        originalPath = newPath;
+    }
+
     if (m_contiguous && m_device.paging.compare("multi")==0)
     {
         //  we can do this in one shot
@@ -326,7 +350,7 @@ void ExtractPagesDialog::doSaveGs()
             command += " -r" + m_resolution + " ";
 
         command += " -o \"" + m_destination + "\"";
-        command += " -f \"" + m_window->getPath() + "\"";
+        command += " -f \"" + originalPath + "\"";
 
         m_commands.push_back(command);
     }
@@ -361,7 +385,7 @@ void ExtractPagesDialog::doSaveGs()
                     newPath += "." + m_device.extension;
                 command += " -o \"" + newPath + "\"";
 
-                command += " -f \"" + m_window->getPath() + "\"";
+                command += " -f \"" + originalPath + "\"";
 
                 m_commands.push_back(command);
             }
