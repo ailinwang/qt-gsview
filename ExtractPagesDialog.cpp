@@ -151,16 +151,6 @@ void ExtractPagesDialog::on_extractButton_clicked()
     //  get selected device
     m_device = devices[ui->formatList->currentIndex().row()];
 
-//    //  from 4-25, can only do one page
-//    if (ui->pageList->selectedItems().size()>1)
-//    {
-//        if (m_device.index>=4 && m_device.index<=25)
-//        {
-//            QMessageBox::information(NULL, tr(""), tr("You can only extract one page at a time with the selected device."));
-//            return;
-//        }
-//    }
-
     //  TODO: no mupdf yet
     if (m_device.command.compare("mupdf")==0)
     {
@@ -205,6 +195,31 @@ void ExtractPagesDialog::doSave()
             m_destination += m_device.extension;
         }
 
+        //  check for contiguity
+        int on = 0;
+        m_firstPage = -1;
+        m_lastPage = -1;
+        int nsec=0;
+
+        for (int i=0; i<m_window->document()->GetPageCount(); i++)
+        {
+            if (ui->pageList->item(i)->isSelected())
+            {
+                if (on==0)
+                    nsec++;
+                if (m_firstPage==-1)
+                    m_firstPage = i+1;
+                m_lastPage = i+1;
+                on = 1;
+            }
+            else
+            {
+                on = 0;
+            }
+        }
+        m_contiguous = (nsec==1);
+
+        //  now do it
         if (m_device.command.compare("mupdf")==0)
         {
             doSaveMupdf();
@@ -226,38 +241,63 @@ void ExtractPagesDialog::doSaveGs()
     m_commands.clear();
     m_currentCommand = 0;
 
-    //  save a file for each page
-    for (int i=0; i<m_window->document()->GetPageCount(); i++)
+    if (m_contiguous && m_device.paging.compare("multi")==0)
     {
-        if (ui->pageList->item(i)->isSelected())
+        //  we can do this in one shot
+
+        QString command;
+        command = "\"" + QtUtil::getGsPath() + "\"";
+
+        command += " -dFirstPage=" + QString::number(m_firstPage) + " ";
+        command += " -dLastPage=" + QString::number(m_lastPage)  + " ";
+
+        if (!m_options.isEmpty())
+            command += " " + m_options + " ";
+        command += " -dNOPAUSE -dBATCH ";
+        command += " -sDEVICE=" + m_device.name + " ";
+        if (!m_resolution.isEmpty())
+            command += " -r" + m_resolution + " ";
+
+        command += " -o \"" + m_destination + "\"";
+        command += " -f \"" + m_window->getPath() + "\"";
+
+        m_commands.push_back(command);
+    }
+    else
+    {
+        //  save a file for each page
+        for (int i=0; i<m_window->document()->GetPageCount(); i++)
         {
-            //  make a command for this page
-            QString page = QString::number(i+1);
+            if (ui->pageList->item(i)->isSelected())
+            {
+                //  make a command for this page
+                QString page = QString::number(i+1);
 
-            QString command;
-            command = "\"" + QtUtil::getGsPath() + "\"";
-            command += " -dFirstPage=" + page + " ";
-            command += " -dLastPage=" + page + " ";
-            if (!m_options.isEmpty())
-                command += " " + m_options + " ";
-            command += " -dNOPAUSE -dBATCH ";
-            command += " -sDEVICE=" + m_device.name + " ";
-            if (!m_resolution.isEmpty())
-                command += " -r" + m_resolution + " ";
+                QString command;
+                command = "\"" + QtUtil::getGsPath() + "\"";
+                command += " -dFirstPage=" + page + " ";
+                command += " -dLastPage=" + page + " ";
+                if (!m_options.isEmpty())
+                    command += " " + m_options + " ";
+                command += " -dNOPAUSE -dBATCH ";
+                command += " -sDEVICE=" + m_device.name + " ";
+                if (!m_resolution.isEmpty())
+                    command += " -r" + m_resolution + " ";
 
-            //  make a page-numbered file name
-            QFileInfo original(m_destination);
-            QString newPath = original.absoluteDir().path() + QDir::separator() +
-                    original.baseName() + "-page" + page;
-            if (!original.completeSuffix().isEmpty())
-                newPath += "." + original.completeSuffix();
-            else
-                newPath += "." + m_device.extension;
-            command += " -o \"" + newPath + "\"";
+                //  make a page-numbered file name
+                QFileInfo original(m_destination);
+                QString newPath = original.absoluteDir().path() + QDir::separator() +
+                        original.baseName() + "-page" + page;
+                if (!original.completeSuffix().isEmpty())
+                    newPath += "." + original.completeSuffix();
+                else
+                    newPath += "." + m_device.extension;
+                command += " -o \"" + newPath + "\"";
 
-            command += " -f \"" + m_window->getPath() + "\"";
+                command += " -f \"" + m_window->getPath() + "\"";
 
-            m_commands.push_back(command);
+                m_commands.push_back(command);
+            }
         }
     }
 

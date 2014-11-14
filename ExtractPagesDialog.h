@@ -62,6 +62,9 @@ private:
     QProgressDialog *m_progressDialog=NULL;
     std::vector<QString> m_commands;
     int m_currentCommand;
+    bool m_contiguous;
+    int m_firstPage;
+    int m_lastPage;
 };
 
 #endif // EXTRACTPAGESDIALOG_H
