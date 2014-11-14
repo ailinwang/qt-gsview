@@ -640,7 +640,7 @@
   </action>
   <action name="actionExract_Pages">
    <property name="text">
-    <string>Exract Pages...</string>
+    <string>Extract Pages...</string>
    </property>
   </action>
  </widget>
