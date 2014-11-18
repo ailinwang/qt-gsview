@@ -162,6 +162,15 @@ void ExtractPagesDialog::on_extractButton_clicked()
 
 void ExtractPagesDialog::doSave()
 {
+    //  if original is cbz and command is gs, that's
+    //  currently unsupported.
+    if (QtUtil::extensionFromPath(m_window->getPath())==QString("cbz") &&
+        m_device.command.compare("gs")==0    )
+    {
+        QMessageBox::information(NULL, tr(""), tr("Saving pages from CBZ files to that format is not yet supported."));
+        return;
+    }
+
     //  where is the desktop?
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
     QString desktop = desktopLocations.first();
