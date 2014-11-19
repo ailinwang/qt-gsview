@@ -16,7 +16,7 @@
 
 FileType fileTypes[] = {
     {"PDF",             "pdf" , "" },
-    {"Linearizded PDF", "pdf" , "" },
+    {"Linearized PDF", "pdf" , "" },
     {"PDF 1.3",         "pdf" , "" },
 //    {"PDF/A-1 RGB",     "pdf" , "" },
 //    {"PDF/A-1 CMYK",    "pdf" , "" },

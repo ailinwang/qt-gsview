@@ -17,6 +17,9 @@ signals:
 public slots:
     void onFilterSelected (const QString &filter);
 
+public:
+    virtual void show();
+
 };
 
 #endif // FILESAVEDIALOG_H

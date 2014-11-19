@@ -2,6 +2,9 @@
 #include <QPushButton>
 #include <QDebug>
 #include <QGridLayout>
+#include <QDialogButtonBox>
+#include <QCheckBox>
+#include <QApplication>
 
 #include "FileSaveDialog.h"
 
@@ -18,3 +21,11 @@ void FileSaveDialog::onFilterSelected(const QString &filter)
 {
     //  user changed filter.  show the profiles UI
 }
+
+void FileSaveDialog::show()
+{
+    //  customize the dialog
+
+    QFileDialog::show();
+}
+
