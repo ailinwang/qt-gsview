@@ -226,6 +226,48 @@ void FileSave::run()
             QString options("-sDEVICE=ps2write -dNOPAUSE -dBATCH -P- -dSAFER");
             saveWithProgress (options, original, dst);
         }
+
+        else if (index==TYPE_PDF_A1_RGB)
+        {
+            QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=1 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceRGB -dColorConversionStrategy=/RGB -sOutputICCProfile=");
+            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            saveWithProgress (options, original, dst);
+
+        }
+        else if (index==TYPE_PDF_A1_CMYK)
+        {
+            QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=1 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceCMYK -dColorConversionStrategy=/CMYK -sOutputICCProfile=");
+            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            saveWithProgress (options, original, dst);
+
+        }
+        else if (index==TYPE_PDF_A2_RGB)
+        {
+            QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=2 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceRGB -dColorConversionStrategy=/RGB -sOutputICCProfile=");
+            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            saveWithProgress (options, original, dst);
+
+        }
+        else if (index==TYPE_PDF_A2_CMYK)
+        {
+            QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=2 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceCMYK -dColorConversionStrategy=/CMYK -sOutputICCProfile=");
+            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            saveWithProgress (options, original, dst);
+
+        }
+        else if (index==TYPE_PDF_X3_GRAY)
+        {
+            QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFX -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceGray -dColorConversionStrategy=/Gray -sOutputICCProfile=");
+            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            saveWithProgress (options, original, dst);
+        }
+        else if (index==TYPE_PDF_X3_CMYK)
+        {
+            QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFX -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceCMYK -dColorConversionStrategy=/CMYK -sOutputICCProfile=");
+            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            saveWithProgress (options, original, dst);
+        }
+
         else
         {
             //  NYI

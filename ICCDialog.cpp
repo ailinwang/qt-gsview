@@ -8,10 +8,7 @@ ICCDialog::ICCDialog(QWidget *parent) :
     ui(new Ui::ICCDialog)
 {
     ui->setupUi(this);
-
     ui->selectedProfile->setWordWrap(true);
-
-    connect(ui->selectButton, SIGNAL(triggered()), this, SLOT(onSelect()));
 }
 
 ICCDialog::~ICCDialog()
