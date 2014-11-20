@@ -13,6 +13,7 @@
 #include "QtUtil.h"
 #include "MessagesDialog.h"
 #include "FileSaveDialog.h"
+#include "ICCDialog.h"
 
 FileType fileTypes[] = {
     {"PDF",             "pdf" , "", false },
@@ -120,11 +121,28 @@ void FileSave::run()
             }
         }
 
-        //  get the profile
+        //  get the profile if required
         if (fileTypes[index].needsProfile)
         {
-            QMessageBox::information (m_window, "", "needs a profile.  Not yet supported.");
-            return;
+            ICCDialog icc_dialog;
+            icc_dialog.setPath(m_icc_path);
+            icc_dialog.show();
+            int result = icc_dialog.exec();
+            if (result == QDialog::Accepted)
+            {
+                if (icc_dialog.getPath().isEmpty())
+                {
+                    QMessageBox::information (m_window, "", "You didn't choose a profile file.");
+                    return;
+                }
+
+                //  remember profile chosen
+                m_icc_path = icc_dialog.getPath();
+            }
+            else
+            {
+                return;
+            }
         }
 
         //  now do the save

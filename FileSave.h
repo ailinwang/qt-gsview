@@ -38,6 +38,8 @@ private:
 
     QString m_dst;
     QString m_tmp;
+
+    QString m_icc_path;
 };
 
 #endif // FILESAVE_H

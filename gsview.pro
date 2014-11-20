@@ -51,7 +51,8 @@ HEADERS       = \
     MessagesDialog.h \
     GSViewApp.h \
     FileSaveDialog.h \
-    ExtractPagesDialog.h
+    ExtractPagesDialog.h \
+    ICCDialog.h
 
 SOURCES       = \
     main.cpp \
@@ -74,14 +75,16 @@ SOURCES       = \
     MessagesDialog.cpp \
     GSViewApp.cpp \
     FileSaveDialog.cpp \
-    ExtractPagesDialog.cpp
+    ExtractPagesDialog.cpp \
+    ICCDialog.cpp
 
 FORMS += \
     Window.ui \
     AboutDialog.ui \
     FileInfoDialog.ui \
     MessagesDialog.ui \
-    ExtractPagesDialog.ui
+    ExtractPagesDialog.ui \
+    ICCDialog.ui
 
 RESOURCES += \
     resources.qrc
