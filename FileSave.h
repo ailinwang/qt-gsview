@@ -8,6 +8,7 @@ public:
     QString filterName;
     QString filterType;
     QString filter;
+    bool needsProfile;
 };
 
 class QProcess;

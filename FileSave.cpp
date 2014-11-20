@@ -15,21 +15,21 @@
 #include "FileSaveDialog.h"
 
 FileType fileTypes[] = {
-    {"PDF",             "pdf" , "" },
-    {"Linearized PDF", "pdf" , "" },
-    {"PDF 1.3",         "pdf" , "" },
-//    {"PDF/A-1 RGB",     "pdf" , "" },
-//    {"PDF/A-1 CMYK",    "pdf" , "" },
-//    {"PDF/A-2 RGB",     "pdf" , "" },
-//    {"PDF/A-2 CMYK",    "pdf" , "" },
-//    {"PDF/X-3 Gray",    "pdf" , "" },
-//    {"PDF/X-3 CMYK",    "pdf" , "" },
-    {"PCL-XL",          "pcl" , "" },
-    {"XPS",             "xps" , "" },
-    {"Text",            "txt" , "" },
-    {"HTML",            "html", "" },
-    {"XML",             "xml" , "" },
-    {"PostScript",      "ps"  , "" }
+    {"PDF",             "pdf" , "", false },
+    {"Linearized PDF",  "pdf" , "", false },
+    {"PDF 1.3",         "pdf" , "", false },
+    {"PDF/A-1 RGB",     "pdf" , "", true },
+    {"PDF/A-1 CMYK",    "pdf" , "", true  },
+    {"PDF/A-2 RGB",     "pdf" , "", true  },
+    {"PDF/A-2 CMYK",    "pdf" , "", true  },
+    {"PDF/X-3 Gray",    "pdf" , "", true  },
+    {"PDF/X-3 CMYK",    "pdf" , "", true  },
+    {"PCL-XL",          "pcl" , "", false },
+    {"XPS",             "xps" , "", false },
+    {"Text",            "txt" , "", false },
+    {"HTML",            "html", "", false },
+    {"XML",             "xml" , "", false },
+    {"PostScript",      "ps"  , "", false }
 };
 int numTypes = 9;
 
@@ -118,6 +118,13 @@ void FileSave::run()
                 index = i;
                 break;
             }
+        }
+
+        //  get the profile
+        if (fileTypes[index].needsProfile)
+        {
+            QMessageBox::information (m_window, "", "needs a profile.  Not yet supported.");
+            return;
         }
 
         //  now do the save
