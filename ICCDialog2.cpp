@@ -63,30 +63,34 @@ void ICCDialog2::on_okButton_clicked()
 }
 
 void ICCDialog2::refreshUI()
-{
-    ui->rgbLabel->setStyleSheet("QLabel { color : black; }");
+{    
+    QString styleEmpty("QLabel { color:red; border: 1px solid; border-color: red;}");
+    QString styleNotEmpty("QLabel { color:black; border: 0px none;}");
+    QString emptyText("Not Set");
+
+    ui->rgbLabel->setStyleSheet(styleNotEmpty);
     if (m_rgbProfile.isEmpty())
     {
-        ui->rgbLabel->setText("not set");
-        ui->rgbLabel->setStyleSheet("QLabel { color : red; }");
+        ui->rgbLabel->setText(emptyText);
+        ui->rgbLabel->setStyleSheet(styleEmpty);
     }
     else
         ui->rgbLabel->setText(m_rgbProfile);
 
-    ui->cmykLabel->setStyleSheet("QLabel { color : black; }");
+    ui->cmykLabel->setStyleSheet(styleNotEmpty);
     if (m_cmykProfile.isEmpty())
     {
-        ui->cmykLabel->setText("not set");
-        ui->cmykLabel->setStyleSheet("QLabel { color : red; }");
+        ui->cmykLabel->setText(emptyText);
+        ui->cmykLabel->setStyleSheet(styleEmpty);
     }
     else
         ui->cmykLabel->setText(m_cmykProfile);
 
-    ui->grayLabel->setStyleSheet("QLabel { color : black; }");
+    ui->grayLabel->setStyleSheet(styleNotEmpty);
     if (m_grayProfile.isEmpty())
     {
-        ui->grayLabel->setText("not set");
-        ui->grayLabel->setStyleSheet("QLabel { color : red; }");
+        ui->grayLabel->setText(emptyText);
+        ui->grayLabel->setStyleSheet(styleEmpty);
     }
     else
         ui->grayLabel->setText(m_grayProfile);
