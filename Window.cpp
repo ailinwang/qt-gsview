@@ -12,6 +12,7 @@
 #include "AboutDialog.h"
 #include "MessagesDialog.h"
 #include "ExtractPagesDialog.h"
+#include "ICCDialog2.h"
 
 Window::Window(QWidget *parent) :
     QMainWindow(parent),
@@ -85,11 +86,13 @@ Window::Window(QWidget *parent) :
 
     connect(ui->actionLinks, SIGNAL(triggered()), this, SLOT(toggleLinks()));
 
-    connect(ui->actionAAHigh,       SIGNAL(triggered()), this, SLOT(setAA()));
-    connect(ui->actionAAMediumHigh, SIGNAL(triggered()), this, SLOT(setAA()));
-    connect(ui->actionAAMedium,     SIGNAL(triggered()), this, SLOT(setAA()));
-    connect(ui->actionAALow,        SIGNAL(triggered()), this, SLOT(setAA()));
-    connect(ui->actionAANone,       SIGNAL(triggered()), this, SLOT(setAA()));
+    //  options menu
+    connect(ui->actionOutput_Intents, SIGNAL(triggered()), this, SLOT(outputIntents()));
+    connect(ui->actionAAHigh,         SIGNAL(triggered()), this, SLOT(setAA()));
+    connect(ui->actionAAMediumHigh,   SIGNAL(triggered()), this, SLOT(setAA()));
+    connect(ui->actionAAMedium,       SIGNAL(triggered()), this, SLOT(setAA()));
+    connect(ui->actionAALow,          SIGNAL(triggered()), this, SLOT(setAA()));
+    connect(ui->actionAANone,         SIGNAL(triggered()), this, SLOT(setAA()));
 
     ui->actionAAHigh->setData(QVariant(AA_HIGH));
     ui->actionAAMediumHigh->setData(QVariant(AA_MEDHIGH));
@@ -945,6 +948,13 @@ void Window::extractPages()
     m_extractDlg = new ExtractPagesDialog();
     m_extractDlg->run (this);
 
+}
+
+void Window::outputIntents()
+{
+    ICCDialog2 icc_dialog;
+    icc_dialog.show();
+    icc_dialog.exec();
 }
 
 void Window::homeSlot()

@@ -254,6 +254,7 @@
      <addaction name="actionAALow"/>
      <addaction name="actionAANone"/>
     </widget>
+    <addaction name="actionOutput_Intents"/>
     <addaction name="menuAntiAlias"/>
    </widget>
    <addaction name="menuFile"/>
@@ -641,6 +642,11 @@
   <action name="actionExract_Pages">
    <property name="text">
     <string>Extract Pages...</string>
+   </property>
+  </action>
+  <action name="actionOutput_Intents">
+   <property name="text">
+    <string>Output Intents...</string>
    </property>
   </action>
  </widget>

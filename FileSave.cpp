@@ -13,7 +13,7 @@
 #include "QtUtil.h"
 #include "MessagesDialog.h"
 #include "FileSaveDialog.h"
-#include "ICCDialog.h"
+#include "ICCDialog2.h"
 
 FileType fileTypes[] = {
     {"PDF",             "pdf" , "", false },
@@ -121,28 +121,52 @@ void FileSave::run()
             }
         }
 
-        //  get the profile if required
-        if (fileTypes[index].needsProfile)
-        {
-            ICCDialog icc_dialog;
-            icc_dialog.setPath(m_icc_path);
-            icc_dialog.show();
-            int result = icc_dialog.exec();
-            if (result == QDialog::Accepted)
-            {
-                if (icc_dialog.getPath().isEmpty())
-                {
-                    QMessageBox::information (m_window, "", "You didn't choose a profile file.");
-                    return;
-                }
+        //  get current profiles
+        QString rgbProfile  = ICCDialog2::rgbProfile();
+        QString cmykProfile = ICCDialog2::cmykProfile();
+        QString grayProfile = ICCDialog2::grayProfile();
 
-                //  remember profile chosen
-                m_icc_path = icc_dialog.getPath();
-            }
-            else
-            {
-                return;
-            }
+        //  see if we need to ask for one
+        bool askProfiles = false;
+        if (rgbProfile.isEmpty())
+            if (index==TYPE_PDF_A1_RGB||index==TYPE_PDF_A2_RGB)
+                askProfiles = true;
+        if (cmykProfile.isEmpty())
+            if (index==TYPE_PDF_A1_CMYK||index==TYPE_PDF_A2_CMYK||index==TYPE_PDF_X3_CMYK)
+                askProfiles = true;
+        if (grayProfile.isEmpty())
+            if (index==TYPE_PDF_X3_GRAY)
+                askProfiles = true;
+
+        //  ask for profiles
+        if (askProfiles)
+        {
+            ICCDialog2 icc_dialog;
+            icc_dialog.show();
+            icc_dialog.exec();
+
+            //  get the profile paths from the dialog
+            rgbProfile  = icc_dialog.rgbProfile();
+            cmykProfile = icc_dialog.cmykProfile();
+            grayProfile = icc_dialog.grayProfile();
+        }
+
+        //  check again for profiles.
+        //  if the one we need is missing, fail.
+        bool profileMissing = false;
+        if (rgbProfile.isEmpty())
+            if (index==TYPE_PDF_A1_RGB||index==TYPE_PDF_A2_RGB)
+                profileMissing = true;
+        if (cmykProfile.isEmpty())
+            if (index==TYPE_PDF_A1_CMYK||index==TYPE_PDF_A2_CMYK||index==TYPE_PDF_X3_CMYK)
+                profileMissing = true;
+        if (grayProfile.isEmpty())
+            if (index==TYPE_PDF_X3_GRAY)
+                profileMissing = true;
+        if (profileMissing)
+        {
+            QMessageBox::information (m_window, "", "You have not chosen a profile to use with this output format.");
+            return;
         }
 
         //  now do the save
@@ -230,41 +254,41 @@ void FileSave::run()
         else if (index==TYPE_PDF_A1_RGB)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=1 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceRGB -dColorConversionStrategy=/RGB -sOutputICCProfile=");
-            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            options += QString("\"");  options += rgbProfile;  options += QString("\"");
             saveWithProgress (options, original, dst);
 
         }
         else if (index==TYPE_PDF_A1_CMYK)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=1 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceCMYK -dColorConversionStrategy=/CMYK -sOutputICCProfile=");
-            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            options += QString("\"");  options += cmykProfile;  options += QString("\"");
             saveWithProgress (options, original, dst);
 
         }
         else if (index==TYPE_PDF_A2_RGB)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=2 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceRGB -dColorConversionStrategy=/RGB -sOutputICCProfile=");
-            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            options += QString("\"");  options += rgbProfile;  options += QString("\"");
             saveWithProgress (options, original, dst);
 
         }
         else if (index==TYPE_PDF_A2_CMYK)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=2 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceCMYK -dColorConversionStrategy=/CMYK -sOutputICCProfile=");
-            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            options += QString("\"");  options += cmykProfile;  options += QString("\"");
             saveWithProgress (options, original, dst);
 
         }
         else if (index==TYPE_PDF_X3_GRAY)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFX -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceGray -dColorConversionStrategy=/Gray -sOutputICCProfile=");
-            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            options += QString("\"");  options += grayProfile;  options += QString("\"");
             saveWithProgress (options, original, dst);
         }
         else if (index==TYPE_PDF_X3_CMYK)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFX -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceCMYK -dColorConversionStrategy=/CMYK -sOutputICCProfile=");
-            options += QString("\"");  options += QString(m_icc_path);  options += QString("\"");
+            options += QString("\"");  options += cmykProfile;  options += QString("\"");
             saveWithProgress (options, original, dst);
         }
 

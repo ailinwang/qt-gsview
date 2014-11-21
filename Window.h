@@ -87,6 +87,7 @@ private slots:
     void findNext();
     void findPrevious();
     void extractPages();
+    void outputIntents();
 
 private:
     Ui::Window *ui;
