@@ -8,6 +8,11 @@
 
 GSViewApp::GSViewApp ( int &argc, char **argv ) : QApplication(argc, argv)
 {
+    //  these three items are necessary for using the QSettings feature
+    QCoreApplication::setOrganizationName("Artifex Software");
+    QCoreApplication::setOrganizationDomain("artifex.com");
+    QCoreApplication::setApplicationName("gsview");
+
     QGuiApplication::setApplicationDisplayName(tr("gsview"));
 }
 

@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include <QSettings>
 
 #include "ICCDialog2.h"
 #include "ui_ICCDialog2.h"
@@ -21,6 +22,12 @@ ICCDialog2::~ICCDialog2()
 
 void ICCDialog2::show()
 {
+    //  get previous values from QSettings
+    QSettings settings;
+    m_rgbProfile  = settings.value("RGB Profile", QString("")).toString();
+    m_cmykProfile = settings.value("CMYK Profile", QString("")).toString();
+    m_grayProfile = settings.value("Gray Profile", QString("")).toString();
+
     refreshUI();
 
     this->setWindowModality(Qt::ApplicationModal);
@@ -59,6 +66,12 @@ void ICCDialog2::on_cmykButton_clicked()
 
 void ICCDialog2::on_okButton_clicked()
 {
+    //  save current values using QSettings
+    QSettings settings;
+    settings.setValue("RGB Profile",  m_rgbProfile);
+    settings.setValue("CMYK Profile", m_cmykProfile);
+    settings.setValue("Gray Profile", m_grayProfile);
+
     close();
 }
 
