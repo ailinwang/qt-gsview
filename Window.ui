@@ -235,9 +235,12 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionSelect_All_Text"/>
     <addaction name="actionDeselect_Text"/>
     <addaction name="actionCopy_Text"/>
-    <addaction name="actionSelect_All_Text"/>
+    <addaction name="separator"/>
+    <addaction name="actionCopy_Page"/>
+    <addaction name="separator"/>
     <addaction name="actionFindDialog"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
@@ -647,6 +650,11 @@
   <action name="actionOutput_Intents">
    <property name="text">
     <string>Output Intents...</string>
+   </property>
+  </action>
+  <action name="actionCopy_Page">
+   <property name="text">
+    <string>Copy Page</string>
    </property>
   </action>
  </widget>

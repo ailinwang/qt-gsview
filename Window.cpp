@@ -62,6 +62,7 @@ Window::Window(QWidget *parent) :
     connect(ui->actionDeselect_Text, SIGNAL(triggered()), this, SLOT(deselectText()));
     connect(ui->actionSelect_All_Text, SIGNAL(triggered()), this, SLOT(selectAllText()));
     connect(ui->actionFindDialog, SIGNAL(triggered()), this, SLOT(onFindDialog()));
+    connect(ui->actionCopy_Page, SIGNAL(triggered()), this, SLOT(copyPage()));
 
     //  view menu
     connect(ui->actionZoom_In, SIGNAL(triggered()), this, SLOT(zoomIn()));
@@ -955,6 +956,28 @@ void Window::outputIntents()
     ICCDialog2 icc_dialog;
     icc_dialog.show();
     icc_dialog.exec();
+}
+
+void Window::copyPage()
+{
+    //  render a bitmap
+
+    int nPage = m_currentPage;
+    double scale = m_pages[m_currentPage].getScale();
+    bool showAnnotations = true;  //  really?
+    //  TODO: what about scale/resolution?
+
+    point_t pageSize;
+    m_document->GetPageSize(nPage, scale, &pageSize);
+
+    int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
+    Byte *bitmap = new Byte[numBytes];
+    m_document->RenderPage (nPage, scale, bitmap, pageSize.X, pageSize.Y, showAnnotations);
+    QImage *image = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
+
+    //  copy to clipboard
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setImage(*image);
 }
 
 void Window::homeSlot()
