@@ -602,10 +602,10 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 	{
 		page = fz_load_page(mu_doc, page_num);
 		sheet = fz_new_text_sheet(mu_ctx);
-		text = fz_new_text_page(mu_ctx);
+        text = fz_new_text_page(mu_ctx);  //  MEMORY
 
 		/* Create a new list */
-		dlist = fz_new_display_list(mu_ctx);
+        dlist = fz_new_display_list(mu_ctx);  //  MEMORY
 		dev = fz_new_list_device(mu_ctx, dlist);
 
 		/* Deal with text device */

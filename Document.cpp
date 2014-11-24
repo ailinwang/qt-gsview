@@ -60,10 +60,10 @@ bool Document::OpenFile(const std::string fileName)
     m_opened = true;
 
     //  allocate an array of page links
-    m_pageLinks = new PageLinks[m_pageCount];
+    m_pageLinks = new PageLinks[m_pageCount];  //  MEMORY
 
     //  allocate an array of text block lists
-    m_block_list = new std::vector<TextBlock>[m_pageCount];
+    m_block_list = new std::vector<TextBlock>[m_pageCount];  //  MEMORY
 
     return true;
 }
@@ -110,7 +110,7 @@ int Document::ComputeLinks(int page_num)
     //  run thru the list and repack
     for (int k = 0; k < num_items; k++)
     {
-        Link *new_link = new Link();
+        Link *new_link = new Link();  //  MEMORY
         if (new_link == nullptr)
             return 0;
 
@@ -224,12 +224,12 @@ void Document::ComputeTextBlocks (int page_num)
             int num_lines = mu_ctx->GetTextBlock (text, kk, &top_x, &top_y, &height, &width);
 
             //  init the block
-            TextBlock *block = new TextBlock(page_num, kk);
+            TextBlock *block = new TextBlock(page_num, kk);  //  MEMORY
             block->X = top_x;
             block->Y = top_y;
             block->Width = width;
             block->Height = height;
-            block->line_list = new std::vector<TextLine>();
+            block->line_list = new std::vector<TextLine>();  //  MEMORY
 
             //  add block to the block list
             m_block_list[page_num].push_back(*block);
@@ -241,12 +241,12 @@ void Document::ComputeTextBlocks (int page_num)
                 int num_chars = mu_ctx->GetTextLine (text, kk, jj, &top_x, &top_y, &height, &width);
 
                 //  init line
-                TextLine *line = new TextLine(page_num, kk, jj);
+                TextLine *line = new TextLine(page_num, kk, jj);  //  MEMORY
                 line->X = top_x;
                 line->Y = top_y;
                 line->Width = width;
                 line->Height = height;
-                line->char_list = new std::vector<TextCharacter>();
+                line->char_list = new std::vector<TextCharacter>();  //  MEMORY
 
                 //  add to the block's line list
                 block->line_list->push_back(*line);
@@ -256,7 +256,7 @@ void Document::ComputeTextBlocks (int page_num)
                     int character = mu_ctx->GetTextCharacter(text, kk, jj, mm, &top_x,
                         &top_y, &height, &width);
 
-                    TextCharacter *textchar = new TextCharacter(page_num, kk, jj, mm);
+                    TextCharacter *textchar = new TextCharacter(page_num, kk, jj, mm);  //  MEMORY
                     textchar->X = top_x;
                     textchar->Y = top_y;
                     textchar->Width = width;

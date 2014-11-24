@@ -9,7 +9,7 @@ ImageWidget::ImageWidget(QWidget *parent) :
     QLabel(parent)
 {
     setMouseTracking(true);
-    this->window()->installEventFilter(this);
+    this->window()->installEventFilter(this);   //  MEMORY??
 }
 
 void ImageWidget::paintEvent(QPaintEvent *event)

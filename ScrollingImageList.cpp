@@ -54,7 +54,7 @@ void ScrollingImageList::buildImages()
     {
         //  create an array of images
         int nPages = m_document->GetPageCount();
-        m_images = new ImageWidget[nPages]();
+        m_images = new ImageWidget[nPages]();  //  MEMORY
 
         //  set up scrolling area
         QWidget* contentWidget = m_scrollArea->widget();
@@ -71,7 +71,7 @@ void ScrollingImageList::buildImages()
             point_t pageSize;
             m_document->GetPageSize(i, theScale, &pageSize);
 
-            m_images[i].setFixedWidth(pageSize.X);
+            m_images[i].setFixedWidth(pageSize.X);  //  MEMORY??
             m_images[i].setFixedHeight(pageSize.Y);
             m_images[i].setPage(i);
             m_images[i].setScale(theScale);
