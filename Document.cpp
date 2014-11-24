@@ -36,12 +36,44 @@ bool Document::Initialize()
 
 void Document::CleanUp()
 {
+    CleanupTextBlocks();
+
     if (mu_ctx != NULL)
     {
         mu_ctx->CleanUp();
         delete mu_ctx;
         mu_ctx = NULL;
     }
+}
+
+void Document::CleanupTextBlocks()
+{
+    for (int i=0; i<m_pageCount ;i++)
+    {
+        if (!m_block_list[i].empty())
+        {
+            int num_blocks = m_block_list[i].size();
+            for (int kk = 0; kk < num_blocks; kk++)
+            {
+                TextBlock *block = (m_block_list[i].at(kk));
+                int num_lines = block->line_list->size();
+                for (int jj = 0; jj < num_lines; jj++)
+                {
+                    TextLine *line = (block->line_list->at(jj));
+                    int num_chars = line->char_list->size();
+                    for (int ii = 0; ii < num_chars; ii++)
+                    {
+                        TextCharacter *textchar = (line->char_list->at(ii));
+                        delete textchar;
+                    }
+                    delete line;
+                }
+                delete block;
+            }
+        }
+        m_block_list[i].clear();
+    }
+    delete [] m_block_list;
 }
 
 bool Document::OpenFile(const std::string fileName)
@@ -63,7 +95,7 @@ bool Document::OpenFile(const std::string fileName)
     m_pageLinks = new PageLinks[m_pageCount];  //  MEMORY
 
     //  allocate an array of text block lists
-    m_block_list = new std::vector<TextBlock>[m_pageCount];  //  MEMORY
+    m_block_list = new std::vector<TextBlock *>[m_pageCount];  //  MEMORY
 
     return true;
 }
@@ -211,7 +243,7 @@ void Document::ComputeTextBlocks (int page_num)
     if (text_ptr==NULL)
         return;
 
-    m_block_list[page_num].clear();
+//    m_block_list[page_num].clear();
 
     if (num_blocks>0)
     {
@@ -229,10 +261,10 @@ void Document::ComputeTextBlocks (int page_num)
             block->Y = top_y;
             block->Width = width;
             block->Height = height;
-            block->line_list = new std::vector<TextLine>();  //  MEMORY
+            block->line_list = new std::vector<TextLine *>();  //  MEMORY
 
             //  add block to the block list
-            m_block_list[page_num].push_back(*block);
+            m_block_list[page_num].push_back(block);
 
             //  for each line
             for (int jj = 0; jj < num_lines; jj++)
@@ -246,10 +278,10 @@ void Document::ComputeTextBlocks (int page_num)
                 line->Y = top_y;
                 line->Width = width;
                 line->Height = height;
-                line->char_list = new std::vector<TextCharacter>();  //  MEMORY
+                line->char_list = new std::vector<TextCharacter *>();  //  MEMORY
 
                 //  add to the block's line list
-                block->line_list->push_back(*line);
+                block->line_list->push_back(line);
 
                 for (int mm = 0; mm < num_chars; mm++)
                 {
@@ -263,8 +295,8 @@ void Document::ComputeTextBlocks (int page_num)
                     textchar->Height = height;
                     textchar->character = static_cast<char>(character);
 
-                    //  add to the
-                    line->char_list->push_back(*textchar);
+                    //  add to the line
+                    line->char_list->push_back(textchar);
                 }
             }
         }

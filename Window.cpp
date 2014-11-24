@@ -457,15 +457,6 @@ void Window::quit()
 
 void Window::closeAction()
 {
-    //  delete things that were allocated
-
-    if (m_document != NULL)
-    {
-        m_document->CleanUp();
-        delete m_document;
-        m_document = NULL;
-    }
-
     this->close();
 }
 
@@ -1031,4 +1022,21 @@ bool Window::eventFilter(QObject *object, QEvent *e)
     UNUSED(object);
 
     return m_pages->onEvent(e);
+}
+
+void Window::closeEvent(QCloseEvent *event)
+{
+    //  delete things that were allocated
+
+    if (m_document != NULL)
+    {
+        m_document->CleanUp();
+        delete m_document;
+        m_document = NULL;
+    }
+
+    delete m_fileSave;
+    delete m_contents;
+    delete m_thumbnails;
+    delete m_pages;
 }

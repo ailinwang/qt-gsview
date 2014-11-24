@@ -72,7 +72,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
                 {
                     if (ii>=line.selBegin && ii<=line.selEnd)
                     {
-                        TextCharacter theChar = line.char_list->at(ii);
+                        TextCharacter theChar = *(line.char_list->at(ii));
                         double scale = this->scale();
                         QRect crect ( QPoint(scale*theChar.X,scale*theChar.Y),
                                       QPoint(scale*(theChar.X+theChar.Width),scale*(theChar.Y+theChar.Height)));
@@ -290,7 +290,7 @@ QString ImageWidget::selectedText()
         int num_chars = line->char_list->size();
         for (int ii = 0; ii < num_chars; ii++)
         {
-            TextCharacter *theChar = &(line->char_list->at(ii));
+            TextCharacter *theChar = (line->char_list->at(ii));
 
             bool include = false;
             if (line->selBegin==-1 && line->selEnd)
@@ -317,12 +317,12 @@ void ImageWidget::selectAllText()
     int num_blocks = m_document->blockList()[pageNumber()].size();
     for (int kk = 0; kk < num_blocks; kk++)
     {
-        TextBlock *block = &(m_document->blockList()[pageNumber()].at(kk));
+        TextBlock *block = (m_document->blockList()[pageNumber()].at(kk));
 
         int num_lines = block->line_list->size();
         for (int jj = 0; jj < num_lines; jj++)
         {
-            TextLine *line = &(block->line_list->at(jj));
+            TextLine *line = (block->line_list->at(jj));
             this->addToSelection(line);
         }
     }
@@ -361,7 +361,7 @@ void ImageWidget::HilightBlocks (QPainter *painter, double scale, int pageNumber
     int num_blocks = m_document->blockList()[pageNumber].size();
     for (int kk = 0; kk < num_blocks; kk++)
     {
-        TextBlock block = m_document->blockList()[pageNumber].at(kk);
+        TextBlock block = *(m_document->blockList()[pageNumber].at(kk));
 
         if (drawBlocks)
         {
@@ -373,7 +373,7 @@ void ImageWidget::HilightBlocks (QPainter *painter, double scale, int pageNumber
         int num_lines = block.line_list->size();
         for (int jj = 0; jj < num_lines; jj++)
         {
-            TextLine line = block.line_list->at(jj);
+            TextLine line = *(block.line_list->at(jj));
 
             if (drawLines)
             {
@@ -386,7 +386,7 @@ void ImageWidget::HilightBlocks (QPainter *painter, double scale, int pageNumber
             int num_chars = line.char_list->size();
             for (int ii = 0; ii < num_chars; ii++)
             {
-                TextCharacter theChar = line.char_list->at(ii);
+                TextCharacter theChar = *(line.char_list->at(ii));
 
                 if (drawChars)
                 {

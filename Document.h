@@ -41,6 +41,11 @@ class TextCharacter : public Block
 public:
     TextCharacter(int pageNum, int blockNum, int lineNum, int charNum)
         {PageNumber=pageNum;BlockNumber=blockNum;LineNumber=lineNum;CharNumber=charNum;}
+    ~TextCharacter()
+    {
+
+    }
+
     int PageNumber;
     int BlockNumber;
     int LineNumber;
@@ -53,10 +58,15 @@ class TextLine : public Block
 public:
     TextLine(int pageNum, int blockNum, int lineNum)
         {PageNumber=pageNum;BlockNumber=blockNum;LineNumber=lineNum;}
+    ~TextLine()
+    {
+        if (char_list!=NULL)
+            delete char_list;
+    }
     int PageNumber;
     int BlockNumber;
     int LineNumber;
-    std::vector<TextCharacter> *char_list;
+    std::vector<TextCharacter *> *char_list=NULL;
     int selBegin = -1;
     int selEnd = -1;
 };
@@ -66,9 +76,15 @@ class TextBlock : public Block
 public:
     TextBlock(int pageNum, int blockNum)
         {PageNumber=pageNum;BlockNumber=blockNum;}
+    ~TextBlock()
+    {
+        if (line_list!=NULL)
+            delete line_list;
+    }
+
     int PageNumber;
     int BlockNumber;
-    std::vector<TextLine> *line_list;
+    std::vector<TextLine *> *line_list=NULL;
 };
 
 class SearchItem
@@ -134,6 +150,7 @@ public:
 
     bool Initialize ();
     void CleanUp ();
+    void CleanupTextBlocks ();
 
     bool OpenFile (const std::string fileName);
     bool isOpen() {return m_opened;}
@@ -151,7 +168,7 @@ public:
 
     void ComputeTextBlocks (int page_num);
 
-    std::vector<TextBlock> *blockList() {return m_block_list;}
+    std::vector<TextBlock *> *blockList() {return m_block_list;}
 
     unsigned int ComputeContents();
     ContentItem *GetContentItem(unsigned int item_num);
@@ -177,7 +194,7 @@ private:
 
     PageLinks *m_pageLinks = NULL;
 
-    std::vector<TextBlock> *m_block_list = NULL;
+    std::vector<TextBlock *> *m_block_list = NULL;
 
     std::vector<ContentItem *> *m_content_items = NULL;
 };

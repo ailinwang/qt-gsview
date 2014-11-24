@@ -16,6 +16,11 @@ ScrollingImageList::ScrollingImageList(QObject *parent) :
 QScrollArea *ScrollingImageList::scrollArea() const
 {
     return m_scrollArea;
+
+    if (m_imagesBuilt && m_images!=NULL)
+    {
+        delete[] m_images;
+    }
 }
 
 void ScrollingImageList::setScrollArea(QScrollArea *scrollArea)

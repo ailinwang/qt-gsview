@@ -48,6 +48,7 @@ protected:
 	void keyPressEvent(QKeyEvent* event);
     void customEvent(QEvent *event);
     bool eventFilter(QObject *object, QEvent *e);
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     void openAction();

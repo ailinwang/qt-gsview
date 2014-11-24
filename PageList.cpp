@@ -116,7 +116,7 @@ void PageList::manageCursor(QEvent *e)
         double scale = widget->scale();
         for (int kk = 0; kk < num_blocks; kk++)
         {
-            TextBlock block = document()->blockList()[pageNumber].at(kk);
+            TextBlock block = *(document()->blockList()[pageNumber].at(kk));
             QRect rect ( QPoint(scale*block.X,scale*block.Y),
                          QPoint(scale*(block.X+block.Width),scale*(block.Y+block.Height)));
             if ( rect.contains(posPage))
@@ -154,7 +154,7 @@ int charIndex(TextLine *line, ImageWidget *widget, QPoint pos)
     int num_chars = line->char_list->size();
     for (int ii = 0; ii < num_chars; ii++)
     {
-        TextCharacter *theChar = &(line->char_list->at(ii));
+        TextCharacter *theChar = (line->char_list->at(ii));
         QRect cRect ( widget->scale()*theChar->X, widget->scale()*theChar->Y,
                       widget->scale()*theChar->Width, widget->scale()*theChar->Height);
         cRect.setTopLeft(widget->mapToGlobal(cRect.topLeft()));
@@ -169,7 +169,7 @@ int charIndex(TextLine *line, ImageWidget *widget, QPoint pos)
         {
             if (isBetween(pos.x(), cRect.left(), cRect.right()))
                 return ii;
-            TextCharacter *theChar2 = &(line->char_list->at(ii-1));
+            TextCharacter *theChar2 = (line->char_list->at(ii-1));
             QRect cRect2 ( widget->scale()*theChar2->X, widget->scale()*theChar2->Y,
                            widget->scale()*theChar2->Width, widget->scale()*theChar2->Height);
             cRect2.setTopLeft(widget->mapToGlobal(cRect2.topLeft()));
@@ -203,12 +203,12 @@ void PageList::updateSelection(QEvent *e)
 
         for (int kk = 0; kk < num_blocks; kk++)
         {
-            TextBlock block = document()->blockList()[pageNumber].at(kk);
+            TextBlock block = *(document()->blockList()[pageNumber].at(kk));
 
             int num_lines = block.line_list->size();
             for (int jj = 0; jj < num_lines; jj++)
             {
-                TextLine *line = &(block.line_list->at(jj));
+                TextLine *line = (block.line_list->at(jj));
 
                 //  global rect of the current line
                 QRect lineRect ( widget->scale()*line->X, widget->scale()*line->Y,
