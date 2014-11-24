@@ -239,7 +239,7 @@ void Document::ComputeTextBlocks (int page_num)
     int height;
     int num_blocks;
     fz_text_page *text;
-    void *text_ptr = (void*)mu_ctx->CreateDisplayListText (page_num, &width, &height, &text, &num_blocks, false);
+    void *text_ptr = (void*)mu_ctx->CreateDisplayListText (page_num, &width, &height, &text, &num_blocks, true);
     if (text_ptr==NULL)
         return;
 

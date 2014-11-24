@@ -4,6 +4,7 @@
 #include "ImageWidget.h"
 #include "Window.h"
 #include "Document.h"
+#include "QtUtil.h"
 
 ImageWidget::ImageWidget(QWidget *parent) :
     QLabel(parent)
@@ -54,28 +55,28 @@ void ImageWidget::paintEvent(QPaintEvent *event)
 
         for (unsigned int jj = 0; jj < m_selected_lines.size(); jj++)
         {
-            TextLine line = *(m_selected_lines.at(jj));
+            TextLine *line = (m_selected_lines.at(jj));
 
-            if (line.selBegin==-1 && line.selEnd==-1)
+            if (line->selBegin==-1 && line->selEnd==-1)
             {
-                //  this is a whole line.
+                //  this is a whole line->
                 double scale = this->scale();
-                QRect lrect ( QPoint(scale*line.X,scale*line.Y),
-                              QPoint(scale*(line.X+line.Width),scale*(line.Y+line.Height)));
+                QRect lrect ( QPoint(scale*line->X,scale*line->Y),
+                              QPoint(scale*(line->X+line->Width),scale*(line->Y+line->Height)));
                 painter.fillRect(lrect, QBrush(QColor("#506EB3E8")));  //  transparent blue
             }
             else
             {
-                //  this is a partial line.
-                int num_chars = line.char_list->size();
+                //  this is a partial line->
+                int num_chars = line->char_list->size();
                 for (int ii = 0; ii < num_chars; ii++)
                 {
-                    if (ii>=line.selBegin && ii<=line.selEnd)
+                    if (ii>=line->selBegin && ii<=line->selEnd)
                     {
-                        TextCharacter theChar = *(line.char_list->at(ii));
+                        TextCharacter *theChar = (line->char_list->at(ii));
                         double scale = this->scale();
-                        QRect crect ( QPoint(scale*theChar.X,scale*theChar.Y),
-                                      QPoint(scale*(theChar.X+theChar.Width),scale*(theChar.Y+theChar.Height)));
+                        QRect crect ( QPoint(scale*theChar->X,scale*theChar->Y),
+                                      QPoint(scale*(theChar->X+theChar->Width),scale*(theChar->Y+theChar->Height)));
                         painter.fillRect(crect, QBrush(QColor("#506EB3E8")));  //  transparent blue
                     }
                 }
@@ -361,37 +362,37 @@ void ImageWidget::HilightBlocks (QPainter *painter, double scale, int pageNumber
     int num_blocks = m_document->blockList()[pageNumber].size();
     for (int kk = 0; kk < num_blocks; kk++)
     {
-        TextBlock block = *(m_document->blockList()[pageNumber].at(kk));
+        TextBlock *block = (m_document->blockList()[pageNumber].at(kk));
 
         if (drawBlocks)
         {
-            QRect brect ( QPoint(scale*block.X,scale*block.Y),
-                          QPoint(scale*(block.X+block.Width),scale*(block.Y+block.Height)));
+            QRect brect ( QPoint(scale*block->X,scale*block->Y),
+                          QPoint(scale*(block->X+block->Width),scale*(block->Y+block->Height)));
             painter->fillRect(brect, QBrush(QColor("#506EB3E8")));
         }
 
-        int num_lines = block.line_list->size();
+        int num_lines = block->line_list->size();
         for (int jj = 0; jj < num_lines; jj++)
         {
-            TextLine line = *(block.line_list->at(jj));
+            TextLine *line = (block->line_list->at(jj));
 
             if (drawLines)
             {
-                QRect lrect ( QPoint(scale*line.X,scale*line.Y),
-                              QPoint(scale*(line.X+line.Width),scale*(line.Y+line.Height)));
+                QRect lrect ( QPoint(scale*line->X,scale*line->Y),
+                              QPoint(scale*(line->X+line->Width),scale*(line->Y+line->Height)));
                 painter->setPen(QPen(QColor("#ff0000"), 1));
                 painter->drawRect(lrect);
             }
 
-            int num_chars = line.char_list->size();
+            int num_chars = line->char_list->size();
             for (int ii = 0; ii < num_chars; ii++)
             {
-                TextCharacter theChar = *(line.char_list->at(ii));
+                TextCharacter *theChar = (line->char_list->at(ii));
 
                 if (drawChars)
                 {
-                    QRect crect ( QPoint(scale*theChar.X,scale*theChar.Y),
-                                  QPoint(scale*(theChar.X+theChar.Width),scale*(theChar.Y+theChar.Height)));
+                    QRect crect ( QPoint(scale*theChar->X,scale*theChar->Y),
+                                  QPoint(scale*(theChar->X+theChar->Width),scale*(theChar->Y+theChar->Height)));
                     painter->setPen(QPen(QColor("#0000ff"), 1));
                     painter->drawRect(crect);
                 }
@@ -400,3 +401,67 @@ void ImageWidget::HilightBlocks (QPainter *painter, double scale, int pageNumber
     }
 
 }
+
+void ImageWidget::setRendered (bool rendered)
+{
+    m_rendered = rendered;
+    if (!rendered)
+        deleteImageData();
+}
+
+void ImageWidget::cleanup()
+{
+    this->window()->removeEventFilter(this);
+    deleteImageData();
+}
+
+void ImageWidget::deleteImageData()
+{
+//    if (m_bitmap!=NULL)
+//        delete m_bitmap;
+//    m_bitmap=NULL;
+
+//    if (m_image!=NULL)
+//        delete m_image;
+//    m_image=NULL;
+
+//    if (m_pixmap!=NULL)
+//        delete m_pixmap;
+//    m_pixmap=NULL;
+}
+
+void ImageWidget::render (bool showAnnotations, bool showLinks)
+{
+    point_t thePageSize = pageSize();
+
+    //  render
+    int numBytes = (int)thePageSize.X * (int)thePageSize.Y * 4;
+    Byte *bitmap = new Byte[numBytes];
+    m_document->RenderPage (m_pageNumber, scale(), bitmap, thePageSize.X, thePageSize.Y, showAnnotations);
+
+    m_document->ComputeTextBlocks(m_pageNumber);
+
+    //  copy to widget
+    QImage *myImage = QtUtil::QImageFromData (bitmap, (int)thePageSize.X, (int)thePageSize.Y);
+    QPixmap pix = QPixmap::fromImage(*myImage);
+    setPixmap(pix);
+
+    //  tell image to show or hide the links.
+    setShowLinks(showLinks);
+    setRendered(true);
+    update();
+
+    //  remember so they can be destroyed later
+    m_bitmap = bitmap;
+    m_image  = myImage;
+//    m_pixmap = pixmap;
+
+}
+
+void ImageWidget::setImageData(Byte *bitmap, QImage *image, QPixmap *pixmap)
+{
+    m_bitmap = bitmap;
+    m_image  = image;
+    m_pixmap = pixmap;
+}
+

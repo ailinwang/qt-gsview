@@ -116,9 +116,9 @@ void PageList::manageCursor(QEvent *e)
         double scale = widget->scale();
         for (int kk = 0; kk < num_blocks; kk++)
         {
-            TextBlock block = *(document()->blockList()[pageNumber].at(kk));
-            QRect rect ( QPoint(scale*block.X,scale*block.Y),
-                         QPoint(scale*(block.X+block.Width),scale*(block.Y+block.Height)));
+            TextBlock *block = (document()->blockList()[pageNumber].at(kk));
+            QRect rect ( QPoint(scale*block->X,scale*block->Y),
+                         QPoint(scale*(block->X+block->Width),scale*(block->Y+block->Height)));
             if ( rect.contains(posPage))
             {
                 bInside = true;
@@ -203,12 +203,12 @@ void PageList::updateSelection(QEvent *e)
 
         for (int kk = 0; kk < num_blocks; kk++)
         {
-            TextBlock block = *(document()->blockList()[pageNumber].at(kk));
+            TextBlock *block = (document()->blockList()[pageNumber].at(kk));
 
-            int num_lines = block.line_list->size();
+            int num_lines = block->line_list->size();
             for (int jj = 0; jj < num_lines; jj++)
             {
-                TextLine *line = (block.line_list->at(jj));
+                TextLine *line = (block->line_list->at(jj));
 
                 //  global rect of the current line
                 QRect lineRect ( widget->scale()*line->X, widget->scale()*line->Y,

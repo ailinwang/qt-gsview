@@ -33,7 +33,6 @@ public:
     void setPage(int nPage) {m_pageNumber=nPage;}
 
     bool rendered() const {return m_rendered;}
-    void setRendered(bool rendered) {m_rendered = rendered;}
 
     double scale() const {return m_scale;}
     void setScale(double scale) {m_scale = scale;}
@@ -66,10 +65,18 @@ public:
     void clearSearchText();
     void hilightSearchText(SearchItem *item);
 
+    void cleanup();
+
+    void render (bool showAnnotations, bool showLinks);
+    void setRendered(bool rendered);
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
 private:
+
+    void setImageData(Byte *bitmap, QImage *image, QPixmap *pixmap);
+    void deleteImageData();
 
     void HilightBlocks (QPainter *painter, double scale, int pageNumber,
                         bool drawBlocks, bool drawLines, bool drawChars);
@@ -87,6 +94,10 @@ private:
 
     std::vector<SearchItem> *m_searchItems = NULL;
     SearchItem *m_hilightedItem = NULL;
+
+    Byte *m_bitmap = NULL;
+    QImage *m_image = NULL;
+    QPixmap *m_pixmap = NULL;
 };
 
 #endif // IMAGEWIDGET_H

@@ -1027,6 +1027,8 @@ bool Window::eventFilter(QObject *object, QEvent *e)
 void Window::closeEvent(QCloseEvent *event)
 {
     //  delete things that were allocated
+    m_thumbnails->cleanup();
+    m_pages->cleanup();
 
     if (m_document != NULL)
     {

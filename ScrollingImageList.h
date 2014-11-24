@@ -43,6 +43,8 @@ public:
 
     void reRender();
 
+    void cleanup();
+
 protected:
     QScrollArea *getScrollArea() {return m_scrollArea;}
     ImageWidget *images() {return m_images;}

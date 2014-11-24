@@ -127,6 +127,16 @@ void ScrollingImageList::reRender()
 
 }
 
+void ScrollingImageList::cleanup()
+{
+    if (m_imagesBuilt)
+    {
+        int nPages = m_document->GetPageCount();
+        for (int i=0; i<nPages; i++)
+            m_images[i].cleanup();
+    }
+}
+
 void ScrollingImageList::zoom (double theScale)
 {
     if (theScale != m_scale)
@@ -239,29 +249,7 @@ void ScrollingImageList::valueChangedSlot(int val)
 
 void ScrollingImageList::renderImage(int i)
 {
-    point_t pageSize = m_images[i].pageSize();
-
-    //  render
-    int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
-    Byte *bitmap = new Byte[numBytes];
-    m_document->RenderPage (i, m_images[i].scale(), bitmap, pageSize.X, pageSize.Y, m_showAnnotations);
-
-    m_document->ComputeTextBlocks(i);
-
-    //  copy to widget
-    QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
-    QPixmap pix = QPixmap::fromImage(*myImage);
-    m_images[i].setPixmap(pix);
-
-    //  tell image to show or hide the links.
-    m_images[i].setShowLinks(m_showLinks);
-
-    m_images[i].setRendered(true);
-
-    m_images[i].update();
-
-    delete myImage;
-    delete bitmap;
+    m_images[i].render(m_showAnnotations, m_showLinks);
 }
 
 void ScrollingImageList::renderVisibleImages()
