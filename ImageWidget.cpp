@@ -417,17 +417,17 @@ void ImageWidget::cleanup()
 
 void ImageWidget::deleteImageData()
 {
-//    if (m_bitmap!=NULL)
-//        delete m_bitmap;
-//    m_bitmap=NULL;
+    if (m_bitmap!=NULL)
+        delete m_bitmap;
+    m_bitmap=NULL;
 
-//    if (m_image!=NULL)
-//        delete m_image;
-//    m_image=NULL;
+    if (m_image!=NULL)
+        delete m_image;
+    m_image=NULL;
 
-//    if (m_pixmap!=NULL)
-//        delete m_pixmap;
-//    m_pixmap=NULL;
+    if (m_pixmap!=NULL)
+        delete m_pixmap;
+    m_pixmap=NULL;
 }
 
 void ImageWidget::render (bool showAnnotations, bool showLinks)
