@@ -13,14 +13,19 @@ public:
                          const QString &directory = QString(),
                          const QString &filter = QString());
 
+    virtual void show();
+
+    void setSeparatorFilter(QString val);
+    void setFallbackFilter (QString val);
+
 signals:
 
 public slots:
     void onFilterSelected (const QString &filter);
 
-public:
-    virtual void show();
-
+private:
+    QString m_separator;
+    QString m_fallback;
 };
 
 #endif // FILESAVEDIALOG_H

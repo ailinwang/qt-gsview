@@ -69,26 +69,33 @@ void FileSave::run()
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
     QString desktop = desktopLocations.first();
 
+    //  set up the dialog
+    FileSaveDialog dialog(m_window, "Save", desktop);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
+
     //  what are the file types?
+    QString sep("--------------------");
     QString types;
     int i;
     for (i=0;i<numTypes;i++)
     {
         QString theFilter;
         if (i==TYPE_BLANK)
-            theFilter = QString("--------------------");
+            theFilter = sep;
         else
             theFilter = fileTypes[i].filterName + QString(" (*.") + fileTypes[i].filterType + QString(")");
         fileTypes[i].filter = theFilter;
+
+        if (i==0)
+            dialog.setFallbackFilter(theFilter);
+
         if (i>0)
             types += ";;";
+
         types += theFilter;
     }
-
-    //  set up the dialog
-    FileSaveDialog dialog(m_window, "Save", desktop);
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
+    dialog.setSeparatorFilter(sep);
     dialog.setNameFilter(types);
 
     //  get the name
