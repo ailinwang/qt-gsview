@@ -452,14 +452,12 @@ void ImageWidget::render (bool showAnnotations, bool showLinks)
     update();
 
     //  remember so they can be destroyed later
-    m_bitmap = bitmap;
-    m_image  = myImage;
-//    m_pixmap = pixmap;
-
+    setImageData(bitmap, myImage, NULL);
 }
 
 void ImageWidget::setImageData(Byte *bitmap, QImage *image, QPixmap *pixmap)
 {
+    deleteImageData();
     m_bitmap = bitmap;
     m_image  = image;
     m_pixmap = pixmap;
