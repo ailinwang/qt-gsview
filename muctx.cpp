@@ -704,8 +704,8 @@ status_t muctx::RenderPageMT(void *dlist, void *a_dlist, int page_width, int pag
 	{
 		fz_free_device(dev);
 		fz_drop_pixmap(ctx_clone, pix);
-		fz_drop_display_list(ctx_clone, display_list);
-		fz_drop_display_list(ctx_clone, annot_displaylist);
+//		fz_drop_display_list(ctx_clone, display_list);
+//		fz_drop_display_list(ctx_clone, annot_displaylist);
 	}
 	fz_catch(ctx_clone)
 	{
