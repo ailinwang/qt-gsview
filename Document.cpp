@@ -38,6 +38,11 @@ void Document::CleanUp()
 {
     CleanupTextBlocks();
 
+    if (m_pageLinks !=NULL)
+        delete [] m_pageLinks;
+    if (m_block_list !=NULL)
+        delete [] m_block_list;
+
     if (mu_ctx != NULL)
     {
         mu_ctx->CleanUp();

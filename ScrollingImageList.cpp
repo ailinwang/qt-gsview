@@ -16,11 +16,6 @@ ScrollingImageList::ScrollingImageList(QObject *parent) :
 QScrollArea *ScrollingImageList::scrollArea() const
 {
     return m_scrollArea;
-
-    if (m_imagesBuilt && m_images!=NULL)
-    {
-        delete[] m_images;
-    }
 }
 
 void ScrollingImageList::setScrollArea(QScrollArea *scrollArea)
@@ -134,6 +129,8 @@ void ScrollingImageList::cleanup()
         int nPages = m_document->GetPageCount();
         for (int i=0; i<nPages; i++)
             m_images[i].cleanup();
+
+        delete []m_images;
     }
 }
 
