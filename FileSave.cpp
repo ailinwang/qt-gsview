@@ -12,44 +12,45 @@
 
 #include "QtUtil.h"
 #include "MessagesDialog.h"
-#include "FileSaveDialog.h"
 #include "ICCDialog2.h"
 
 FileType fileTypes[] = {
     {"PDF",             "pdf" , "", false },
     {"Linearized PDF",  "pdf" , "", false },
     {"PDF 1.3",         "pdf" , "", false },
-    {"PDF/A-1 RGB",     "pdf" , "", true },
-    {"PDF/A-1 CMYK",    "pdf" , "", true  },
-    {"PDF/A-2 RGB",     "pdf" , "", true  },
-    {"PDF/A-2 CMYK",    "pdf" , "", true  },
-    {"PDF/X-3 Gray",    "pdf" , "", true  },
-    {"PDF/X-3 CMYK",    "pdf" , "", true  },
     {"PCL-XL",          "pcl" , "", false },
     {"XPS",             "xps" , "", false },
     {"Text",            "txt" , "", false },
     {"HTML",            "html", "", false },
     {"XML",             "xml" , "", false },
-    {"PostScript",      "ps"  , "", false }
+    {"PostScript",      "ps"  , "", false },
+    {"",                ""    , "", false },
+    {"PDF/A-1 RGB",     "pdf" , "", true  },
+    {"PDF/A-1 CMYK",    "pdf" , "", true  },
+    {"PDF/A-2 RGB",     "pdf" , "", true  },
+    {"PDF/A-2 CMYK",    "pdf" , "", true  },
+    {"PDF/X-3 Gray",    "pdf" , "", true  },
+    {"PDF/X-3 CMYK",    "pdf" , "", true  },
 };
-int numTypes = 9;
+int numTypes = 16;
 
 enum {
     TYPE_PDF = 0,
     TYPE_PDF_LINEAR,
     TYPE_PDF_13,
+    TYPE_PCL_XL,
+    TYPE_XPS,
+    TYPE_TEXT,
+    TYPE_HTML,
+    TYPE_XML,
+    TYPE_PS,
+    TYPE_BLANK,
     TYPE_PDF_A1_RGB,
     TYPE_PDF_A1_CMYK,
     TYPE_PDF_A2_RGB,
     TYPE_PDF_A2_CMYK,
     TYPE_PDF_X3_GRAY,
     TYPE_PDF_X3_CMYK,
-    TYPE_PCL_XL,
-    TYPE_XPS,
-    TYPE_TEXT,
-    TYPE_HTML,
-    TYPE_XML,
-    TYPE_PS
 };
 
 void FileSave::run()
@@ -72,7 +73,11 @@ void FileSave::run()
     int i;
     for (i=0;i<numTypes;i++)
     {
-        QString theFilter = fileTypes[i].filterName + QString(" (*.") + fileTypes[i].filterType + QString(")");
+        QString theFilter;
+        if (i==TYPE_BLANK)
+            theFilter = QString("--------------------");
+        else
+            theFilter = fileTypes[i].filterName + QString(" (*.") + fileTypes[i].filterType + QString(")");
         fileTypes[i].filter = theFilter;
         if (i>0)
             types += ";;";
@@ -80,7 +85,7 @@ void FileSave::run()
     }
 
     //  set up the dialog
-    FileSaveDialog dialog(m_window, "Save", desktop);
+    QFileDialog dialog(m_window, "Save", desktop);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     dialog.setNameFilter(types);
