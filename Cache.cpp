@@ -79,7 +79,8 @@ void Cache::Add(int value, int width_in, int height_in, fz_display_list *dlist,
 	}
 	size++;
 
-//	/* We are going to use this item now */
+    //  11/25/2014 - Fred and Michael think this unnecessarily increments
+    //  the display list's reference counter
 //    fz_keep_display_list(mu_ctx, new_entry->dlist);
 }
 
@@ -96,7 +97,10 @@ fz_display_list* Cache::Use(int value, int *width_out, int *height_out, fz_conte
 	}
 	if (curr_entry != NULL)
 	{
+        //  11/25/2014 - Fred and Michael think this unnecessarily increments
+        //  the display list's reference counter
 //		fz_keep_display_list(mu_ctx, curr_entry->dlist);
+
 		/* Move this to the front */
 		if (curr_entry != head)
 		{
