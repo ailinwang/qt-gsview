@@ -96,7 +96,7 @@ fz_display_list* Cache::Use(int value, int *width_out, int *height_out, fz_conte
 	}
 	if (curr_entry != NULL)
 	{
-		fz_keep_display_list(mu_ctx, curr_entry->dlist);
+//		fz_keep_display_list(mu_ctx, curr_entry->dlist);
 		/* Move this to the front */
 		if (curr_entry != head)
 		{
