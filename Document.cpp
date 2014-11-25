@@ -321,6 +321,10 @@ void Document::ComputeTextBlocks (int page_num)
             }
         }
     }
+
+    //  free up the text, since it's been copied into
+    //  other structures.
+    mu_ctx->freeText(text);
 }
 
 unsigned int Document::ComputeContents()

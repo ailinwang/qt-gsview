@@ -1033,3 +1033,8 @@ int muctx::GetTextCharacter(void *page, int block_num, int line_num,
     return cab.c;
 }
 
+void muctx::freeText(fz_text_page *text)
+{
+    fz_free_text_page(mu_ctx, text);
+}
+

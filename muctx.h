@@ -145,6 +145,8 @@ public:
     int GetTextCharacter(void *page, int block_num, int line_num,
         int item_num, double *top_x, double *top_y, double *height, double *width);
 
+    void freeText(fz_text_page *text);
+
 #ifdef _WINRT_DLL
 	status_t InitializeStream(IRandomAccessStream^ readStream, char *ext);
 #else

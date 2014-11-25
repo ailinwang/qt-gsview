@@ -954,8 +954,8 @@ void Window::copyPage()
     //  render a bitmap
 
     int nPage = m_currentPage;
-    double scale = m_pages[m_currentPage].getScale();
-    bool showAnnotations = true;  //  really?
+    double scale = m_scalePage;
+
     //  TODO: what about scale/resolution?
 
     point_t pageSize;
@@ -963,12 +963,20 @@ void Window::copyPage()
 
     int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
     Byte *bitmap = new Byte[numBytes];
-    m_document->RenderPage (nPage, scale, bitmap, pageSize.X, pageSize.Y, showAnnotations);
+    m_document->RenderPage (nPage, scale, bitmap, pageSize.X, pageSize.Y, m_showAnnotations);
     QImage *image = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
 
     //  copy to clipboard
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setImage(*image);
+
+    if (NULL!=m_copiedImage)
+        delete m_copiedImage;
+    m_copiedImage = image;
+
+    if (NULL!=m_copiedBitmap)
+        delete m_copiedBitmap;
+    m_copiedBitmap = bitmap;
 }
 
 void Window::homeSlot()
@@ -1029,6 +1037,15 @@ void Window::closeEvent(QCloseEvent *event)
     UNUSED(event);
 
     //  delete things that were allocated
+    if (NULL!=m_copiedImage)
+
+        delete m_copiedImage;
+    m_copiedImage = NULL;
+
+    if (NULL!=m_copiedBitmap)
+        delete m_copiedBitmap;
+    m_copiedBitmap = NULL;
+
     m_thumbnails->cleanup();
     m_pages->cleanup();
 

@@ -158,6 +158,8 @@ private:
 
     ExtractPagesDialog *m_extractDlg=NULL;
 
+    Byte *m_copiedBitmap = NULL;
+    QImage *m_copiedImage = NULL;
 };
 
 #endif  //  WINDOW_H
