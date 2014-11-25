@@ -176,13 +176,18 @@ void muctx::CleanUp(void)
 	fz_close_document(mu_doc);
     page_cache->Empty(mu_ctx);
     annot_cache->Empty(mu_ctx);
-	fz_free_context(mu_ctx);
+    text_cache->Empty(mu_ctx);
+    fz_free_context(mu_ctx);
 
 	delete page_cache;
-	delete annot_cache;
-	annot_cache = NULL;
-	page_cache = NULL;
-	this->mu_ctx = NULL;
+    delete annot_cache;
+    delete text_cache;
+
+    annot_cache = NULL;
+    page_cache = NULL;
+    text_cache = NULL;
+
+    this->mu_ctx = NULL;
 	this->mu_doc = NULL;
 	this->mu_outline = NULL;
 }
@@ -230,7 +235,8 @@ muctx::muctx(void)
 	mu_doc = NULL;
 	mu_outline = NULL;
 	page_cache = new Cache();
-	annot_cache = new Cache();
+    annot_cache = new Cache();
+    text_cache = new Cache();
 }
 
 /* Destructor */
@@ -239,16 +245,22 @@ muctx::~muctx(void)
 	fz_free_outline(mu_ctx, mu_outline);
 	fz_close_document(mu_doc);
 	page_cache->Empty(mu_ctx);
-	annot_cache->Empty(mu_ctx);
-	fz_free_context(mu_ctx);
+    annot_cache->Empty(mu_ctx);
+    text_cache->Empty(mu_ctx);
+    fz_free_context(mu_ctx);
 
 	mu_ctx = NULL;
 	mu_doc = NULL;
 	mu_outline = NULL;
+
 	delete page_cache;
 	page_cache = NULL;
-	delete annot_cache;
-	annot_cache = NULL;
+
+    delete annot_cache;
+    annot_cache = NULL;
+
+    delete text_cache;
+    text_cache = NULL;
 }
 
 /* Return the documents page count */
@@ -585,7 +597,7 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
     fz_display_list *dlist = NULL;
     if (useCache)
     {
-        dlist = page_cache->Use(page_num, width, height, mu_ctx);
+        dlist = text_cache->Use(page_num, width, height, mu_ctx);
         if (dlist != NULL)
             return dlist;
     }
@@ -602,10 +614,10 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 	{
 		page = fz_load_page(mu_doc, page_num);
 		sheet = fz_new_text_sheet(mu_ctx);
-        text = fz_new_text_page(mu_ctx);  //  MEMORY
+        text = fz_new_text_page(mu_ctx);  //  MEMORY leak here
 
 		/* Create a new list */
-        dlist = fz_new_display_list(mu_ctx);  //  MEMORY
+        dlist = fz_new_display_list(mu_ctx);
 		dev = fz_new_list_device(mu_ctx, dlist);
 
 		/* Deal with text device */
@@ -623,14 +635,13 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 		*height = page_size.Y;
 		/* Add it to the cache and set that it is in use */
         if (useCache)
-            page_cache->Add(page_num, *width, *height, dlist, mu_ctx);
+            text_cache->Add(page_num, *width, *height, dlist, mu_ctx);
 	}
 	fz_always(mu_ctx)
 	{
 		fz_free_device(dev);
 		fz_free_page(mu_doc, page);
 		fz_free_text_sheet(mu_ctx, sheet);
-
 	}
 	fz_catch(mu_ctx)
 	{

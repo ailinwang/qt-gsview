@@ -21,7 +21,7 @@ macx: DEFINES += _QT_MAC
 win32: DEFINES += _QT_WIN
 
 #  debugging can be easier if we don't use native file dialogs
-DEFINES += USE_NATIVE_FILE_DIALOGS=false
+DEFINES += USE_NATIVE_FILE_DIALOGS=true
 
 #  Qt configuration
 QT       += core gui

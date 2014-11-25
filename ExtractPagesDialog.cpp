@@ -467,7 +467,7 @@ void ExtractPagesDialog::onFinished(int exitCode)
 
         //  more commands?  Keep going
         m_currentCommand++;
-        if (m_currentCommand<m_commands.size())
+        if (m_currentCommand<(int)m_commands.size())
         {
             startCommand(m_commands.at(m_currentCommand));
             return;

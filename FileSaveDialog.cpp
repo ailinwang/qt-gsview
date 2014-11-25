@@ -19,6 +19,8 @@ FileSaveDialog::FileSaveDialog (QWidget *parent,
 
 void FileSaveDialog::onFilterSelected(const QString &filter)
 {
+//    UNUSED(filter);
+
     //  user changed filter.  show the profiles UI
 }
 

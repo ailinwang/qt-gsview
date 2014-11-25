@@ -102,6 +102,7 @@ private:
 						sh_vector_content contents_vec);
     Cache *page_cache;
     Cache *annot_cache;
+    Cache *text_cache;
 
 public:
 	muctx(void);

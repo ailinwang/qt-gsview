@@ -2,6 +2,7 @@
 #include "pch.h"
 #endif
 #include "Cache.h"
+#include "list"
 
 Cache::Cache(void)
 {
@@ -23,8 +24,7 @@ void Cache::Empty(fz_context *mu_ctx)
 		{
 			cache_entry_t *old_entry = curr_entry;
 			curr_entry = old_entry->next;
-			fz_drop_display_list(mu_ctx, old_entry->dlist);
-			
+            fz_drop_display_list(mu_ctx, old_entry->dlist);
 			delete old_entry;
 		}
 		this->size = 0;
