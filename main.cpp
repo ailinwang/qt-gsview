@@ -23,7 +23,8 @@ int main(int argc, char *argv[])
         int y=dw.height()*0.85;
         newWindow->setFixedSize(x,y);
         newWindow->show();
-        newWindow->OpenFile("/Users/fredross-perry/Desktop/CM District Admin Overview.pdf");
+//        newWindow->OpenFile("/Users/fredross-perry/Desktop/CM District Admin Overview.pdf");
+        newWindow->OpenFile("/home/fred/Desktop/sample files/pdf/CM District Admin Overview.pdf");
         return app.exec();
     }
 

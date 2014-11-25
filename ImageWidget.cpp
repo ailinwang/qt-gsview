@@ -417,49 +417,41 @@ void ImageWidget::cleanup()
 
 void ImageWidget::deleteImageData()
 {
-    if (m_bitmap!=NULL)
-        delete m_bitmap;
-    m_bitmap=NULL;
+    if (m_pixmap!=NULL)
+        delete m_pixmap;
+    m_pixmap=NULL;\
 
     if (m_image!=NULL)
         delete m_image;
     m_image=NULL;
 
-    if (m_pixmap!=NULL)
-        delete m_pixmap;
-    m_pixmap=NULL;
+    if (m_bitmap!=NULL)
+        delete m_bitmap;
+    m_bitmap=NULL;
 }
 
 void ImageWidget::render (bool showAnnotations, bool showLinks)
 {
+    deleteImageData();
+
     point_t thePageSize = pageSize();
 
     //  render
     int numBytes = (int)thePageSize.X * (int)thePageSize.Y * 4;
-    Byte *bitmap = new Byte[numBytes];
-    m_document->RenderPage (m_pageNumber, scale(), bitmap, thePageSize.X, thePageSize.Y, showAnnotations);
+    m_bitmap = new Byte[numBytes];
+    m_document->RenderPage (m_pageNumber, scale(), m_bitmap, thePageSize.X, thePageSize.Y, showAnnotations);
 
     m_document->ComputeTextBlocks(m_pageNumber);
 
     //  copy to widget
-    QImage *myImage = QtUtil::QImageFromData (bitmap, (int)thePageSize.X, (int)thePageSize.Y);
-    QPixmap pix = QPixmap::fromImage(*myImage);
+    m_image = QtUtil::QImageFromData (m_bitmap, (int)thePageSize.X, (int)thePageSize.Y);
+    QPixmap pix = QPixmap::fromImage(*m_image);
     setPixmap(pix);
 
     //  tell image to show or hide the links.
     setShowLinks(showLinks);
     setRendered(true);
     update();
-
-    //  remember so they can be destroyed later
-    setImageData(bitmap, myImage, NULL);
 }
 
-void ImageWidget::setImageData(Byte *bitmap, QImage *image, QPixmap *pixmap)
-{
-    deleteImageData();
-    m_bitmap = bitmap;
-    m_image  = image;
-    m_pixmap = pixmap;
-}
 

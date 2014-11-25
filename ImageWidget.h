@@ -75,7 +75,6 @@ protected:
 
 private:
 
-    void setImageData(Byte *bitmap, QImage *image, QPixmap *pixmap);
     void deleteImageData();
 
     void HilightBlocks (QPainter *painter, double scale, int pageNumber,

@@ -1038,7 +1038,6 @@ void Window::closeEvent(QCloseEvent *event)
 
     //  delete things that were allocated
     if (NULL!=m_copiedImage)
-
         delete m_copiedImage;
     m_copiedImage = NULL;
 
