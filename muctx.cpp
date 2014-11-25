@@ -595,7 +595,7 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 
     /* First see if we have this one in the cache */
     fz_display_list *dlist = NULL;
-    if (useCache)
+    //if (useCache)
     {
         dlist = text_cache->Use(page_num, width, height, mu_ctx);
         if (dlist != NULL)
@@ -634,7 +634,7 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 		*width = page_size.X;
 		*height = page_size.Y;
 		/* Add it to the cache and set that it is in use */
-        if (useCache)
+        //if (useCache)
             text_cache->Add(page_num, *width, *height, dlist, mu_ctx);
 	}
 	fz_always(mu_ctx)
@@ -642,6 +642,7 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 		fz_free_device(dev);
 		fz_free_page(mu_doc, page);
 		fz_free_text_sheet(mu_ctx, sheet);
+        fz_drop_display_list(mu_ctx, dlist);
 	}
 	fz_catch(mu_ctx)
 	{
@@ -704,8 +705,8 @@ status_t muctx::RenderPageMT(void *dlist, void *a_dlist, int page_width, int pag
 	{
 		fz_free_device(dev);
 		fz_drop_pixmap(ctx_clone, pix);
-//		fz_drop_display_list(ctx_clone, display_list);
-//		fz_drop_display_list(ctx_clone, annot_displaylist);
+        fz_drop_display_list(ctx_clone, display_list);
+        fz_drop_display_list(ctx_clone, annot_displaylist);
 	}
 	fz_catch(ctx_clone)
 	{

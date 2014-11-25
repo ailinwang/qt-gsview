@@ -79,7 +79,7 @@ void Cache::Add(int value, int width_in, int height_in, fz_display_list *dlist,
 	}
 	size++;
 	/* We are going to use this item now */
-//	fz_keep_display_list(mu_ctx, new_entry->dlist);
+    fz_keep_display_list(mu_ctx, new_entry->dlist);
 }
 
 fz_display_list* Cache::Use(int value, int *width_out, int *height_out, fz_context *mu_ctx)
