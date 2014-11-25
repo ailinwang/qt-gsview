@@ -614,7 +614,7 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 	{
 		page = fz_load_page(mu_doc, page_num);
 		sheet = fz_new_text_sheet(mu_ctx);
-        text = fz_new_text_page(mu_ctx);  //  MEMORY leak here
+        text = fz_new_text_page(mu_ctx);
 
 		/* Create a new list */
         dlist = fz_new_display_list(mu_ctx);
