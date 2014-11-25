@@ -129,7 +129,7 @@ class PageLinks
 {
 public:
     bool processed = false;
-    std::vector<Link> links;
+    std::vector<Link *> links;
 };
 
 class Document
@@ -151,6 +151,7 @@ public:
     bool Initialize ();
     void CleanUp ();
     void CleanupTextBlocks ();
+    void CleanupLinks ();
 
     bool OpenFile (const std::string fileName);
     bool isOpen() {return m_opened;}

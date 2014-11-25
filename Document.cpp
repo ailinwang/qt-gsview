@@ -37,11 +37,7 @@ bool Document::Initialize()
 void Document::CleanUp()
 {
     CleanupTextBlocks();
-
-    if (m_pageLinks !=NULL)
-        delete [] m_pageLinks;
-    if (m_block_list !=NULL)
-        delete [] m_block_list;
+    CleanupLinks();
 
     if (mu_ctx != NULL)
     {
@@ -79,6 +75,25 @@ void Document::CleanupTextBlocks()
         m_block_list[i].clear();
     }
     delete [] m_block_list;
+    m_block_list = NULL;
+}
+
+void Document::CleanupLinks()
+{
+    for (int i=0; i<m_pageCount ;i++)
+    {
+        if (m_pageLinks[i].processed)
+        {
+            int num_items = m_pageLinks[i].links.size();
+            for (int k = 0; k < num_items; k++)
+            {
+                Link *theLink = m_pageLinks[i].links.at(k);
+                delete theLink;
+            }
+        }
+    }
+    delete [] m_pageLinks;
+    m_pageLinks = NULL;
 }
 
 bool Document::OpenFile(const std::string fileName)
@@ -125,7 +140,7 @@ Link * Document::GetLink(int page_num, int link_num)
     if (link_num>=numItems)  //  zero-based
         return NULL;
 
-    return &(m_pageLinks[page_num].links.at(link_num));
+    return (m_pageLinks[page_num].links.at(link_num));
 }
 
 int Document::ComputeLinks(int page_num)
@@ -167,7 +182,7 @@ int Document::ComputeLinks(int page_num)
         }
 
         //  add to this page's link list
-        m_pageLinks[page_num].links.push_back(*new_link);
+        m_pageLinks[page_num].links.push_back(new_link);
     }
 
     m_pageLinks[page_num].processed = true;
