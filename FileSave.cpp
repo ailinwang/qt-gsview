@@ -13,6 +13,7 @@
 #include "QtUtil.h"
 #include "MessagesDialog.h"
 #include "ICCDialog2.h"
+#include "FileSaveDialog.h"
 
 FileType fileTypes[] = {
     {"PDF",             "pdf" , "", false },
@@ -85,7 +86,7 @@ void FileSave::run()
     }
 
     //  set up the dialog
-    QFileDialog dialog(m_window, "Save", desktop);
+    FileSaveDialog dialog(m_window, "Save", desktop);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     dialog.setNameFilter(types);

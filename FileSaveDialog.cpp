@@ -19,15 +19,18 @@ FileSaveDialog::FileSaveDialog (QWidget *parent,
 
 void FileSaveDialog::onFilterSelected(const QString &filter)
 {
-//    UNUSED(filter);
-
-    //  user changed filter.  show the profiles UI
+    //  user changed filter.
+    //  prevent them from using the separator
+    if (filter.compare("--------------------")==0)
+    {
+        disconnect (this, SIGNAL(filterSelected(const QString &)), this, SLOT(onFilterSelected(const QString &)));
+        this->selectNameFilter("PDF (*.pdf)");
+        connect (this, SIGNAL(filterSelected(const QString &)), this, SLOT(onFilterSelected(const QString &)));
+    }
 }
 
 void FileSaveDialog::show()
 {
     //  customize the dialog
-
     QFileDialog::show();
 }
-
