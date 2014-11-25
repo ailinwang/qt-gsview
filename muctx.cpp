@@ -642,7 +642,7 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 		fz_free_device(dev);
 		fz_free_page(mu_doc, page);
 		fz_free_text_sheet(mu_ctx, sheet);
-        fz_drop_display_list(mu_ctx, dlist);
+//        fz_drop_display_list(mu_ctx, dlist);
 	}
 	fz_catch(mu_ctx)
 	{
@@ -705,8 +705,8 @@ status_t muctx::RenderPageMT(void *dlist, void *a_dlist, int page_width, int pag
 	{
 		fz_free_device(dev);
 		fz_drop_pixmap(ctx_clone, pix);
-        fz_drop_display_list(ctx_clone, display_list);
-        fz_drop_display_list(ctx_clone, annot_displaylist);
+//        fz_drop_display_list(ctx_clone, display_list);
+//        fz_drop_display_list(ctx_clone, annot_displaylist);
 	}
 	fz_catch(ctx_clone)
 	{
@@ -947,8 +947,8 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
 			fz_drop_pixmap(mu_ctx, pix);
 		fz_free_device(dev);
 		fz_free_page(mu_doc, page);
-		if (dlist != NULL)
-			fz_drop_display_list(mu_ctx, dlist);
+//		if (dlist != NULL)
+//			fz_drop_display_list(mu_ctx, dlist);
 		if (out != NULL)
 		{
 			fz_close_output(out);
