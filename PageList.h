@@ -27,6 +27,14 @@ private:
     void onMouseMove(QEvent *e);
     void manageCursor(QEvent *e);
     void updateSelection(QEvent *e);
+    void onRightClick(QEvent *e);
+
+    void onMenuCopy();
+    void onMenuDeselect();
+    void onMenuSelectLine();
+    void onMenuSelectBlock();
+    void onMenuSelectPage();
+    void onMenuSelectAll();
 
     QPoint m_origin;
 };

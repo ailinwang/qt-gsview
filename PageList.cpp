@@ -1,6 +1,7 @@
 #include <QPoint>
 #include <QMouseEvent>
 #include <QClipboard>
+#include <QMessageBox>
 
 #include "PageList.h"
 
@@ -10,6 +11,13 @@ PageList::PageList()
 
 void PageList::onMousePress(QEvent *e)
 {
+    //  right mouse button?
+    if (((QMouseEvent *)e)->button()==Qt::RightButton)
+    {
+        onRightClick(e);
+        return;
+    }
+
     //  if the shift key is pressed,
     //  update the current selection instead of starting a new one.
     QMouseEvent *me = ((QMouseEvent *)e);
@@ -310,3 +318,65 @@ bool PageList::onEvent(QEvent *e)
 
     return false;
 }
+
+void PageList::onRightClick(QEvent *e)
+{
+    QPoint origin = getScrollArea()->mapToGlobal(((QMouseEvent *)e)->pos());
+
+    QMenu myMenu;
+    QAction *copy        = myMenu.addAction("Copy");
+    QAction *deselect    = myMenu.addAction("Deselect All");
+    QAction *selectLine  = myMenu.addAction("Select Line");
+    QAction *selectBlock = myMenu.addAction("Select Block");
+    QAction *selectPage  = myMenu.addAction("Select Page");
+    QAction *selectAll   = myMenu.addAction("Select All");
+
+    QAction* selectedItem = myMenu.exec(origin);
+
+    if (selectedItem==copy)
+        onMenuCopy();
+    else if (selectedItem==deselect)
+        onMenuDeselect();
+    else if (selectedItem==selectLine)
+        onMenuSelectLine();
+    else if (selectedItem==selectBlock)
+        onMenuSelectBlock();
+    else if (selectedItem==selectPage)
+        onMenuSelectPage();
+    else if (selectedItem==selectAll)
+        onMenuSelectAll();
+    else
+        ;//nothing chosen
+
+}
+
+void PageList::onMenuCopy()
+{
+    copyText();
+}
+
+void PageList::onMenuDeselect()
+{
+    deselectText();
+}
+
+void PageList::onMenuSelectLine()
+{
+
+}
+
+void PageList::onMenuSelectBlock()
+{
+
+}
+
+void PageList::onMenuSelectPage()
+{
+
+}
+
+void PageList::onMenuSelectAll()
+{
+    selectAllText();
+}
+
