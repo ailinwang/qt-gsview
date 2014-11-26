@@ -383,6 +383,46 @@ void PageList::onMenuDeselect()
 
 void PageList::onMenuSelectLine(QEvent *e)
 {
+    //  first deselect everything
+    deselectText();
+
+    //  current mouse location
+    QPoint pos = ((QMouseEvent *)e)->pos();
+    QPoint posGlobal = getScrollArea()->mapToGlobal(pos);
+
+    ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
+    if (widget != NULL)
+    {
+        QPoint posPage = widget->mapFromGlobal(posGlobal);
+
+        //  compute (or retrieve) text blocks for this page
+        int pageNumber = widget->pageNumber();
+        document()->ComputeTextBlocks(pageNumber);
+
+        int num_blocks = document()->blockList()[pageNumber].size();
+        double scale = widget->scale();
+        for (int kk = 0; kk < num_blocks; kk++)
+        {
+            TextBlock *block = (document()->blockList()[pageNumber].at(kk));
+
+            int num_lines = block->line_list->size();
+            for (int jj = 0; jj < num_lines; jj++)
+            {
+                TextLine *line = (block->line_list->at(jj));
+
+                //  see if we're inside this line
+                QRect rect ( QPoint(scale*line->X,scale*line->Y),
+                             QPoint(scale*(line->X+line->Width),scale*(line->Y+line->Height)));
+                if (rect.contains(posPage))
+                {
+                    widget->addToSelection(line);
+                    //  we're only selecting one line, so just return
+                    widget->update();
+                    return;
+                }
+            }
+        }
+    }
 }
 
 void PageList::onMenuSelectBlock(QEvent *e)
