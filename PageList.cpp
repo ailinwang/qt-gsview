@@ -368,7 +368,7 @@ void PageList::onRightClick(QEvent *e)
     else if (selectedItem==selectAll)
         onMenuSelectAll();
     else
-        ;//nothing chosen
+        {}  //nothing chosen
 }
 
 void PageList::onMenuCopy()
