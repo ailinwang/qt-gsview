@@ -123,7 +123,7 @@ public:
 							point_t bottom_right);
 	fz_display_list* CreateDisplayList(int page_num, int *width, int *height);
 	fz_display_list * CreateDisplayListText(int page_num, int *width,
-        int *height, fz_text_page **text, int *length, bool useCache);
+        int *height, fz_text_page **text, int *length);
 	fz_display_list * CreateAnnotationList(int page_num);
 	int MeasurePage(int page_num, point_t *size);
 	point_t MeasurePage(fz_page *page);

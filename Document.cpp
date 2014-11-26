@@ -259,7 +259,7 @@ void Document::ComputeTextBlocks (int page_num)
     int height;
     int num_blocks;
     fz_text_page *text;
-    void *text_ptr = (void*)mu_ctx->CreateDisplayListText (page_num, &width, &height, &text, &num_blocks, true);
+    void *text_ptr = (void*)mu_ctx->CreateDisplayListText (page_num, &width, &height, &text, &num_blocks);
     if (text_ptr==NULL)
         return;
 
@@ -322,9 +322,9 @@ void Document::ComputeTextBlocks (int page_num)
         }
     }
 
-    //  free up the text, since it's been copied into
-    //  other structures.
-    mu_ctx->freeText(text);
+//    //  free up the text, since it's been copied into
+//    //  other structures.
+//    mu_ctx->freeText(text);
 }
 
 unsigned int Document::ComputeContents()

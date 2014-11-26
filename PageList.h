@@ -4,6 +4,8 @@
 #include "ScrollingImageList.h"
 #include "Document.h"
 
+class SelectionFrame;
+
 class PageList : public ScrollingImageList
 {
 public:
@@ -39,6 +41,11 @@ private:
     QString collectSelectedText();
 
     QPoint m_origin;
+
+    SelectionFrame *m_rubberBand=NULL;
+    bool m_selectingArea = false;
+    QPoint m_rubberBandOrigin;
+    bool m_controlKeyIsDown = false;
 };
 
 #endif // PAGELIST_H

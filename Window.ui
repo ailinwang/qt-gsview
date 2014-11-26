@@ -193,6 +193,7 @@
     <addaction name="actionClose"/>
     <addaction name="actionSave"/>
     <addaction name="actionExract_Pages"/>
+    <addaction name="actionSave_Selection"/>
     <addaction name="separator"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
@@ -655,6 +656,11 @@
   <action name="actionCopy_Page">
    <property name="text">
     <string>Copy Page</string>
+   </property>
+  </action>
+  <action name="actionSave_Selection">
+   <property name="text">
+    <string>Save Selection...</string>
    </property>
   </action>
  </widget>

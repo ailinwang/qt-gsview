@@ -582,7 +582,7 @@ fz_display_list * muctx::CreateDisplayList(int page_num, int *width, int *height
 /* A special version which will create the display list AND get the information
    that we need for various text selection tasks */
 fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *height,
-    fz_text_page **text_out, int *length, bool useCache)
+    fz_text_page **text_out, int *length)
 {
 	fz_text_sheet *sheet = NULL;
 	fz_text_page *text = NULL;
@@ -595,12 +595,9 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 
     /* First see if we have this one in the cache */
     fz_display_list *dlist = NULL;
-    //if (useCache)
-    {
-        dlist = text_cache->Use(page_num, width, height, mu_ctx);
-        if (dlist != NULL)
-            return dlist;
-    }
+    dlist = text_cache->Use(page_num, width, height, mu_ctx);
+    if (dlist != NULL)
+        return dlist;
 
 	/* Apparently not, lets go ahead and create and add to cache */
 	fz_var(dev);
@@ -634,8 +631,7 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 		*width = page_size.X;
 		*height = page_size.Y;
 		/* Add it to the cache and set that it is in use */
-        //if (useCache)
-            text_cache->Add(page_num, *width, *height, dlist, mu_ctx);
+        text_cache->Add(page_num, *width, *height, dlist, mu_ctx);
 	}
 	fz_always(mu_ctx)
 	{

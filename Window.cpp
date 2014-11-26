@@ -56,6 +56,7 @@ Window::Window(QWidget *parent) :
     connect(ui->actionInfo, SIGNAL(triggered()), this, SLOT(fileInfo()));
     connect(ui->actionGhostscript_Messages, SIGNAL(triggered()), this, SLOT(ghostscriptMessages()));
     connect(ui->actionExract_Pages, SIGNAL(triggered()), this, SLOT(extractPages()));
+    connect(ui->actionSave_Selection, SIGNAL(triggered()), this, SLOT(saveSelection()));
 
     //  edit menu
     connect(ui->actionCopy_Text, SIGNAL(triggered()), this, SLOT(copyText()));
@@ -977,6 +978,13 @@ void Window::copyPage()
     if (NULL!=m_copiedBitmap)
         delete m_copiedBitmap;
     m_copiedBitmap = bitmap;
+}
+
+void Window::saveSelection()
+{
+    //  is there a selection?
+
+
 }
 
 void Window::homeSlot()

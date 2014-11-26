@@ -90,6 +90,7 @@ private slots:
     void extractPages();
     void outputIntents();
     void copyPage();
+    void saveSelection();
 
 private:
     Ui::Window *ui;

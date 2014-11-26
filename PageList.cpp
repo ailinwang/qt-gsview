@@ -10,33 +10,28 @@ PageList::PageList()
 {
 }
 
-SelectionFrame *rubberBand=NULL;
-bool selectingArea = false;
-QPoint rubberBandOrigin;
-bool controlKeyIsDown = false;
-
 void PageList::onMousePress(QEvent *e)
 {
     QMouseEvent *me = ((QMouseEvent *)e);
 
-    selectingArea = false;
-    if (rubberBand)
+    m_selectingArea = false;
+    if (m_rubberBand)
     {
-        rubberBand->hide();
-        delete rubberBand;
-        rubberBand=NULL;
+        m_rubberBand->hide();
+        delete m_rubberBand;
+        m_rubberBand=NULL;
     }
 
     //  selecting an area?
     if(me->modifiers() & Qt::ControlModifier)
     {
         deselectText();
-        selectingArea = true;
-        rubberBandOrigin = me->pos();
+        m_selectingArea = true;
+        m_rubberBandOrigin = me->pos();
         ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
-        rubberBand = new SelectionFrame(widget);
-        rubberBand->setGeometry(QRect(rubberBandOrigin, QSize()));        
-        rubberBand->show();
+        m_rubberBand = new SelectionFrame(widget);
+        m_rubberBand->setGeometry(QRect(m_rubberBandOrigin, QSize()));
+        m_rubberBand->show();
 
         qApp->setOverrideCursor(Qt::CrossCursor);
         qApp->processEvents();
@@ -141,9 +136,9 @@ void PageList::onMouseRelease(QEvent *e)
     UNUSED(e);
 //    QMouseEvent *me = ((QMouseEvent *)e);
 
-    if (rubberBand && selectingArea)
+    if (m_rubberBand && m_selectingArea)
     {
-        selectingArea = false;
+        m_selectingArea = false;
         QApplication::restoreOverrideCursor();  //  default arrow cursor
         qApp->processEvents();
 
@@ -160,7 +155,7 @@ void PageList::onMouseRelease(QEvent *e)
 
 void PageList::manageCursor(QEvent *e)
 {
-    if (controlKeyIsDown)
+    if (m_controlKeyIsDown)
         return;
 
     //  current mouse location
@@ -352,9 +347,9 @@ void PageList::onMouseMove(QEvent *e)
 {
     QMouseEvent *me = ((QMouseEvent *)e);
 
-    if (rubberBand && selectingArea)
+    if (m_rubberBand && m_selectingArea)
     {
-        rubberBand->setGeometry(QRect(rubberBandOrigin, me->pos()).normalized());
+        m_rubberBand->setGeometry(QRect(m_rubberBandOrigin, me->pos()).normalized());
         return;
     }
 
@@ -385,7 +380,7 @@ bool PageList::onEvent(QEvent *e)
         QKeyEvent *ke = (QKeyEvent *)e;
         if (ke->key() == Qt::Key_Control)
         {
-            controlKeyIsDown = true;
+            m_controlKeyIsDown = true;
             qApp->setOverrideCursor(Qt::CrossCursor);
             qApp->processEvents();
         }
@@ -395,7 +390,7 @@ bool PageList::onEvent(QEvent *e)
         QKeyEvent *ke = (QKeyEvent *)e;
         if (ke->key() == Qt::Key_Control)
         {
-            controlKeyIsDown = false;
+            m_controlKeyIsDown = false;
             QApplication::restoreOverrideCursor();  //  default arrow cursor
             qApp->processEvents();
         }
