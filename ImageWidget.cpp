@@ -134,27 +134,6 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
             //  post event to the window
             QApplication::postEvent(this->window(), new ImageClickedEvent(m_pageNumber));
         }
-        else
-        {
-            //  clicked on a page.
-            //  Handle it if we're not currently selecting text
-            if (m_mouseInLink)
-            {
-                if (m_selected_lines.size()<=0)
-                {
-                    //  handle URI and GOTO links
-                    if (m_mouseInLink->Type == LINK_URI)
-                    {
-                        QUrl url(QString(m_mouseInLink->Uri.c_str()));
-                        QDesktopServices::openUrl(url);
-                    }
-                    else if (m_mouseInLink->Type == LINK_GOTO)
-                    {
-                        ((Window *)this->window())->goToPage(m_mouseInLink->PageNum);
-                    }
-                }
-            }
-        }
     }
 
     //  returning false allows the event to processed further.
@@ -407,6 +386,30 @@ void ImageWidget::setRendered (bool rendered)
     m_rendered = rendered;
     if (!rendered)
         deleteImageData();
+}
+
+void ImageWidget::onMouseRelease(QEvent *event)
+{
+    UNUSED(event);
+
+    //  clicked on a page.
+    //  Handle it if we're not currently selecting text
+    if (m_mouseInLink)
+    {
+        if (m_selected_lines.size()<=0)
+        {
+            //  handle URI and GOTO links
+            if (m_mouseInLink->Type == LINK_URI)
+            {
+                QUrl url(QString(m_mouseInLink->Uri.c_str()));
+                QDesktopServices::openUrl(url);
+            }
+            else if (m_mouseInLink->Type == LINK_GOTO)
+            {
+                ((Window *)this->window())->goToPage(m_mouseInLink->PageNum);
+            }
+        }
+    }
 }
 
 void ImageWidget::cleanup()

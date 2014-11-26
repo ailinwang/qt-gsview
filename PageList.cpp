@@ -2,6 +2,7 @@
 #include <QMouseEvent>
 #include <QClipboard>
 #include <QMessageBox>
+#include <QRubberBand>
 
 #include "PageList.h"
 
@@ -9,10 +10,37 @@ PageList::PageList()
 {
 }
 
+QRubberBand *rubberBand=NULL;
+bool selectingArea = false;
+QPoint rubberBandOrigin;
+
 void PageList::onMousePress(QEvent *e)
 {
+    QMouseEvent *me = ((QMouseEvent *)e);
+
+    selectingArea = false;
+    if (rubberBand)
+    {
+        rubberBand->hide();
+        delete rubberBand;
+        rubberBand=NULL;
+    }
+
+    //  selecting an area?
+    if(me->modifiers() & Qt::ControlModifier)
+    {
+        deselectText();
+        selectingArea = true;
+        rubberBandOrigin = me->pos();
+        ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
+        rubberBand = new QRubberBand(QRubberBand::Rectangle, widget);
+        rubberBand->setGeometry(QRect(rubberBandOrigin, QSize()));
+        rubberBand->show();
+        return;
+    }
+
     //  right mouse button?
-    if (((QMouseEvent *)e)->button()==Qt::RightButton)
+    if (me->button()==Qt::RightButton)
     {
         onRightClick(e);
         return;
@@ -20,7 +48,6 @@ void PageList::onMousePress(QEvent *e)
 
     //  if the shift key is pressed,
     //  update the current selection instead of starting a new one.
-    QMouseEvent *me = ((QMouseEvent *)e);
     if(me->modifiers() & Qt::ShiftModifier)
     {
         updateSelection(e);
@@ -107,6 +134,21 @@ void PageList::copyText()
 void PageList::onMouseRelease(QEvent *e)
 {
     UNUSED(e);
+//    QMouseEvent *me = ((QMouseEvent *)e);
+
+    if (rubberBand && selectingArea)
+    {
+        selectingArea = false;
+        //  TODO:  something with the selection?
+        return;
+    }
+
+    ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
+    if (widget != NULL)
+    {
+        widget->onMouseRelease(e);
+    }
+
 }
 
 void PageList::manageCursor(QEvent *e)
@@ -298,6 +340,14 @@ void PageList::updateSelection(QEvent *e)
 
 void PageList::onMouseMove(QEvent *e)
 {
+    QMouseEvent *me = ((QMouseEvent *)e);
+
+    if (rubberBand && selectingArea)
+    {
+        rubberBand->setGeometry(QRect(rubberBandOrigin, me->pos()).normalized());
+        return;
+    }
+
     manageCursor(e);
 
     if(((QMouseEvent *)e)->buttons() == Qt::LeftButton)

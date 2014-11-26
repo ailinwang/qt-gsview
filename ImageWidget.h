@@ -70,6 +70,8 @@ public:
     void render (bool showAnnotations, bool showLinks);
     void setRendered(bool rendered);
 
+    void onMouseRelease(QEvent *event);
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
