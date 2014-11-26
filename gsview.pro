@@ -52,7 +52,8 @@ HEADERS       = \
     FileSaveDialog.h \
     ExtractPagesDialog.h \
     ICCDialog.h \
-    ICCDialog2.h
+    ICCDialog2.h \
+    SelectionFrame.h
 
 SOURCES       = \
     main.cpp \
@@ -76,7 +77,8 @@ SOURCES       = \
     FileSaveDialog.cpp \
     ExtractPagesDialog.cpp \
     ICCDialog.cpp \
-    ICCDialog2.cpp
+    ICCDialog2.cpp \
+    SelectionFrame.cpp
 
 FORMS += \
     Window.ui \

@@ -2,17 +2,18 @@
 #include <QMouseEvent>
 #include <QClipboard>
 #include <QMessageBox>
-#include <QRubberBand>
 
 #include "PageList.h"
+#include "SelectionFrame.h"
 
 PageList::PageList()
 {
 }
 
-QRubberBand *rubberBand=NULL;
+SelectionFrame *rubberBand=NULL;
 bool selectingArea = false;
 QPoint rubberBandOrigin;
+bool controlKeyIsDown = false;
 
 void PageList::onMousePress(QEvent *e)
 {
@@ -33,9 +34,13 @@ void PageList::onMousePress(QEvent *e)
         selectingArea = true;
         rubberBandOrigin = me->pos();
         ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
-        rubberBand = new QRubberBand(QRubberBand::Rectangle, widget);
-        rubberBand->setGeometry(QRect(rubberBandOrigin, QSize()));
+        rubberBand = new SelectionFrame(widget);
+        rubberBand->setGeometry(QRect(rubberBandOrigin, QSize()));        
         rubberBand->show();
+
+        qApp->setOverrideCursor(Qt::CrossCursor);
+        qApp->processEvents();
+
         return;
     }
 
@@ -139,7 +144,9 @@ void PageList::onMouseRelease(QEvent *e)
     if (rubberBand && selectingArea)
     {
         selectingArea = false;
-        //  TODO:  something with the selection?
+        QApplication::restoreOverrideCursor();  //  default arrow cursor
+        qApp->processEvents();
+
         return;
     }
 
@@ -153,6 +160,9 @@ void PageList::onMouseRelease(QEvent *e)
 
 void PageList::manageCursor(QEvent *e)
 {
+    if (controlKeyIsDown)
+        return;
+
     //  current mouse location
     QPoint pos = ((QMouseEvent *)e)->pos();
     QPoint posGlobal = getScrollArea()->mapToGlobal(pos);
@@ -184,12 +194,12 @@ void PageList::manageCursor(QEvent *e)
 
         if (bInside)
         {
-            getScrollArea()->setCursor(Qt::IBeamCursor);
+            qApp->setOverrideCursor(Qt::IBeamCursor);
             qApp->processEvents();
         }
         else
         {
-            getScrollArea()->setCursor(Qt::ArrowCursor);
+            QApplication::restoreOverrideCursor();  //  default arrow cursor
             qApp->processEvents();
         }
     }
@@ -366,10 +376,29 @@ bool PageList::onEvent(QEvent *e)
     {
         onMouseRelease(e);
     }
-
     else if (e->type() == QMouseEvent::MouseMove)
     {
         onMouseMove(e);
+    }
+    else if (e->type() == QKeyEvent::KeyPress)
+    {
+        QKeyEvent *ke = (QKeyEvent *)e;
+        if (ke->key() == Qt::Key_Control)
+        {
+            controlKeyIsDown = true;
+            qApp->setOverrideCursor(Qt::CrossCursor);
+            qApp->processEvents();
+        }
+    }
+    else if (e->type() == QKeyEvent::KeyRelease)
+    {
+        QKeyEvent *ke = (QKeyEvent *)e;
+        if (ke->key() == Qt::Key_Control)
+        {
+            controlKeyIsDown = false;
+            QApplication::restoreOverrideCursor();  //  default arrow cursor
+            qApp->processEvents();
+        }
     }
 
     return false;
