@@ -31,8 +31,8 @@ private:
 
     void onMenuCopy();
     void onMenuDeselect();
-    void onMenuSelectLine();
-    void onMenuSelectBlock();
+    void onMenuSelectLine(QEvent *e);
+    void onMenuSelectBlock(QEvent *e);
     void onMenuSelectPage();
     void onMenuSelectAll();
 

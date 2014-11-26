@@ -360,16 +360,15 @@ void PageList::onRightClick(QEvent *e)
     else if (selectedItem==deselect && !selectedText.isEmpty())
         onMenuDeselect();
     else if (selectedItem==selectLine)
-        onMenuSelectLine();
+        onMenuSelectLine(e);
     else if (selectedItem==selectBlock)
-        onMenuSelectBlock();
+        onMenuSelectBlock(e);
     else if (selectedItem==selectPage)
         onMenuSelectPage();
     else if (selectedItem==selectAll)
         onMenuSelectAll();
     else
         ;//nothing chosen
-
 }
 
 void PageList::onMenuCopy()
@@ -382,19 +381,79 @@ void PageList::onMenuDeselect()
     deselectText();
 }
 
-void PageList::onMenuSelectLine()
+void PageList::onMenuSelectLine(QEvent *e)
 {
-
 }
 
-void PageList::onMenuSelectBlock()
+void PageList::onMenuSelectBlock(QEvent *e)
 {
+    //  first deselect everything
+    deselectText();
 
+    //  current mouse location
+    QPoint pos = ((QMouseEvent *)e)->pos();
+    QPoint posGlobal = getScrollArea()->mapToGlobal(pos);
+
+    ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
+    if (widget != NULL)
+    {
+        //  compute (or retrieve) text blocks for this page
+        int pageNumber = widget->pageNumber();
+        document()->ComputeTextBlocks(pageNumber);
+
+        //  see if we're inside one
+        QPoint posPage = widget->mapFromGlobal(posGlobal);
+        int num_blocks = document()->blockList()[pageNumber].size();
+        double scale = widget->scale();
+        for (int kk = 0; kk < num_blocks; kk++)
+        {
+            TextBlock *block = (document()->blockList()[pageNumber].at(kk));
+            QRect rect ( QPoint(scale*block->X,scale*block->Y),
+                         QPoint(scale*(block->X+block->Width),scale*(block->Y+block->Height)));
+            if ( rect.contains(posPage))
+            {
+                //  select all of the lines in this block
+                int num_lines = block->line_list->size();
+                for (int jj = 0; jj < num_lines; jj++)
+                {
+                    TextLine *line = (block->line_list->at(jj));
+                    widget->addToSelection(line);
+                }
+                break;
+            }
+        }
+        widget->update();
+    }
 }
 
 void PageList::onMenuSelectPage()
 {
+    //  first deselect everything
+    deselectText();
 
+    ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
+    if (widget != NULL)
+    {
+        //  compute (or retrieve) text blocks for this page
+        int pageNumber = widget->pageNumber();
+        document()->ComputeTextBlocks(pageNumber);
+
+        int num_blocks = document()->blockList()[pageNumber].size();
+        for (int kk = 0; kk < num_blocks; kk++)
+        {
+            TextBlock *block = (document()->blockList()[pageNumber].at(kk));
+            {
+                //  select all of the lines in this block
+                int num_lines = block->line_list->size();
+                for (int jj = 0; jj < num_lines; jj++)
+                {
+                    TextLine *line = (block->line_list->at(jj));
+                    widget->addToSelection(line);
+                }
+            }
+        }
+        widget->update();
+    }
 }
 
 void PageList::onMenuSelectAll()
