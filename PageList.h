@@ -36,6 +36,8 @@ private:
     void onMenuSelectPage();
     void onMenuSelectAll();
 
+    QString collectSelectedText();
+
     QPoint m_origin;
 };
 

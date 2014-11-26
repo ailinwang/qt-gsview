@@ -83,19 +83,25 @@ void PageList::hilightSearchText(SearchItem *item)
     getScrollArea()->ensureVisible(p.x(), p.y(), 50, 200);
 }
 
-void PageList::copyText()
+QString PageList::collectSelectedText()
 {
-    QString allText;
+    QString selectedText;
     int nPages = document()->GetPageCount();
     for (int i=0; i<nPages; i++)
     {
         QString pageText = images()[i].selectedText();
-        allText += pageText;
+        selectedText += pageText;
     }
+    return selectedText;
+}
+
+void PageList::copyText()
+{
+    QString selectedText = collectSelectedText();
 
     //  now put it on the clipboard
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(allText);
+    clipboard->setText(selectedText);
 }
 
 void PageList::onMouseRelease(QEvent *e)
@@ -321,21 +327,37 @@ bool PageList::onEvent(QEvent *e)
 
 void PageList::onRightClick(QEvent *e)
 {
+    //  point at which to show the menu
     QPoint origin = getScrollArea()->mapToGlobal(((QMouseEvent *)e)->pos());
 
+    //  currently-selected text
+    QString selectedText = collectSelectedText();
+
+    //  new menu
     QMenu myMenu;
-    QAction *copy        = myMenu.addAction("Copy");
-    QAction *deselect    = myMenu.addAction("Deselect All");
+
+    //  these two actions aren't used if nothing is selected
+    QAction *copy=NULL;
+    QAction *deselect=NULL;
+    if (!selectedText.isEmpty())
+    {
+        copy        = myMenu.addAction("Copy");
+        deselect    = myMenu.addAction("Deselect All");
+    }
+
+    //  more actions
     QAction *selectLine  = myMenu.addAction("Select Line");
     QAction *selectBlock = myMenu.addAction("Select Block");
     QAction *selectPage  = myMenu.addAction("Select Page");
     QAction *selectAll   = myMenu.addAction("Select All");
 
+    //  show the menu
     QAction* selectedItem = myMenu.exec(origin);
 
-    if (selectedItem==copy)
+    //  handle the result
+    if (selectedItem==copy && !selectedText.isEmpty())
         onMenuCopy();
-    else if (selectedItem==deselect)
+    else if (selectedItem==deselect && !selectedText.isEmpty())
         onMenuDeselect();
     else if (selectedItem==selectLine)
         onMenuSelectLine();
