@@ -40,7 +40,6 @@ HEADERS       = \
     QtUtil.h \
     ScrollingImageList.h \
     ImageWidget.h \
-    MyScrollArea.h \
     ThumbnailList.h \
     PageList.h \
     Printer.h \
@@ -64,7 +63,6 @@ SOURCES       = \
     QtUtil.cpp \
     ScrollingImageList.cpp \
     ImageWidget.cpp \
-    MyScrollArea.cpp \
     ThumbnailList.cpp \
     PageList.cpp \
     Printer.cpp \
