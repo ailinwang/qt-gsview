@@ -415,9 +415,9 @@ void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int 
         command += " -o \"" + m_tmp + "\"";
         command += " " + QString("-c") + " ";
         command += "\"<</Install {";
-        command += "-" + QString::number(x) + " " ;
-        command += "-" + QString::number(y) + " " ;
-        command += "translate (testing) == flush}>> setpagedevice \"";
+        command += "-" + QString::number(x) + ".0 " ;
+        command += "-" + QString::number(y) + ".0 " ;
+        command += "translate (testing) == flush}>> setpagedevice\"";
         command += " -f \"" + m_window->getPath() + "\"";
 
         //  launch it
@@ -430,7 +430,7 @@ void FileSave::setProgress (int val)
     m_progressDialog->setValue(val);
     QString s = QString("Processed ")
                     + QString::number(val) + QString(" of ")
-                    + QString::number(m_window->document()->GetPageCount()) + QString(" pages...");
+                    + QString::number(m_progressDialog->maximum()) + QString(" pages...");
     m_progressDialog->setLabelText(s);
     qApp->processEvents();
 }
@@ -538,7 +538,7 @@ void FileSave::saveWithProgress2(QString command)
     //  show a progress widget
     m_progressDialog = new QProgressDialog(m_window);
     connect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
-    m_progressDialog->setMaximum(m_window->document()->GetPageCount());
+    m_progressDialog->setMaximum(1);  //  only one page
     setProgress(0);
     m_progressDialog->show();
     qApp->processEvents();
@@ -604,6 +604,13 @@ void FileSave::onFinished(int exitCode)
     //  are we canceled?
     if (m_progressDialog->wasCanceled())
     {
+        //  take down progress widget
+        m_progressDialog->hide(); qApp->processEvents();
+        disconnect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
+        delete m_progressDialog;
+        disconnect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
+        disconnect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
+
         //  yes
         MessagesDialog::addMessage("canceled.\n");
 
@@ -615,6 +622,13 @@ void FileSave::onFinished(int exitCode)
     }
     else
     {
+        //  take down progress widget
+        m_progressDialog->hide(); qApp->processEvents();
+        disconnect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
+        delete m_progressDialog;
+        disconnect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
+        disconnect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
+
         //  no
         MessagesDialog::addMessage("finished.\n");
 
@@ -627,20 +641,6 @@ void FileSave::onFinished(int exitCode)
 
         QMessageBox::information (NULL, "", "Finished.");
     }
-
-    //  take down progress widget
-    m_progressDialog->hide();
-    qApp->processEvents();
-    disconnect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
-    delete m_progressDialog;
-
-    //  disconnect/delete the process
-    disconnect (m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
-    disconnect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
-
-    //  this seems to be unnecessary.  Qt?
-//    delete m_process;
-//    m_process=NULL;
 
 }
 

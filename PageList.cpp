@@ -32,8 +32,8 @@ void PageList::onMousePress(QEvent *e)
     {
         deselectText();
         m_selectingArea = true;
-        m_rubberBandOrigin = me->pos();
         ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
+        m_rubberBandOrigin = widget->mapFromGlobal(QCursor::pos());
         m_rubberBand = new SelectionFrame(widget);
         m_rubberBand->setGeometry(QRect(m_rubberBandOrigin, QSize()));
         m_rubberBand->show();
@@ -129,22 +129,20 @@ bool PageList::isAreaSelected()
 
 void PageList::saveSelection(FileSave *fileSave)
 {
+    //  get selection rect
     QRect rect = m_rubberBand->geometry();
+
+    //  TODO: deal with scaling
+
     ImageWidget *image = &(images()[m_rubberbandpage]);
-    int imageheight = image->height();
+    int imageHeight = image->height();
 
-    //  TODO: scaling?
+    int transX = rect.left();
+    int transY = imageHeight-rect.top()-rect.height();
 
-    fileSave->extractSelection (rect.left(),
-                                rect.top(), //  Y is measured from the bottom
-                                rect.width(),
-                                rect.height(),
+    fileSave->extractSelection (transX, transY,
+                                rect.width(), rect.height(),
                                 m_rubberbandpage, 300);
-//    fileSave->extractSelection (0,
-//                                100, //  Y is measured from the bottom
-//                                image->width(),
-//                                image->height(),
-//                                m_rubberbandpage, 300);
 }
 
 void PageList::zoom (double scale)
@@ -152,11 +150,13 @@ void PageList::zoom (double scale)
     //  adjust the size of the selection rectangle
     if (m_rubberBand!=NULL)
     {
+        QRect r = m_rubberBand->geometry();
+
         QRect r2 (
-                    m_rubberbandRect.left()  *scale/m_rubberbandScale,
-                    m_rubberbandRect.top()   *scale/m_rubberbandScale,
-                    m_rubberbandRect.width() *scale/m_rubberbandScale,
-                    m_rubberbandRect.height()*scale/m_rubberbandScale  );
+                    r.left()  *scale/m_rubberbandScale,
+                    r.top()   *scale/m_rubberbandScale,
+                    r.width() *scale/m_rubberbandScale,
+                    r.height()*scale/m_rubberbandScale  );
 
         m_rubberBand->setGeometry(r2);
     }
@@ -188,12 +188,10 @@ void PageList::copyText()
 void PageList::onMouseRelease(QEvent *e)
 {
     UNUSED(e);
-//    QMouseEvent *me = ((QMouseEvent *)e);
 
     if (m_rubberBand && m_selectingArea)
     {
         m_rubberbandScale = getScale();
-        m_rubberbandRect = m_rubberBand->geometry();
         m_selectingArea = false;
         QApplication::restoreOverrideCursor();  //  default arrow cursor
         qApp->processEvents();
@@ -401,11 +399,13 @@ void PageList::updateSelection(QEvent *e)
 
 void PageList::onMouseMove(QEvent *e)
 {
-    QMouseEvent *me = ((QMouseEvent *)e);
+    UNUSED(e);
 
     if (m_rubberBand && m_selectingArea)
     {
-        m_rubberBand->setGeometry(QRect(m_rubberBandOrigin, me->pos()).normalized());
+        ImageWidget *image = &(images()[m_rubberbandpage]);
+        QPoint p = image->mapFromGlobal(QCursor::pos());
+        m_rubberBand->setGeometry(QRect(m_rubberBandOrigin, p));
         return;
     }
 

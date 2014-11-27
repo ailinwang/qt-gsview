@@ -53,7 +53,6 @@ private:
     QPoint m_rubberBandOrigin;
     bool m_controlKeyIsDown = false;
     double m_rubberbandScale=1.0;
-    QRect m_rubberbandRect;
     int m_rubberbandpage=0;
 
     Window *m_window=NULL;
