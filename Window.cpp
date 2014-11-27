@@ -36,7 +36,7 @@ Window::Window(QWidget *parent) :
     connect(m_thumbnails, SIGNAL(imagesReady()), this, SLOT(thumbnailsReady()));
 
     //  create and set up the right-side scrolling area
-    m_pages = new PageList();
+    m_pages = new PageList(this);
     m_pages->setScrollArea(ui->rightScrollArea);
     connect(m_pages, SIGNAL(imagesReady()), this, SLOT(pagesReady()));
 
@@ -982,9 +982,23 @@ void Window::copyPage()
 
 void Window::saveSelection()
 {
-    //  is there a selection?
+    //  if no area selected, error
+    if (!m_pages->isAreaSelected())
+    {
+        QMessageBox::information(NULL, tr(""), tr("Nothing is selected."));
+        return;
+    }
 
+    //  TODO: get this data from the PageList
+    int x = 200;
+    int y = 100;
+    int w = 200;
+    int h = 200;
+    int pageNumber = 1;
+    int resolution=300;
 
+    //  save it
+    m_fileSave->extractSelection (x, y, w, h, pageNumber, resolution);
 }
 
 void Window::homeSlot()

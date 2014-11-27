@@ -5,11 +5,12 @@
 #include "Document.h"
 
 class SelectionFrame;
+class Window;
 
 class PageList : public ScrollingImageList
 {
 public:
-    PageList();
+    PageList(Window *parent);
     bool onEvent(QEvent *e);
     void copyText();
     void deselectText();
@@ -21,6 +22,9 @@ public:
     void setSearchText (int nPage, std::vector<SearchItem> *items);
     void clearSearchText();
     void hilightSearchText(SearchItem *item);
+
+    bool isAreaSelected();
+    virtual void zoom (double scale);
 
 private:
 
@@ -46,6 +50,10 @@ private:
     bool m_selectingArea = false;
     QPoint m_rubberBandOrigin;
     bool m_controlKeyIsDown = false;
+    double m_rubberbandScale=1.0;
+    QRect m_rubberbandRect;
+
+    Window *m_window=NULL;
 };
 
 #endif // PAGELIST_H

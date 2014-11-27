@@ -28,7 +28,7 @@ public:
     void hilightImage(int nImage);
     void goToPage (int nPage, bool evenIfVisible=false);
 
-    void zoom (double scale);
+    virtual void zoom (double scale);
     void annot (bool showAnnotations);
     void links (bool showLinks);
 

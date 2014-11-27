@@ -2,12 +2,17 @@
 #include <QMouseEvent>
 #include <QClipboard>
 #include <QMessageBox>
+#include <QProcess>
+#include <FileSave.h>
 
 #include "PageList.h"
+#include "QtUtil.h"
 #include "SelectionFrame.h"
+#include "Window.h"
 
-PageList::PageList()
+PageList::PageList(Window *parent)
 {
+    m_window = parent;
 }
 
 void PageList::onMousePress(QEvent *e)
@@ -110,6 +115,32 @@ void PageList::hilightSearchText(SearchItem *item)
     getScrollArea()->ensureVisible(p.x(), p.y(), 50, 200);
 }
 
+bool PageList::isAreaSelected()
+{
+    if (m_rubberBand!=NULL && m_rubberBand->rect().width()>0 && m_rubberBand->rect().height()>0)
+    {
+        return true;
+    }
+    return false;
+}
+
+void PageList::zoom(double scale)
+{
+    //  adjust the size of the selection rectangle
+    if (m_rubberBand!=NULL)
+    {
+        QRect r2 (
+                    m_rubberbandRect.left()  *scale/m_rubberbandScale,
+                    m_rubberbandRect.top()   *scale/m_rubberbandScale,
+                    m_rubberbandRect.width() *scale/m_rubberbandScale,
+                    m_rubberbandRect.height()*scale/m_rubberbandScale  );
+
+        m_rubberBand->setGeometry(r2);
+    }
+
+    ScrollingImageList::zoom(scale);
+}
+
 QString PageList::collectSelectedText()
 {
     QString selectedText;
@@ -138,6 +169,8 @@ void PageList::onMouseRelease(QEvent *e)
 
     if (m_rubberBand && m_selectingArea)
     {
+        m_rubberbandScale = getScale();
+        m_rubberbandRect = m_rubberBand->geometry();
         m_selectingArea = false;
         QApplication::restoreOverrideCursor();  //  default arrow cursor
         qApp->processEvents();

@@ -316,6 +316,115 @@ void FileSave::run()
 
 }
 
+void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int resolution)
+{
+    QString original = m_window->getPath();
+
+    //  if the original is CBZ, convert to PDF first?
+    if (QtUtil::extensionFromPath(original)==QString("cbz"))
+    {
+        QMessageBox::information (m_window, "", "Saving CBZ files is not yet supported.");
+        return;
+    }
+
+    //  where is the desktop?
+    const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
+    QString desktop = desktopLocations.first();
+
+    //  set up the dialog
+    FileSaveDialog dialog(m_window, "Save", desktop);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
+
+    //  what are the file types?
+    QString types;
+    types += "PDF (*.pdf)";
+    types += ";;EPS (*.eps)";
+    types += ";;PS (*.ps)";
+    dialog.setNameFilter(types);
+
+    //  get the name
+    dialog.show();
+    int result = dialog.exec();
+    if (result == QDialog::Accepted)
+    {
+        QString dst = dialog.selectedFiles().first();
+        QString filter = dialog.selectedNameFilter();
+        QString filterExt = QtUtil::extensionFromFilter(filter);
+        QString fileExt = QtUtil::extensionFromPath(dst);
+
+        //  if the user gave no extension, use the filter
+        if (fileExt.length()==0)
+        {
+            fileExt = filterExt;
+            dst += ".";
+            dst += filterExt;
+        }
+
+        //  if the extensions don't match, that's an error
+        if (fileExt != filterExt)
+        {
+            QMessageBox::information (m_window, "", "you supplied a filename extension that does not match the format.");
+            return;
+        }
+
+        //  if the original is xps, convert tp pdf first.
+        if (QtUtil::extensionFromPath(original)==QString("xps"))
+        {
+            //  put the result into the temp folder
+            QFileInfo fileInfo (original);
+            QString newPath = QtUtil::getTempFolderPath() + fileInfo.fileName() + ".pdf";
+
+            //  construct the command
+            QString command = "\"" + QtUtil::getGxpsPath() + "\"";
+            command += " -sDEVICE=pdfwrite ";
+            command += "-sOutputFile=\"" + newPath + "\"";
+            command += " -dNOPAUSE \"" + original + "\"";
+            qDebug("command is: %s", command.toStdString().c_str());
+
+            //  create a process to do it, and wait
+            QProcess *process = new QProcess(this);
+            process->start(command);
+            process->waitForFinished();
+
+            original = newPath;
+        }
+
+        //  set the output device based on the file type
+        QString device;
+        if (filterExt.compare("pdf",Qt::CaseInsensitive)==0)
+            device = QString("pdfwrite");
+        if (filterExt.compare("eps",Qt::CaseInsensitive)==0)
+            device = QString("eps2write");
+        if (filterExt.compare("ps",Qt::CaseInsensitive)==0)
+            device = QString("ps2write");
+
+        m_dst = dst;
+        m_tmp = dst + ".temp";
+
+        //  construct the command
+        QString command = "\"" + QtUtil::getGsPath() + "\"";
+        command += " " + QString("-sDEVICE=") + QString(device) ;
+        command += " " + QString("-dNOPAUSE -dBATCH -P- -dSAFER") ;
+        command += " -r" + QString::number(resolution) + " ";
+        command += " " + QString("-dFirstPage=") + QString::number(pageNumber) + " ";
+        command += " " + QString("-dLastPage=") + QString::number(pageNumber) + " ";
+        command += " " + QString("-dDEVICEWIDTHPOINTS=") + QString::number(w) + " ";
+        command += " " + QString("-dDEVICEHEIGHTPOINTS=") + QString::number(h) + " ";
+        command += " " + QString("-dFIXEDMEDIA") + " ";
+        command += " -o \"" + m_tmp + "\"";
+        command += " " + QString("-c") + " ";
+        command += "\"<</Install {";
+        command += "-" + QString::number(x) + " " ;
+        command += "-" + QString::number(y) + " " ;
+        command += "translate (testing) == flush}>> setpagedevice \"";
+        command += " -f \"" + m_window->getPath() + "\"";
+
+        //  launch it
+        saveWithProgress2(command);
+    }
+}
+
 void FileSave::setProgress (int val)
 {
     m_progressDialog->setValue(val);
@@ -420,18 +529,8 @@ void FileSave::saveAsText(QString dst, int type)
     }
 }
 
-void FileSave::saveWithProgress (QString options, QString src, QString dst)
+void FileSave::saveWithProgress2(QString command)
 {
-    m_dst = dst;
-    m_tmp = dst + ".temp";
-
-    //  construct the command
-    QString command = "\"" + QtUtil::getGsPath() + "\"";
-    command += " " + options + " ";
-//    command += " -r72 ";
-    command += " -o \"" + m_tmp + "\"";
-    command += " -f \"" + src + "\"";
-
     MessagesDialog::addMessage("\n");
     MessagesDialog::addMessage("starting\n");
     MessagesDialog::addMessage(command+"\n\n");
@@ -455,6 +554,21 @@ void FileSave::saveWithProgress (QString options, QString src, QString dst)
     //  don't wait here, that will block the UI.
     //  instead, clean up in onFinshed(), which will be called in both the
     //  regular finish and when cancelling.
+}
+
+void FileSave::saveWithProgress (QString options, QString src, QString dst)
+{
+    m_dst = dst;
+    m_tmp = dst + ".temp";
+
+    //  construct the command
+    QString command = "\"" + QtUtil::getGsPath() + "\"";
+    command += " " + options + " ";
+//    command += " -r72 ";
+    command += " -o \"" + m_tmp + "\"";
+    command += " -f \"" + src + "\"";
+
+    saveWithProgress2 (command);
 }
 
 void FileSave::onReadyReadStandardOutput()

@@ -21,6 +21,7 @@ public:
 
     FileSave(Window *win) {m_window = win;}
     void run();
+    void extractSelection(int x, int y, int w, int h, int pageNumber, int resolution);
 
 private slots:
     void onReadyReadStandardOutput();
@@ -31,6 +32,7 @@ private:
     void saveWithProgress(QString options, QString src, QString dst);
     void setProgress (int val);
     void saveAsText (QString dst, int type);
+    void saveWithProgress2(QString command);
 
     Window *m_window;
     QProcess *m_process = NULL;
