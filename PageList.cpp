@@ -405,7 +405,9 @@ void PageList::onMouseMove(QEvent *e)
     {
         ImageWidget *image = &(images()[m_rubberbandpage]);
         QPoint p = image->mapFromGlobal(QCursor::pos());
-        m_rubberBand->setGeometry(QRect(m_rubberBandOrigin, p));
+
+        m_rubberBand->setGeometry(QRect(m_rubberBandOrigin, p).normalized());
+
         return;
     }
 
