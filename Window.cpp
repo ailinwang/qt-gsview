@@ -965,7 +965,7 @@ void Window::copyPage()
     int numBytes = (int)pageSize.X * (int)pageSize.Y * 4;
     Byte *bitmap = new Byte[numBytes];
     m_document->RenderPage (nPage, scale, bitmap, pageSize.X, pageSize.Y, m_showAnnotations);
-    QImage *image = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
+    QImage *image = new QImage(bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
 
     //  copy to clipboard
     QClipboard *clipboard = QApplication::clipboard();
@@ -989,16 +989,7 @@ void Window::saveSelection()
         return;
     }
 
-    //  TODO: get this data from the PageList
-    int x = 200;
-    int y = 100;
-    int w = 200;
-    int h = 200;
-    int pageNumber = 1;
-    int resolution=300;
-
-    //  save it
-    m_fileSave->extractSelection (x, y, w, h, pageNumber, resolution);
+    m_pages->saveSelection(m_fileSave);
 }
 
 void Window::homeSlot()

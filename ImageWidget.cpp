@@ -447,7 +447,7 @@ void ImageWidget::render (bool showAnnotations, bool showLinks)
     m_document->ComputeTextBlocks(m_pageNumber);
 
     //  copy to widget
-    m_image = QtUtil::QImageFromData (m_bitmap, (int)thePageSize.X, (int)thePageSize.Y);
+    m_image = new QImage(m_bitmap, (int)thePageSize.X, (int)thePageSize.Y, QImage::Format_ARGB32);
     QPixmap pix = QPixmap::fromImage(*m_image);
     setPixmap(pix);
 

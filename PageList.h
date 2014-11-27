@@ -6,6 +6,7 @@
 
 class SelectionFrame;
 class Window;
+class FileSave;
 
 class PageList : public ScrollingImageList
 {
@@ -24,6 +25,7 @@ public:
     void hilightSearchText(SearchItem *item);
 
     bool isAreaSelected();
+    void saveSelection(FileSave *fileSave);
     virtual void zoom (double scale);
 
 private:
@@ -52,6 +54,7 @@ private:
     bool m_controlKeyIsDown = false;
     double m_rubberbandScale=1.0;
     QRect m_rubberbandRect;
+    int m_rubberbandpage=0;
 
     Window *m_window=NULL;
 };

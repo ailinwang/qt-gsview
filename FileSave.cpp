@@ -407,8 +407,8 @@ void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int 
         command += " " + QString("-sDEVICE=") + QString(device) ;
         command += " " + QString("-dNOPAUSE -dBATCH -P- -dSAFER") ;
         command += " -r" + QString::number(resolution) + " ";
-        command += " " + QString("-dFirstPage=") + QString::number(pageNumber) + " ";
-        command += " " + QString("-dLastPage=") + QString::number(pageNumber) + " ";
+        command += " " + QString("-dFirstPage=") + QString::number(pageNumber+1) + " ";
+        command += " " + QString("-dLastPage=") + QString::number(pageNumber+1) + " ";
         command += " " + QString("-dDEVICEWIDTHPOINTS=") + QString::number(w) + " ";
         command += " " + QString("-dDEVICEHEIGHTPOINTS=") + QString::number(h) + " ";
         command += " " + QString("-dFIXEDMEDIA") + " ";

@@ -8,37 +8,6 @@
 #include <QEvent>
 
 
-QImage * QtUtil::QImageFromData(unsigned char *samples, int w, int h)
-{
-    //  An earlier version of the code used to rearrange the pixels
-    //  to match the expected image format (commented-out below).
-    //  this no longer seems to be necessary, so we let
-    //  QImage create itself directly from the pixels given.
-
-    QImage *myImage = new QImage(samples, w, h, QImage::Format_ARGB32);
-
-//    QImage *myImage = new QImage(w, h, QImage::Format_ARGB32);
-//
-//    int index = 0;
-//    for (int row=0; row <h ;row++)
-//    {
-//        for (int col=0; col <w ;col++)
-//        {
-//            //  image comes in as RGBA
-//            unsigned char red   = samples[index];
-//            unsigned char green = samples[index+1];
-//            unsigned char blue  = samples[index+2];
-//            unsigned char alpha = samples[index+3];
-//            index+= 4;
-//            uint pixel = red + (green<<8) + (blue<<16) + (alpha<<24);
-//
-//            myImage->setPixel (col, row, pixel);
-//        }
-//    }
-
-    return myImage;
-}
-
 QString getRealAppDirPath()
 {
     QString path = qApp->applicationDirPath();
@@ -127,6 +96,18 @@ QString QtUtil::extensionFromFilter(QString filter)
     return filter.mid(start,end-start+1).toLower();
 }
 
+QRect QtUtil::mapToGlobal ( QWidget *widget, QRect r)
+{
+    QPoint tl = widget->mapToGlobal(r.topLeft());
+    QPoint br = widget->mapToGlobal(r.bottomRight());
+    QRect r2(tl, br);
+    return r2;
+}
 
-
-
+QRect QtUtil::mapFromGlobal ( QWidget*widget, QRect r)
+{
+    QPoint tl = widget->mapFromGlobal(r.topLeft());
+    QPoint br = widget->mapFromGlobal(r.bottomRight());
+    QRect r2(tl, br);
+    return r2;
+}

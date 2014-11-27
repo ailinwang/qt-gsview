@@ -351,7 +351,7 @@ void PrintWorker::process()
             break;
 
         //  copy to printer
-        QImage *myImage = QtUtil::QImageFromData (bitmap, (int)pageSize.X, (int)pageSize.Y);
+        QImage *myImage = new QImage(bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
         painter.drawImage(0, 0, *myImage);
 
         delete myImage;

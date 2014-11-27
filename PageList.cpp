@@ -41,6 +41,9 @@ void PageList::onMousePress(QEvent *e)
         qApp->setOverrideCursor(Qt::CrossCursor);
         qApp->processEvents();
 
+        //  which page?
+        m_rubberbandpage = widget->pageNumber();
+
         return;
     }
 
@@ -124,7 +127,27 @@ bool PageList::isAreaSelected()
     return false;
 }
 
-void PageList::zoom(double scale)
+void PageList::saveSelection(FileSave *fileSave)
+{
+    QRect rect = m_rubberBand->geometry();
+    ImageWidget *image = &(images()[m_rubberbandpage]);
+    int imageheight = image->height();
+
+    //  TODO: scaling?
+
+    fileSave->extractSelection (rect.left(),
+                                rect.top(), //  Y is measured from the bottom
+                                rect.width(),
+                                rect.height(),
+                                m_rubberbandpage, 300);
+//    fileSave->extractSelection (0,
+//                                100, //  Y is measured from the bottom
+//                                image->width(),
+//                                image->height(),
+//                                m_rubberbandpage, 300);
+}
+
+void PageList::zoom (double scale)
 {
     //  adjust the size of the selection rectangle
     if (m_rubberBand!=NULL)

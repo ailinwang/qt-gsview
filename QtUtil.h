@@ -10,13 +10,14 @@
 class QtUtil
 {
 public:
-    static QImage * QImageFromData(unsigned char *samples, int w, int h);
     static QString getTempFolderPath();
     static QString getGsPath();
     static QString getGxpsPath();
     static QString eventTypeName(QEvent *event);
     static QString extensionFromPath(QString path);
     static QString extensionFromFilter(QString filter);
+    static QRect mapToGlobal ( QWidget*widget, QRect r);
+    static QRect mapFromGlobal ( QWidget*widget, QRect r);
 };
 
 #endif // QTUTIL_H
