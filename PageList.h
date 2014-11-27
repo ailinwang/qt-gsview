@@ -54,6 +54,7 @@ private:
     bool m_controlKeyIsDown = false;
     double m_rubberbandScale=1.0;
     int m_rubberbandpage=0;
+    QRect m_rubberbandRect;
 
     Window *m_window=NULL;
 };

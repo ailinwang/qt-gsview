@@ -129,28 +129,34 @@ bool PageList::isAreaSelected()
 
 void PageList::saveSelection(FileSave *fileSave)
 {
-    //  get selection rect
+    //  get selection specifics
     QRect rect = m_rubberBand->geometry();
-
-    //  TODO: deal with scaling
-
     ImageWidget *image = &(images()[m_rubberbandpage]);
     int imageHeight = image->height();
 
     int transX = rect.left();
     int transY = imageHeight-rect.top()-rect.height();
+    int w = rect.width();
+    int h = rect.height();
 
-    fileSave->extractSelection (transX, transY,
-                                rect.width(), rect.height(),
-                                m_rubberbandpage, 300);
+    //  de-scale these things
+    double scale = getScale();
+    w /= scale;
+    h /= scale;
+    transX /= scale;
+    transY /= scale;
+
+    fileSave->extractSelection (transX, transY, w, h, m_rubberbandpage, 300);
 }
 
 void PageList::zoom (double scale)
 {
+    ScrollingImageList::zoom (scale);
+
     //  adjust the size of the selection rectangle
     if (m_rubberBand!=NULL)
     {
-        QRect r = m_rubberBand->geometry();
+        QRect r = m_rubberbandRect;
 
         QRect r2 (
                     r.left()  *scale/m_rubberbandScale,
@@ -161,7 +167,6 @@ void PageList::zoom (double scale)
         m_rubberBand->setGeometry(r2);
     }
 
-    ScrollingImageList::zoom(scale);
 }
 
 QString PageList::collectSelectedText()
@@ -192,6 +197,7 @@ void PageList::onMouseRelease(QEvent *e)
     if (m_rubberBand && m_selectingArea)
     {
         m_rubberbandScale = getScale();
+        m_rubberbandRect = m_rubberBand->geometry();
         m_selectingArea = false;
         QApplication::restoreOverrideCursor();  //  default arrow cursor
         qApp->processEvents();
