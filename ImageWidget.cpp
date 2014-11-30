@@ -6,6 +6,11 @@
 #include "Document.h"
 #include "QtUtil.h"
 
+#define SELECTED_BORDER_COLOR "#24A719"
+#define LINK_COLOR            "#506EB3E8"
+#define SELECTED_TEXT_COLOR   "#506EB3E8"
+#define FOUND_TEXT_COLOR      "#506EB3E8"
+
 ImageWidget::ImageWidget(QWidget *parent) :
     QLabel(parent)
 {
@@ -28,7 +33,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
         rect.setWidth(rect.width()-4);
         rect.setHeight(rect.height()-4);
 
-        QPen lineStyle (QColor("#24A719"), 2);
+        QPen lineStyle (QColor(SELECTED_BORDER_COLOR), 2);
         painter.setPen(lineStyle);
         painter.drawRect(rect);
     }
@@ -44,7 +49,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
                 //  draw transparent blue filled rect
                 QRect rect ( QPoint(m_scale*link->left,m_scale*link->top),
                              QPoint(m_scale*link->right,m_scale*link->bottom));
-                painter.fillRect(rect, QBrush(QColor("#506EB3E8")));  //  transparent blue
+                painter.fillRect(rect, QBrush(QColor(LINK_COLOR)));  //  transparent blue
             }
         }
     }
@@ -63,7 +68,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
                 double scale = this->scale();
                 QRect lrect ( QPoint(scale*line->X,scale*line->Y),
                               QPoint(scale*(line->X+line->Width),scale*(line->Y+line->Height)));
-                painter.fillRect(lrect, QBrush(QColor("#506EB3E8")));  //  transparent blue
+                painter.fillRect(lrect, QBrush(QColor(SELECTED_TEXT_COLOR)));
             }
             else
             {
@@ -77,7 +82,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
                         double scale = this->scale();
                         QRect crect ( QPoint(scale*theChar->X,scale*theChar->Y),
                                       QPoint(scale*(theChar->X+theChar->Width),scale*(theChar->Y+theChar->Height)));
-                        painter.fillRect(crect, QBrush(QColor("#506EB3E8")));  //  transparent blue
+                        painter.fillRect(crect, QBrush(QColor(SELECTED_TEXT_COLOR)));
                     }
                 }
             }
@@ -92,14 +97,13 @@ void ImageWidget::paintEvent(QPaintEvent *event)
             SearchItem item = m_searchItems->at(i);
             QRect crect3 ( QPoint(m_scale*item.left, m_scale*item.top),
                            QPoint(m_scale*item.right, m_scale*item.bottom));
-            painter.fillRect(crect3, QBrush(QColor("#506EB3E8")));  //  transparent blue
-
+            painter.fillRect(crect3, QBrush(QColor(FOUND_TEXT_COLOR)));  //  transparent blue
             //  hilight the current one
             if (m_hilightedItem!=NULL && m_hilightedItem->equals(item))
             {
                 crect3.setLeft(crect3.left()-1);
                 crect3.setTop(crect3.top()-1);
-                painter.setPen(QPen(QColor("#000000"), 1));
+                painter.setPen(QPen(QColor(Qt::black), 1));
                 painter.drawRect(crect3);
             }
         }
@@ -193,11 +197,11 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
             {
                 if (linkIAmIn->Type==LINK_GOTO)
                 {
-                    QToolTip::showText(event->globalPos(), QString("go to page ")+QString::number(linkIAmIn->PageNum+1));
+                    QToolTip::showText(event->globalPos(), QString(tr("go to page %1").arg(QString::number(linkIAmIn->PageNum+1))));
                 }
                 else if (linkIAmIn->Type==LINK_URI)
                 {
-                    QToolTip::showText(event->globalPos(), QString(linkIAmIn->Uri.c_str()));
+                    QToolTip::showText(event->globalPos(),  QString::fromStdString(linkIAmIn->Uri) );
                 }
                 else
                 {

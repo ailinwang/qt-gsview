@@ -886,7 +886,7 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
 		{
 			file = fopen(filename, "wb");
 			if (file == NULL)
-				fz_throw(mu_ctx, FZ_ERROR_GENERIC, "cannot open file '%s'", filename);
+                fz_throw(mu_ctx, FZ_ERROR_GENERIC, "cannot open file '%s'", filename);  //  TODO: localization
 			out = fz_new_output_with_file(mu_ctx, file);
 
 			dev = fz_new_svg_device(mu_ctx, out, tbounds.x1 - tbounds.x0, tbounds.y1 - tbounds.y0);
