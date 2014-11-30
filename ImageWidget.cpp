@@ -405,7 +405,7 @@ void ImageWidget::onMouseRelease(QEvent *event)
             //  handle URI and GOTO links
             if (m_mouseInLink->Type == LINK_URI)
             {
-                QUrl url(QString(m_mouseInLink->Uri.c_str()));
+                QUrl url(QString::fromStdString(m_mouseInLink->Uri));
                 QDesktopServices::openUrl(url);
             }
             else if (m_mouseInLink->Type == LINK_GOTO)

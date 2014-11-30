@@ -477,8 +477,7 @@ void FileSave::saveAsText(QString dst, int type)
     for (int i=0; i<nPages; i++)
     {
         std::string str = m_window->document()->GetText(i,type);
-        QString qstr(str.c_str());
-        out << qstr;
+        out << QString::fromStdString(str);
 
         setProgress(i+1);
 
