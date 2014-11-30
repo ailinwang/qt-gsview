@@ -141,29 +141,6 @@ void ScrollingImageList::zoom (double theScale)
         double zoomRatio = theScale/m_scale;
         int nPages = m_document->GetPageCount();
 
-//        //  estimate which images will be visible after the zoom
-//        QRegion vreg = m_scrollArea->widget()->visibleRegion();
-//        QRect vrect = vreg.boundingRect();
-//        vrect.setTop(vrect.top()*zoomRatio);  // future position, same size
-//        int minVis = -1;
-//        int maxVis = -1;
-//        for (int i=0; i<nPages; i++)
-//        {
-//            QRect imRect = m_images[i].geometry();
-//            imRect.setTop(imRect.top()*zoomRatio);  //  future top
-//            imRect.setBottom(imRect.bottom()*zoomRatio);  //  future bottom
-//            if (vrect.intersects(imRect))
-//            {
-//                //  will be visible
-//                if (minVis==-1)
-//                    minVis = i;
-//                maxVis = i;
-//            }
-//        }
-
-//        qDebug("zoom raio = %f minVis=%d, maxVis = %d", zoomRatio, minVis, maxVis);
-
-
         //  estimate where the slider should go and send it there.
         QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
         int oldVal = slider->value();

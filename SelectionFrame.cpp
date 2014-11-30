@@ -11,8 +11,6 @@ SelectionFrame::SelectionFrame(QWidget *parent) :
 
 void SelectionFrame::paintEvent(QPaintEvent *pe)
 {
-//    Q_UNUSED(pe);
-
     QPainter painter;
     QPen pen(Qt::red, 4);
     pen.setStyle(Qt::SolidLine);

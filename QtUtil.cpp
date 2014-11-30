@@ -52,8 +52,6 @@ QString QtUtil::getTempFolderPath()
         tempFolderPath += "/";
         tempFolderPath += "gsview/";
 
-//        qDebug() << "Temp path is" << tempFolderPath;
-
         //  create the folder.
         QDir dir(tempFolderPath);
         if (!dir.exists())

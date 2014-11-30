@@ -173,7 +173,7 @@ void Window::setupToolbar()
     ui->toolBar->widgetForAction(ui->actionFind_Next)->setMinimumWidth(16);
     ui->toolBar->widgetForAction(ui->actionFind_Next)->setMaximumWidth(16);
 
-    m_searchLabel = new QLabel();  m_searchLabel->setText(tr(""));
+    m_searchLabel = new QLabel();  m_searchLabel->clear();
     ui->toolBar->insertWidget(NULL, m_searchLabel);
     connect ( m_search, SIGNAL(textChanged(const QString &)), SLOT(onFind()));
     connect(ui->actionFind_Next, SIGNAL(triggered()), this, SLOT(findNext()));
@@ -304,7 +304,7 @@ bool Window::OpenFile (QString path)
     if (fileInfo.suffix().toLower() == QString("pdf") )
     {
         m_fileExtension = "PDF";
-        m_fileType = "Portable Document Format";
+        m_fileType = tr("Portable Document Format");
     }
     else if (fileInfo.suffix().toLower() == QString("ps") )
     {
@@ -319,27 +319,27 @@ bool Window::OpenFile (QString path)
     else if (fileInfo.suffix().toLower() == QString("eps") )
     {
         m_fileExtension = "EPS";
-        m_fileType = "Encapsulated Postscript";
+        m_fileType = tr("Encapsulated Postscript");
     }
     else if (fileInfo.suffix().toLower() == QString("cbz") )
     {
         m_fileExtension = "CBZ";
-        m_fileType = "Comic Book Archive";
+        m_fileType = tr("Comic Book Archive");
     }
     else if (fileInfo.suffix().toLower() == QString("png") )
     {
         m_fileExtension = "PNG";
-        m_fileType = "Portable Network Graphics Image";
+        m_fileType = tr("Portable Network Graphics Image");
     }
     else if (fileInfo.suffix().toLower() == QString("jpg") )
     {
         m_fileExtension = "JPG";
-        m_fileType = "Joint Photographic Experts Group Image";
+        m_fileType = tr("Joint Photographic Experts Group Image");
     }
     else
     {
         m_fileExtension = "UNKNOWN";
-        m_fileType = "Unknown";
+        m_fileType = tr("Unknown");
     }
 
     //  handle .PS and .EPS by running ghostscript first
@@ -355,7 +355,6 @@ bool Window::OpenFile (QString path)
         command += "-sOutputFile=\"" + newPath + "\"";
         command += " -c .setpdfwrite ";
         command += "-f \"" + path + "\"";
-//        qDebug("command is: %s", command.toStdString().c_str());
 
         //  create a process to do it, and wait
         QProcess *process = new QProcess(this);
@@ -380,7 +379,7 @@ bool Window::OpenFile2 (QString path)
     bool result = m_document->OpenFile(path.toStdString());
     if (!result)
     {
-        QMessageBox::critical(NULL, "", "Error opening file");
+        QMessageBox::critical(NULL, "", tr("Error opening file"));
         return false;
     }
 
@@ -598,8 +597,7 @@ void Window::helpAbout()
 void Window::help()
 {
     //  TODO
-    QString message = "put something here.";//tr((pdfapp_usage(this->gapp)));
-    QMessageBox::about(this, tr("How to use muPDF"), message);
+    QMessageBox::about(this, tr("How to use muPDF"), tr("Help is not yet available."));
 }
 
 void Window::updateActions()
@@ -757,21 +755,19 @@ void Window::fileInfo()
     QString docType = m_fileExtension;
     docType += " - ";
     docType += m_fileType;
-    strVar += makeRow(QString("Document Type:"), docType);
+    strVar += makeRow(tr("Document Type:"), docType);
 
-    strVar += makeRow(QString("Pages:"), QString::number(m_document->GetPageCount()));
+    strVar += makeRow(tr("Pages:"), QString::number(m_document->GetPageCount()));
 
-    strVar += makeRow(QString("Current Page:"), QString::number(m_currentPage+1));
+    strVar += makeRow(tr("Current Page:"), QString::number(m_currentPage+1));
 
     strVar += "</table>";
 
     //  show the message
+    //  TODO: title is not working
 
-    QMessageBox msgBox;
     QSpacerItem* horizontalSpacer = new QSpacerItem(600, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    msgBox.setText( strVar );
-    QString title("Info");
-    msgBox.setWindowTitle(title);  //  TODO: this seems not to be working
+    QMessageBox msgBox(QMessageBox::Information, tr("Info"), strVar);
     QGridLayout* layout = (QGridLayout*)msgBox.layout();
     layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
     msgBox.exec();
@@ -867,7 +863,7 @@ void Window::onFindTimer()
 
     //  clear existing search text
     m_pages->clearSearchText();
-    m_searchLabel->setText(tr(""));
+    m_searchLabel->clear();
     m_searchItems.clear();
 
     //  get text to find
@@ -906,7 +902,7 @@ void Window::onFindTimer()
         hilightCurrentSearchText();
     }
     else
-        m_searchLabel->setText(tr(""));
+        m_searchLabel->clear();
 }
 
 void Window::hilightCurrentSearchText()
