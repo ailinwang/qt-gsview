@@ -176,10 +176,10 @@ void ExtractPagesDialog::doSave()
     QString desktop = desktopLocations.first();
 
     //  set up the dialog
-    QFileDialog dialog(m_window, "Save", desktop);
+    QFileDialog dialog(m_window, tr("Save"), desktop);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
-    QString theFilter = m_device.label + QString(" files (*.") + m_device.extension + QString(")");
+    QString theFilter = QString(tr("%1 files (*.%2)")).arg(m_device.label, m_device.extension);
     dialog.setNameFilter(theFilter);
 
     //  get the name
@@ -272,7 +272,7 @@ void ExtractPagesDialog::doSaveMupdf()
             //  make a page-numbered file name
             QFileInfo original(m_destination);
             QString newPath = original.absoluteDir().path() + QDir::separator() +
-                    original.baseName() + "-page" + page;
+                    original.baseName() + tr("-page") + page;
             if (!original.completeSuffix().isEmpty())
                 newPath += "." + original.completeSuffix();
             else
@@ -301,13 +301,13 @@ void ExtractPagesDialog::doSaveMupdf()
 
     if (m_progressDialog->wasCanceled())
     {
-        MessagesDialog::addMessage("canceled.\n");
-        QMessageBox::information (NULL, "", "Canceled.");
+        MessagesDialog::addMessage(tr("Extract cancelled."));  MessagesDialog::addMessage("\n");
+        QMessageBox::information (NULL, "", tr("Extract cancelled."));
     }
     else
     {
-        MessagesDialog::addMessage("finished.\n");
-        QMessageBox::information (NULL, "", "Finished.");
+         MessagesDialog::addMessage(tr("Extract completed."));  MessagesDialog::addMessage("\n");
+        QMessageBox::information (NULL, "", tr("Extract completed."));
     }
 
 }
@@ -331,7 +331,6 @@ void ExtractPagesDialog::doSaveGs()
         command += " -sDEVICE=pdfwrite ";
         command += "-sOutputFile=\"" + newPath + "\"";
         command += " -dNOPAUSE \"" + originalPath + "\"";
-        qDebug("command is: %s", command.toStdString().c_str());
 
         //  create a process to do it, and wait
         QProcess *process = new QProcess(this);
@@ -437,7 +436,7 @@ void ExtractPagesDialog::onReadyReadStandardOutput()
 
         //  every time we see "Page", crank the progress
         QString s(data);
-        if (s.left(4).compare(QString("Page"))==0)
+        if (s.left(4).compare(QString("Page"))==0)  //  don't translate this string
         {
             int val = m_progressDialog->value();
             setProgress(val+1);
@@ -458,8 +457,8 @@ void ExtractPagesDialog::onFinished(int exitCode)
     if (m_progressDialog->wasCanceled())
     {
         //  yes
-        MessagesDialog::addMessage("canceled.\n");
-        QMessageBox::information (NULL, "", "Canceled.");
+        MessagesDialog::addMessage(tr("Extract cancelled."));  MessagesDialog::addMessage("\n");
+        QMessageBox::information (NULL, "", tr("Extract cancelled."));
     }
     else
     {
@@ -474,8 +473,8 @@ void ExtractPagesDialog::onFinished(int exitCode)
         }
 
         //  we're done
-        MessagesDialog::addMessage("finished.\n");
-        QMessageBox::information (NULL, "", "Finished.");
+        MessagesDialog::addMessage(tr("Extract completed."));  MessagesDialog::addMessage("\n");
+        QMessageBox::information (NULL, "", tr("Extract completed."));
     }
 
     //  take down progress widget
@@ -494,9 +493,8 @@ void ExtractPagesDialog::onFinished(int exitCode)
 void ExtractPagesDialog::setProgress (int val)
 {
     m_progressDialog->setValue(val);
-    QString s = QString("Processed ")
-                    + QString::number(val) + QString(" of ")
-                    + QString::number(m_progressDialog->maximum()) + QString(" pages...");
+    QString s = QString(tr("Processed %1 of %2 pages...")).arg(
+                QString::number(val), QString::number(m_progressDialog->maximum()));
     m_progressDialog->setLabelText(s);
     qApp->processEvents();
 }
@@ -504,7 +502,8 @@ void ExtractPagesDialog::setProgress (int val)
 void ExtractPagesDialog::startCommand(QString command)
 {
     MessagesDialog::addMessage("\n");
-    MessagesDialog::addMessage("starting\n");
+    MessagesDialog::addMessage(tr("starting"));
+    MessagesDialog::addMessage("\n");
     MessagesDialog::addMessage(command+"\n\n");
 
     m_process->start(command);
