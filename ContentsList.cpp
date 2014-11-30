@@ -17,14 +17,6 @@ QScrollArea *ContentsList::scrollArea() const
 void ContentsList::setScrollArea (QScrollArea *scrollArea)
 {
     m_scrollArea = scrollArea;
-
-//    QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
-//    connect (slider, SIGNAL(sliderReleased()), this, SLOT(sliderReleasedSlot()));
-//    connect (slider, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSlot(int)));
-
-//    //  install an event filter on the scrolling area.
-//    QWidget* contentWidget = m_scrollArea->widget();
-//    contentWidget->installEventFilter(this);
 }
 
 void ContentsList::show()
@@ -60,12 +52,9 @@ void ContentsList::build()
             ContentItem *item = m_document->GetContentItem(i);
             if (item != NULL)
             {
-                QString s;
-                s += QString::number(item->Page+1);
-                s += QString("       ");
-                s += QString(item->StringMargin.c_str());
-//                s += QString("   ");
-//                s += QString(item->StringOrig.c_str());
+                QString s = QString("%1       %2").arg(
+                            QString::number(item->Page+1),
+                            QString::fromStdString(item->StringMargin));
                 m_list->addItem(s);
             }
         }
