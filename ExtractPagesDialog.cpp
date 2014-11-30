@@ -287,7 +287,7 @@ void ExtractPagesDialog::doSaveMupdf()
                     res = res2;
             }
 
-            MessagesDialog::addMessage("saving page: ");
+            MessagesDialog::addMessage(tr("saving page: "));
             MessagesDialog::addMessage(newPath);
             MessagesDialog::addMessage("\n");
             m_window->document()->SavePage((char *)newPath.toStdString().c_str(), i, res, m_device.type, false);

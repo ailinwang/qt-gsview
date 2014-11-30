@@ -61,7 +61,7 @@ void FileSave::run()
     //  if the original is CBZ, convert to PDF first?
     if (QtUtil::extensionFromPath(original)==QString("cbz"))
     {
-        QMessageBox::information (m_window, "", "Saving CBZ files is not yet supported.");
+        QMessageBox::information (m_window, "", tr("Saving CBZ files is not yet supported."));
         return;
     }
 
@@ -70,7 +70,7 @@ void FileSave::run()
     QString desktop = desktopLocations.first();
 
     //  set up the dialog
-    FileSaveDialog dialog(m_window, "Save", desktop);
+    FileSaveDialog dialog(m_window, tr("Save"), desktop);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
 
@@ -84,7 +84,7 @@ void FileSave::run()
         if (i==TYPE_BLANK)
             theFilter = sep;
         else
-            theFilter = fileTypes[i].filterName + QString(" (*.") + fileTypes[i].filterType + QString(")");
+            theFilter = QString(tr("%1 (*.%2)")).arg(fileTypes[i].filterName, fileTypes[i].filterType);
         fileTypes[i].filter = theFilter;
 
         if (i==0)
@@ -119,7 +119,8 @@ void FileSave::run()
         //  if the extensions don't match, that's an error
         if (fileExt != filterExt)
         {
-            QMessageBox::information (m_window, "", "you supplied a filename extension that does not match the format.");
+            QMessageBox::information (m_window, "",
+                                      tr("You supplied a filename extension that does not match the format."));
             return;
         }
 
@@ -178,7 +179,8 @@ void FileSave::run()
                 profileMissing = true;
         if (profileMissing)
         {
-            QMessageBox::information (m_window, "", "You have not chosen a profile to use with this output format.");
+            QMessageBox::information (m_window, "",
+                                      tr("You have not chosen a profile to use with this output format."));
             return;
         }
 
@@ -202,7 +204,6 @@ void FileSave::run()
             command += " -sDEVICE=pdfwrite ";
             command += "-sOutputFile=\"" + newPath + "\"";
             command += " -dNOPAUSE \"" + original + "\"";
-            qDebug("command is: %s", command.toStdString().c_str());
 
             //  create a process to do it, and wait
             QProcess *process = new QProcess(this);
@@ -218,7 +219,7 @@ void FileSave::run()
             if (QFile::exists(dst))
                 QFile::remove(dst);
             QFile::copy(original, dst);
-            QMessageBox::information (NULL, "", "Finished.");
+            QMessageBox::information (NULL, "", tr("Save completed."));
         }
         else if (index==TYPE_PDF_LINEAR)
         {
@@ -228,7 +229,7 @@ void FileSave::run()
             m_window->document()->PDFExtract (original.toStdString().c_str(), dst.toStdString().c_str(),
                                               password.toStdString().c_str(),
                                               password.length()>0, true, -1, NULL);
-            QMessageBox::information (NULL, "", "Finished.");
+            QMessageBox::information (NULL, "", tr("Save completed."));
         }
         else if (index==TYPE_PDF_13)
         {
@@ -308,8 +309,8 @@ void FileSave::run()
         else
         {
             //  NYI
-            QString message = "saving is not yet implemented.<br/><br/>";
-            message += "saving " + dst + "<br/>as " + QString::number(index+1) + ". " + filter;
+            QString message(tr("Saving this file type is not yet implemented.<br/><br/>"));
+            message += QString(tr("saving %1<br/>as %2.%3")).arg(dst, QString::number(index+1), filter);
             QMessageBox::information (m_window, "", message);
         }
     }
@@ -323,7 +324,7 @@ void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int 
     //  if the original is CBZ, convert to PDF first?
     if (QtUtil::extensionFromPath(original)==QString("cbz"))
     {
-        QMessageBox::information (m_window, "", "Saving CBZ files is not yet supported.");
+        QMessageBox::information (m_window, "", tr("Saving CBZ files is not yet supported."));
         return;
     }
 
@@ -332,7 +333,7 @@ void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int 
     QString desktop = desktopLocations.first();
 
     //  set up the dialog
-    FileSaveDialog dialog(m_window, "Save", desktop);
+    FileSaveDialog dialog(m_window, tr("Save"), desktop);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
 
@@ -364,7 +365,8 @@ void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int 
         //  if the extensions don't match, that's an error
         if (fileExt != filterExt)
         {
-            QMessageBox::information (m_window, "", "you supplied a filename extension that does not match the format.");
+            QMessageBox::information (m_window, "",
+                                      tr("You supplied a filename extension that does not match the format."));
             return;
         }
 
@@ -380,7 +382,6 @@ void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int 
             command += " -sDEVICE=pdfwrite ";
             command += "-sOutputFile=\"" + newPath + "\"";
             command += " -dNOPAUSE \"" + original + "\"";
-            qDebug("command is: %s", command.toStdString().c_str());
 
             //  create a process to do it, and wait
             QProcess *process = new QProcess(this);
@@ -428,9 +429,8 @@ void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int 
 void FileSave::setProgress (int val)
 {
     m_progressDialog->setValue(val);
-    QString s = QString("Processed ")
-                    + QString::number(val) + QString(" of ")
-                    + QString::number(m_progressDialog->maximum()) + QString(" pages...");
+    QString s = QString(tr("Processed %1 of %2 pages...")).arg(
+                QString::number(val), QString::number(m_progressDialog->maximum()));
     m_progressDialog->setLabelText(s);
     qApp->processEvents();
 }
@@ -506,7 +506,6 @@ void FileSave::saveAsText(QString dst, int type)
     //  take down progress widget
     m_progressDialog->hide();
     qApp->processEvents();
-//    disconnect (m_progressDialog, SIGNAL(canceled()), this, SLOT(onCanceled()));
     delete m_progressDialog;
 
     if (canceled)
@@ -514,7 +513,7 @@ void FileSave::saveAsText(QString dst, int type)
         //  remove temp
         if (QFile::exists(tmp))
             QFile::remove(tmp);
-        QMessageBox::information (m_window, "", "Canceled.");
+        QMessageBox::information (m_window, "", tr("Save cancelled."));
     }
     else
     {
@@ -525,14 +524,14 @@ void FileSave::saveAsText(QString dst, int type)
         //  put temp file in place
         QFile::rename(tmp, dst);
 
-        QMessageBox::information (m_window, "", "Done.");
+        QMessageBox::information (m_window, "", tr("Save completed."));
     }
 }
 
 void FileSave::saveWithProgress2(QString command)
 {
     MessagesDialog::addMessage("\n");
-    MessagesDialog::addMessage("starting\n");
+    MessagesDialog::addMessage(tr("starting"));  MessagesDialog::addMessage("\n");
     MessagesDialog::addMessage(command+"\n\n");
 
     //  show a progress widget
@@ -564,7 +563,6 @@ void FileSave::saveWithProgress (QString options, QString src, QString dst)
     //  construct the command
     QString command = "\"" + QtUtil::getGsPath() + "\"";
     command += " " + options + " ";
-//    command += " -r72 ";
     command += " -o \"" + m_tmp + "\"";
     command += " -f \"" + src + "\"";
 
@@ -612,13 +610,13 @@ void FileSave::onFinished(int exitCode)
         disconnect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
 
         //  yes
-        MessagesDialog::addMessage("canceled.\n");
+        MessagesDialog::addMessage(tr("Save cancelled."));  MessagesDialog::addMessage("\n");
 
         //  remove temp file
         if (QFile::exists(m_tmp))
             QFile::remove(m_tmp);
 
-        QMessageBox::information (NULL, "", "Canceled.");
+        QMessageBox::information (NULL, "", tr("Save cancelled."));
     }
     else
     {
@@ -630,7 +628,7 @@ void FileSave::onFinished(int exitCode)
         disconnect (m_process, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
 
         //  no
-        MessagesDialog::addMessage("finished.\n");
+        MessagesDialog::addMessage(tr("Save completed."));  MessagesDialog::addMessage("\n");
 
         //  remove destination file
         if (QFile::exists(m_dst))
@@ -639,8 +637,7 @@ void FileSave::onFinished(int exitCode)
         //  put temp file in place
         QFile::rename(m_tmp, m_dst);
 
-        QMessageBox::information (NULL, "", "Finished.");
+        QMessageBox::information (NULL, "", tr("Save completed."));
     }
 
 }
-
