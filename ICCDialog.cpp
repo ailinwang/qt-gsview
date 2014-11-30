@@ -19,7 +19,7 @@ ICCDialog::~ICCDialog()
 void ICCDialog::show()
 {
     if (m_icc_path.isEmpty())
-        ui->selectedProfile->setText("none");
+        ui->selectedProfile->setText(tr("None"));
     else
         ui->selectedProfile->setText(m_icc_path);
 

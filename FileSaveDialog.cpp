@@ -21,6 +21,7 @@ void FileSaveDialog::onFilterSelected(const QString &filter)
 {
     //  user changed filter.
     //  prevent them from using the separator
+    //  Qt: is there a better way to do this?
     if (filter.compare(m_separator)==0)
     {
         disconnect (this, SIGNAL(filterSelected(const QString &)), this, SLOT(onFilterSelected(const QString &)));

@@ -8,6 +8,11 @@ QString ICCDialog2::m_rgbProfile;
 QString ICCDialog2::m_cmykProfile;
 QString ICCDialog2::m_grayProfile;
 
+//  don't translate these
+#define RGB_SETTINGS_KEY  "RGB Profile"
+#define CMYK_SETTINGS_KEY "CMYK Profile"
+#define GRAY_SETTINGS_KEY "Gray Profile"
+
 ICCDialog2::ICCDialog2(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ICCDialog2)
@@ -24,9 +29,9 @@ void ICCDialog2::show()
 {
     //  get previous values from QSettings
     QSettings settings;
-    m_rgbProfile  = settings.value("RGB Profile", QString("")).toString();
-    m_cmykProfile = settings.value("CMYK Profile", QString("")).toString();
-    m_grayProfile = settings.value("Gray Profile", QString("")).toString();
+    m_rgbProfile  = settings.value(RGB_SETTINGS_KEY, QString("")).toString();
+    m_cmykProfile = settings.value(CMYK_SETTINGS_KEY, QString("")).toString();
+    m_grayProfile = settings.value(GRAY_SETTINGS_KEY, QString("")).toString();
 
     refreshUI();
 
@@ -68,9 +73,9 @@ void ICCDialog2::on_okButton_clicked()
 {
     //  save current values using QSettings
     QSettings settings;
-    settings.setValue("RGB Profile",  m_rgbProfile);
-    settings.setValue("CMYK Profile", m_cmykProfile);
-    settings.setValue("Gray Profile", m_grayProfile);
+    settings.setValue(RGB_SETTINGS_KEY,  m_rgbProfile);
+    settings.setValue(CMYK_SETTINGS_KEY, m_cmykProfile);
+    settings.setValue(GRAY_SETTINGS_KEY, m_grayProfile);
 
     close();
 }
@@ -79,7 +84,7 @@ void ICCDialog2::refreshUI()
 {    
     QString styleEmpty("QLabel { color:red; border: 1px solid; border-color: red;}");
     QString styleNotEmpty("QLabel { color:black; border: 0px none;}");
-    QString emptyText("Not Set");
+    QString emptyText(tr("Not Set"));
 
     ui->rgbLabel->setStyleSheet(styleNotEmpty);
     if (m_rgbProfile.isEmpty())

@@ -9,8 +9,8 @@
 GSViewApp::GSViewApp ( int &argc, char **argv ) : QApplication(argc, argv)
 {
     //  these three items are necessary for using the QSettings feature
-    QCoreApplication::setOrganizationName("Artifex Software");
-    QCoreApplication::setOrganizationDomain("artifex.com");
+    QCoreApplication::setOrganizationName(tr("Artifex Software"));
+    QCoreApplication::setOrganizationDomain(tr("artifex.com"));
     QCoreApplication::setApplicationName("gsview");
 
     QGuiApplication::setApplicationDisplayName(tr("gsview"));
@@ -63,7 +63,7 @@ void GSViewApp::onStarted()
 
         //  error
         delete newWindow;
-        QMessageBox::information(NULL, tr(""), tr("Error opening ") + m_fileToOpen);
+        QMessageBox::information(NULL, tr(""), tr("Error opening %1").arg(m_fileToOpen));
     }
 
     //  ask for a new file to open
