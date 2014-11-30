@@ -479,15 +479,15 @@ void PageList::onRightClick(QEvent *e)
     QAction *deselect=NULL;
     if (!selectedText.isEmpty())
     {
-        copy        = myMenu.addAction("Copy");
-        deselect    = myMenu.addAction("Deselect All");
+        copy        = myMenu.addAction(tr("Copy"));
+        deselect    = myMenu.addAction(tr("Deselect All"));
     }
 
     //  more actions
-    QAction *selectLine  = myMenu.addAction("Select Line");
-    QAction *selectBlock = myMenu.addAction("Select Block");
-    QAction *selectPage  = myMenu.addAction("Select Page");
-    QAction *selectAll   = myMenu.addAction("Select All");
+    QAction *selectLine  = myMenu.addAction(tr("Select Line"));
+    QAction *selectBlock = myMenu.addAction(tr("Select Block"));
+    QAction *selectPage  = myMenu.addAction(tr("Select Page"));
+    QAction *selectAll   = myMenu.addAction(tr("Select All"));
 
     //  show the menu
     QAction* selectedItem = myMenu.exec(origin);

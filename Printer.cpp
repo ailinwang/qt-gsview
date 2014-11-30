@@ -71,7 +71,7 @@ void Printer::print()
     //  get the printer
     m_printer = new QPrinter(QPrinter::HighResolution);
     QPrintDialog *dialog = new QPrintDialog(m_printer, m_window);
-    dialog->setWindowTitle(QString("Print Document"));
+    dialog->setWindowTitle(tr("Print Document"));
     if (dialog->exec() != QDialog::Accepted)
         return;
     dialog->hide();
@@ -109,7 +109,6 @@ void Printer::print()
         command += "-sOutputFile=\"" + newPath + "\"";
         command += " ";
         command += "\"" + m_window->getPath() + "\"";
-//        qDebug("command is: %s", command.toStdString().c_str());
 
         //  create a process to do it, and wait
         QProcess *process = new QProcess(this);
@@ -207,11 +206,11 @@ void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPag
 #else
         //  non-mac.  Do nothing.
 #endif
-        QMessageBox::information(m_window, "", "Print job created.");
+        QMessageBox::information(m_window, "", tr("Print job created.");
     }
     else
     {
-        QMessageBox::information(m_window, "", "Error creating print job.");
+        QMessageBox::information(m_window, "", tr("Error creating print job.");
     }
 }
 #endif
@@ -235,7 +234,7 @@ void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
 
     //  put up a progress dialog
     m_pagesToPrint = toPage-fromPage+1;
-    m_progress = new QProgressDialog ("Printing", "Cancel", 0, m_pagesToPrint, m_window);
+    m_progress = new QProgressDialog (tr("Printing"), tr("Cancel"), 0, m_pagesToPrint, m_window);
     connect (m_progress, SIGNAL(canceled()), this, SLOT(onCanceled()));
     m_progress->setWindowModality(Qt::WindowModal);
     setProgress(0);
@@ -243,7 +242,6 @@ void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
     qApp->processEvents();
 
     //  start the thread
-//    qDebug("starting thread");
     m_printThread->start();
 
     m_killed = false;
@@ -251,33 +249,27 @@ void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
 
 void Printer::pagePrinted(int nPage)
 {
-//    qDebug("received pagePrinted(%d)", nPage);
-
     //  update progress dialog
     setProgress(nPage);
 }
 
 void Printer::printFinished()
 {
-//    qDebug("received printFinished()");
-
     m_progress->hide();
     delete m_progress;
 
     if (m_killed)
     {
-        QMessageBox::information(m_window, "", "Print job canceled.");
+        QMessageBox::information(m_window, "", tr("Print job canceled."));
     }
     else
     {
-        QMessageBox::information(m_window, "", "Print job created.");
+        QMessageBox::information(m_window, "", tr("Print job created."));
     }
 }
 
 void Printer::onCanceled()
 {
-//    qDebug("received onCanceled()");
-
     m_printWorker->kill();  //  we should also receive printFinished
     m_killed = true;
 }
@@ -285,12 +277,8 @@ void Printer::onCanceled()
 
 void Printer::setProgress (int val)
 {
-//    qDebug("received setProgress()");
-
     m_progress->setValue(val);
-    QString s = QString("Printed ")
-                    + QString::number(val) + QString(" of ")
-                    + QString::number(m_pagesToPrint) + QString(" pages...");
+    QString s = QString("Printed %1 of %2 pages...").arg(QString::number(val), QString::number(m_pagesToPrint));
     m_progress->setLabelText(s);
     qApp->processEvents();
 }
@@ -306,19 +294,14 @@ PrintWorker::PrintWorker(Window *window, QPrinter *printer, int fromPage, int to
     m_fromPage = fromPage;
     m_toPage = toPage;
     m_window = window;
-
-//    qDebug("worker created");
 }
 
 PrintWorker::~PrintWorker()
 {
-//    qDebug("worker destroyed");
 }
 
 void PrintWorker::process()
 {
-//    qDebug("worker starting");
-
     //  get scale factor based on printer's resolution
     double scalePrint = m_printer->resolution() / 72;
 
@@ -363,7 +346,6 @@ void PrintWorker::process()
             break;
 
         nPagesPrinted++;
-//        qDebug("worker emitting pagePrinted(%d)", nPagesPrinted);
         emit pagePrinted(nPagesPrinted);
     }
 
@@ -373,7 +355,6 @@ void PrintWorker::process()
         m_printer->abort();
 
     //  done!
-//    qDebug("worker emitting finished()");
     emit finished();
 }
 
