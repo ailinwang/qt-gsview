@@ -72,6 +72,8 @@ public:
 
     void onMouseRelease(QEvent *event);
 
+    void setSelectingArea(bool val) {m_selectingArea=val;};
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -99,6 +101,8 @@ private:
     Byte *m_bitmap = NULL;
     QImage *m_image = NULL;
     QPixmap *m_pixmap = NULL;
+
+    bool m_selectingArea = false;
 };
 
 #endif // IMAGEWIDGET_H

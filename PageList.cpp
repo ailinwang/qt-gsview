@@ -18,12 +18,15 @@ PageList::PageList(Window *parent)
 void PageList::onMousePress(QEvent *e)
 {
     QMouseEvent *me = ((QMouseEvent *)e);
+    ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
 
     //  if we have an area selected, and the user does right-click, ignore.
     if (m_rubberBand && (me->button()==Qt::RightButton))
         return;
 
     m_selectingArea = false;
+    if (NULL!=widget)
+        widget->setSelectingArea(false);
     if (m_rubberBand)
     {
         m_rubberBand->hide();
@@ -36,7 +39,8 @@ void PageList::onMousePress(QEvent *e)
     {
         deselectText();
         m_selectingArea = true;
-        ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
+        if (NULL!=widget)
+            widget->setSelectingArea(true);
         m_rubberBandOrigin = widget->mapFromGlobal(QCursor::pos());
         m_rubberBand = new SelectionFrame(widget);
         m_rubberBand->setGeometry(QRect(m_rubberBandOrigin, QSize()));
@@ -198,18 +202,21 @@ void PageList::onMouseRelease(QEvent *e)
 {
     UNUSED(e);
 
+    ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
+
     if (m_rubberBand && m_selectingArea)
     {
         m_rubberbandScale = getScale();
         m_rubberbandRect = m_rubberBand->geometry();
         m_selectingArea = false;
+        if (NULL!=widget)
+            widget->setSelectingArea(false);
         QApplication::restoreOverrideCursor();  //  default arrow cursor
         qApp->processEvents();
 
         return;
     }
 
-    ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
     if (widget != NULL)
     {
         widget->onMouseRelease(e);

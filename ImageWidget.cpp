@@ -146,7 +146,7 @@ bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
 
 void ImageWidget::mouseMoveEvent( QMouseEvent * event )
 {
-    if (!thumbnail())
+    if (!thumbnail() && !m_selectingArea)
     {
         //  get coordinates of the cursor relative to the widget
         //
