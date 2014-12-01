@@ -19,6 +19,10 @@ void PageList::onMousePress(QEvent *e)
 {
     QMouseEvent *me = ((QMouseEvent *)e);
 
+    //  if we have an area selected, and the user does right-click, ignore.
+    if (m_rubberBand && (me->button()==Qt::RightButton))
+        return;
+
     m_selectingArea = false;
     if (m_rubberBand)
     {
