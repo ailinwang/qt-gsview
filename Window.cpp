@@ -471,13 +471,12 @@ void Window::open()
 {
     //  create a dialog for choosing a file
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
-    QFileDialog dialog(NULL, tr("Open File"),
+    QFileDialog dialog(qApp->activeWindow(), tr("Open File"),
                        desktopLocations.isEmpty() ? QDir::currentPath() : desktopLocations.first());
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz *.ps *.eps)"));
-    dialog.setWindowModality(Qt::ApplicationModal);
 
     //  create a window that will show the file.
     Window *newWindow = new Window();
