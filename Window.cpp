@@ -477,6 +477,7 @@ void Window::open()
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz *.ps *.eps)"));
+    dialog.setWindowModality(Qt::ApplicationModal);
 
     //  create a window that will show the file.
     Window *newWindow = new Window();
