@@ -340,6 +340,8 @@ void ExtractPagesDialog::doSaveGs()
         originalPath = newPath;
     }
 
+    QString password = m_window->password();
+
     if (m_contiguous && m_device.paging.compare("multi")==0)
     {
         //  we can do this in one shot
@@ -356,6 +358,8 @@ void ExtractPagesDialog::doSaveGs()
         command += " -sDEVICE=" + m_device.name + " ";
         if (!m_resolution.isEmpty())
             command += " -r" + m_resolution + " ";
+        if (!password.isEmpty())
+            command += "-sPDFPassword=" + password + " ";
 
         command += " -o \"" + m_destination + "\"";
         command += " -f \"" + originalPath + "\"";
@@ -382,6 +386,8 @@ void ExtractPagesDialog::doSaveGs()
                 command += " -sDEVICE=" + m_device.name + " ";
                 if (!m_resolution.isEmpty())
                     command += " -r" + m_resolution + " ";
+                if (!password.isEmpty())
+                    command += "-sPDFPassword=" + password + " ";
 
                 //  make a page-numbered file name
                 QFileInfo original(m_destination);

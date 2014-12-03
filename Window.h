@@ -44,8 +44,11 @@ public:
     QString getPath() {return m_path;}
     void goToPage(int nPage);
 
+    QString password() const;
+    void setPassword(const QString &password);
+
 protected:
-	void keyPressEvent(QKeyEvent* event);
+    void keyPressEvent(QKeyEvent* event);
     void customEvent(QEvent *event);
     bool eventFilter(QObject *object, QEvent *e);
     void closeEvent(QCloseEvent *event);
@@ -161,6 +164,8 @@ private:
 
     Byte *m_copiedBitmap = NULL;
     QImage *m_copiedImage = NULL;
+
+    QString m_password;  //  the one the user supplied when the file was opened
 };
 
 #endif  //  WINDOW_H

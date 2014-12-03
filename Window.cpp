@@ -275,10 +275,11 @@ bool Window::handlePassword()
     //  password, or the user cancels.
 
     bool pwdValid = false;
+    QString text;
     while (!pwdValid)
     {
         bool ok;
-        QString text = QInputDialog::getText(this, tr(""), tr("Enter password:"), QLineEdit::Password,
+        text = QInputDialog::getText(this, tr(""), tr("Enter password:"), QLineEdit::Password,
                                              QDir::home().dirName(), &ok);
         if (ok && !text.isEmpty())
         {
@@ -290,6 +291,8 @@ bool Window::handlePassword()
             return false;
         }
     }
+
+    m_password = text;  //  save for later
 
     return true;
 }
@@ -910,6 +913,16 @@ void Window::hilightCurrentSearchText()
     m_searchLabel->setText(QString::number(m_searchCounter+1)+tr("/")+QString::number(m_searchHits));
     m_pages->hilightSearchText(&(m_searchItems.at(m_searchCounter)));
 }
+QString Window::password() const
+{
+    return m_password;
+}
+
+void Window::setPassword(const QString &password)
+{
+    m_password = password;
+}
+
 
 void Window::findNext()
 {

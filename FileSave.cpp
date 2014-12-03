@@ -189,8 +189,7 @@ void FileSave::run()
         //  in all cases, the file dialog has asked the user about overwriting,
         //  so it's OK not to ask here.
 
-//        QString original = m_window->getPath();
-        QString password;
+        QString password = m_window->password();
 
         //  if the original is xps, convert tp pdf first.
         if (QtUtil::extensionFromPath(original)==QString("xps"))
@@ -234,12 +233,12 @@ void FileSave::run()
         else if (index==TYPE_PDF_13)
         {
             QString options("-dCompatibilityLevel=1.3 -sDEVICE=pdfwrite -dNOPAUSE -dBATCH");
-            saveWithProgress (options, original, dst);
+            saveWithProgress (options, original, dst, password);
         }
         else if (index==TYPE_XPS)
         {
             QString options("-dNOCACHE -sDEVICE=xpswrite -dNOPAUSE -dBATCH");
-            saveWithProgress (options, original, dst);
+            saveWithProgress (options, original, dst, password);
         }
         else if (index==TYPE_TEXT)
         {
@@ -256,54 +255,54 @@ void FileSave::run()
         else if (index==TYPE_PCL_XL)
         {
             QString options("-sDEVICE=pxlcolor -dNOPAUSE -dBATCH -P- -dSAFER");
-            saveWithProgress (options, original, dst);
+            saveWithProgress (options, original, dst, password);
 
         }
         else if (index==TYPE_PS)
         {
             QString options("-sDEVICE=ps2write -dNOPAUSE -dBATCH -P- -dSAFER");
-            saveWithProgress (options, original, dst);
+            saveWithProgress (options, original, dst, password);
         }
 
         else if (index==TYPE_PDF_A1_RGB)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=1 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceRGB -dColorConversionStrategy=/RGB -sOutputICCProfile=");
             options += QString("\"");  options += rgbProfile;  options += QString("\"");
-            saveWithProgress (options, original, dst);
+            saveWithProgress (options, original, dst, password);
 
         }
         else if (index==TYPE_PDF_A1_CMYK)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=1 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceCMYK -dColorConversionStrategy=/CMYK -sOutputICCProfile=");
             options += QString("\"");  options += cmykProfile;  options += QString("\"");
-            saveWithProgress (options, original, dst);
+            saveWithProgress (options, original, dst, password);
 
         }
         else if (index==TYPE_PDF_A2_RGB)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=2 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceRGB -dColorConversionStrategy=/RGB -sOutputICCProfile=");
             options += QString("\"");  options += rgbProfile;  options += QString("\"");
-            saveWithProgress (options, original, dst);
+            saveWithProgress (options, original, dst, password);
 
         }
         else if (index==TYPE_PDF_A2_CMYK)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFA=2 -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceCMYK -dColorConversionStrategy=/CMYK -sOutputICCProfile=");
             options += QString("\"");  options += cmykProfile;  options += QString("\"");
-            saveWithProgress (options, original, dst);
+            saveWithProgress (options, original, dst, password);
 
         }
         else if (index==TYPE_PDF_X3_GRAY)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFX -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceGray -dColorConversionStrategy=/Gray -sOutputICCProfile=");
             options += QString("\"");  options += grayProfile;  options += QString("\"");
-            saveWithProgress (options, original, dst);
+            saveWithProgress (options, original, dst, password);
         }
         else if (index==TYPE_PDF_X3_CMYK)
         {
             QString options("-sDEVICE=pdfwrite -dNOPAUSE -dBATCH -P- -dSAFER -dPDFX -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceCMYK -dColorConversionStrategy=/CMYK -sOutputICCProfile=");
             options += QString("\"");  options += cmykProfile;  options += QString("\"");
-            saveWithProgress (options, original, dst);
+            saveWithProgress (options, original, dst, password);
         }
 
         else
@@ -403,6 +402,8 @@ void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int 
         m_dst = dst;
         m_tmp = dst + ".temp";
 
+        QString password = m_window->password();
+
         //  construct the command
         QString command = "\"" + QtUtil::getGsPath() + "\"";
         command += " " + QString("-sDEVICE=") + QString(device) ;
@@ -413,6 +414,8 @@ void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int 
         command += " " + QString("-dDEVICEWIDTHPOINTS=") + QString::number(w) + " ";
         command += " " + QString("-dDEVICEHEIGHTPOINTS=") + QString::number(h) + " ";
         command += " " + QString("-dFIXEDMEDIA") + " ";
+        if (!password.isEmpty())
+            command += " -sPDFPassword=" + password + " ";
         command += " -o \"" + m_tmp + "\"";
         command += " " + QString("-c") + " ";
         command += "\"<</Install {";
@@ -554,7 +557,7 @@ void FileSave::saveWithProgress2(QString command)
     //  regular finish and when cancelling.
 }
 
-void FileSave::saveWithProgress (QString options, QString src, QString dst)
+void FileSave::saveWithProgress (QString options, QString src, QString dst, QString password)
 {
     m_dst = dst;
     m_tmp = dst + ".temp";
@@ -562,6 +565,8 @@ void FileSave::saveWithProgress (QString options, QString src, QString dst)
     //  construct the command
     QString command = "\"" + QtUtil::getGsPath() + "\"";
     command += " " + options + " ";
+    if (!password.isEmpty())
+        command += " -sPDFPassword=" + password + " ";
     command += " -o \"" + m_tmp + "\"";
     command += " -f \"" + src + "\"";
 

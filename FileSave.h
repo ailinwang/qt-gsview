@@ -29,7 +29,7 @@ private slots:
     void onFinished(int exitCode);
 
 private:
-    void saveWithProgress(QString options, QString src, QString dst);
+    void saveWithProgress(QString options, QString src, QString dst, QString password);
     void setProgress (int val);
     void saveAsText (QString dst, int type);
     void saveWithProgress2(QString command);
