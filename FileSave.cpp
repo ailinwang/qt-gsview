@@ -419,7 +419,7 @@ void FileSave::extractSelection(int x, int y, int w, int h, int pageNumber, int 
         command += "-" + QString::number(x) + ".0 " ;
         command += "-" + QString::number(y) + ".0 " ;
         command += "translate (testing) == flush}>> setpagedevice\"";
-        command += " -f \"" + m_window->getPath() + "\"";
+        command += " -f \"" + original + "\"";
 
         //  launch it
         saveWithProgress2(command);
