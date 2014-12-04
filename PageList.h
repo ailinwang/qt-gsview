@@ -36,6 +36,7 @@ private:
     void manageCursor(QEvent *e);
     void updateSelection(QEvent *e);
     void onRightClick(QEvent *e);
+    void onRightClickArea(QEvent *e);
 
     void onMenuCopy();
     void onMenuDeselect();

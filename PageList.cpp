@@ -22,7 +22,10 @@ void PageList::onMousePress(QEvent *e)
 
     //  if we have an area selected, and the user does right-click, ignore.
     if (m_rubberBand && (me->button()==Qt::RightButton))
+    {
+        onRightClickArea(e);
         return;
+    }
 
     m_selectingArea = false;
     if (NULL!=widget)
@@ -473,6 +476,27 @@ bool PageList::onEvent(QEvent *e)
 
     return false;
 }
+
+void PageList::onRightClickArea(QEvent *e)
+{
+    //  point at which to show the menu
+    QPoint origin = getScrollArea()->mapToGlobal(((QMouseEvent *)e)->pos());
+
+    //  show a menu
+    QMenu myMenu;
+    QAction *select = myMenu.addAction(tr("Save Selection..."));
+    QAction* selectedItem = myMenu.exec(origin);
+
+    //  handle the result
+    if (selectedItem==select)
+    {
+        m_window->saveSelection();
+    }
+    else
+    {}  //nothing chosen
+
+}
+
 
 void PageList::onRightClick(QEvent *e)
 {
