@@ -14,6 +14,14 @@ macx: QMAKE_CXXFLAGS += -stdlib=libstdc++
 INCPATH+=.
 INCPATH+=../../include/
 
+#  look for shared libs in ./libs
+#  unix only, release only
+CONFIG(release,debug|release) {
+    unix:!macx {
+        QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN/libs\'"
+    }
+}
+
 #  proprocessor
 DEFINES += _QT
 macx: DEFINES += _QT_MAC
@@ -137,3 +145,18 @@ macx {
     OTHER_FILES += resources/gsview_mac.plist
     QMAKE_INFO_PLIST = '''resources/gsview_mac.plist'''
 }
+
+#  post-link step to get some shared files for the release build
+
+QTLIBPATH = /home/fred/Qt5.3.2/5.3/gcc_64/lib
+CONFIG(release,debug|release) {
+    unix:!macx {
+        QMAKE_POST_LINK += $$quote(rmdir --ignore-fail-on-non-empty ./libs $$escape_expand(\n\t))
+        QMAKE_POST_LINK += $$quote(mkdir -p ./libs $$escape_expand(\n\t))
+        QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5PrintSupport.so.5.3.2 ./libs/libQt5PrintSupport.so.5 $$escape_expand(\n\t))
+        QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5Widgets.so.5.3.2 ./libs/libQt5Widgets.so.5 $$escape_expand(\n\t))
+        QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5Gui.so.5.3.2 ./libs/libQt5Gui.so.5 $$escape_expand(\n\t))
+        QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5Core.so.5.3.2 ./libs/libQt5Core.so.5 $$escape_expand(\n\t))
+    }
+}
+
