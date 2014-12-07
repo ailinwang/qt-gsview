@@ -93,6 +93,8 @@ private slots:
     void extractPages();
     void outputIntents();
     void copyPage();
+
+public slots:
     void saveSelection();
 
 private:
