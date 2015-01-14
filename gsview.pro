@@ -61,7 +61,8 @@ HEADERS       = \
     ExtractPagesDialog.h \
     ICCDialog.h \
     ICCDialog2.h \
-    SelectionFrame.h
+    SelectionFrame.h \
+    PrintDialog.h
 
 SOURCES       = \
     main.cpp \
@@ -86,7 +87,8 @@ SOURCES       = \
     ExtractPagesDialog.cpp \
     ICCDialog.cpp \
     ICCDialog2.cpp \
-    SelectionFrame.cpp
+    SelectionFrame.cpp \
+    PrintDialog.cpp
 
 FORMS += \
     Window.ui \
@@ -95,7 +97,8 @@ FORMS += \
     MessagesDialog.ui \
     ExtractPagesDialog.ui \
     ICCDialog.ui \
-    ICCDialog2.ui
+    ICCDialog2.ui \
+    PrintDialog.ui
 
 RESOURCES += \
     resources.qrc

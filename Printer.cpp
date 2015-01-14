@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "Document.h"
 #include "QtUtil.h"
+#include "PrintDialog.h"
 
 #include <QtPrintSupport>
 #include <QApplication>
@@ -68,6 +69,21 @@ ipp_jstate_t getJobState(int jobID)
 
 void Printer::print()
 {
+    //  create a print dialog
+    PrintDialog *pdialog = new PrintDialog (0,
+                                            m_window->document()->GetPageCount(),
+                                            m_window->currentPage()+1);
+    //  run it
+    if (pdialog->exec() != QDialog::Accepted)
+        return;  //  user cancelled
+
+    //  make a new printer
+    m_printer = new QPrinter(QPrinter::HighResolution);
+
+    return;
+    //---------------------------------
+
+
     //  get the printer
     m_printer = new QPrinter(QPrinter::HighResolution);
     QPrintDialog *dialog = new QPrintDialog(m_printer, m_window);

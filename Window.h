@@ -47,6 +47,8 @@ public:
     QString password() const;
     void setPassword(const QString &password);
 
+    int currentPage() {return m_currentPage;}
+
 protected:
     void keyPressEvent(QKeyEvent* event);
     void customEvent(QEvent *event);

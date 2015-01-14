@@ -538,6 +538,9 @@ int Window::m_numWindows = 0;
 
 void Window::print()
 {
+    QApplication::restoreOverrideCursor();
+    qApp->processEvents();
+
     Printer *p = new Printer();
     p->setWindow(this);
     p->print();
