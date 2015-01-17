@@ -69,38 +69,23 @@ ipp_jstate_t getJobState(int jobID)
 
 void Printer::print()
 {
+    //  make a printer
+    m_printer = new QPrinter(QPrinter::HighResolution);
+
     //  create a print dialog
     PrintDialog *pdialog = new PrintDialog (0,
                                             m_window->document()->GetPageCount(),
-                                            m_window->currentPage()+1);
-    //  run it
+                                            m_window->currentPage()+1, m_printer);
+    //  run the dialog
     if (pdialog->exec() != QDialog::Accepted)
         return;  //  user cancelled
 
-    //  make a new printer
-    m_printer = new QPrinter(QPrinter::HighResolution);
+    //  get the page range
+    QString pageRange = pdialog->printRange();
 
-    return;
-    //---------------------------------
-
-
-    //  get the printer
-    m_printer = new QPrinter(QPrinter::HighResolution);
-    QPrintDialog *dialog = new QPrintDialog(m_printer, m_window);
-    dialog->setWindowTitle(tr("Print Document"));
-    if (dialog->exec() != QDialog::Accepted)
-        return;
-    dialog->hide();
-
-    //  figure out printing range
-    int fromPage = 1;
-    int toPage = m_window->document()->GetPageCount();
-    if (m_printer->fromPage()>0)
-        fromPage = m_printer->fromPage();
-    if (m_printer->toPage()>0)
-        toPage = m_printer->toPage();
-    if (toPage>m_window->document()->GetPageCount())
-        toPage = m_window->document()->GetPageCount();
+//    //  debugging - see how many pages are in the range
+//    QList<int> pageList = PrintWorker::listFromRange(pageRange);
+//    int np = pageList.size();
 
     QFileInfo fileInfo (m_window->getPath());
 
@@ -108,9 +93,9 @@ void Printer::print()
     {
         //  print it as is
 #ifdef USE_CUPS
-        pdfPrint (m_printer, m_window->getPath(), fromPage, toPage);
+        pdfPrint (m_printer, m_window->getPath(), pageRange);
 #else
-        bitmapPrint (m_printer, fromPage, toPage);
+        bitmapPrint (m_printer, pageRange);
 #endif
     }
     else if (fileInfo.suffix().toLower() == QString("xps"))
@@ -132,29 +117,29 @@ void Printer::print()
         process->waitForFinished();
 
         //  print the new one
-        pdfPrint (m_printer, newPath, fromPage, toPage);
+        pdfPrint (m_printer, newPath, pageRange);
 #else
-        bitmapPrint (m_printer, fromPage, toPage);
+        bitmapPrint (m_printer, pageRange);
 #endif
     }
     else
     {
         //  TODO: convert to PDF.  But for now,
         //  do it with bitmaps.
-        bitmapPrint (m_printer, fromPage, toPage);
+        bitmapPrint (m_printer, pageRange);
     }
 }
 
 #ifdef USE_CUPS
-void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPage)
+
+void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange)
 {
     //  set up options
     int num_options = 0;
     cups_option_t *options = NULL;
 
     //  construct an option for the page range.
-    QString range = QString::number(fromPage) + "-" + QString::number(toPage);
-    num_options = cupsAddOption("page-ranges", range.toStdString().c_str(), num_options, &options);
+    num_options = cupsAddOption("page-ranges", pageRange.toStdString().c_str(), num_options, &options);
 
     //  start it
     m_jobID = cupsPrintFile (printer->printerName().toStdString().c_str(), path.toStdString().c_str(),
@@ -222,20 +207,21 @@ void Printer::pdfPrint (QPrinter *printer, QString path, int fromPage, int toPag
 #else
         //  non-mac.  Do nothing.
 #endif
-        QMessageBox::information(m_window, "", tr("Print job created.");
+        QMessageBox::information(m_window, "", tr("Print job created."));
     }
     else
     {
-        QMessageBox::information(m_window, "", tr("Error creating print job.");
+        QMessageBox::information(m_window, "", tr("Error creating print job."));
     }
 }
+
 #endif
 
-void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
+void Printer::bitmapPrint(QPrinter *printer, QString pageRange)
 {
     //  make a thread for printing, and a worker that runs ni the thread.
     m_printThread = new QThread;
-    m_printWorker = new PrintWorker(m_window, printer, fromPage-1, toPage-1);  //  values given are  1-based
+    m_printWorker = new PrintWorker(m_window, printer, pageRange);  //  values given are  1-based
     m_printWorker->moveToThread(m_printThread);
 
     //  connect worker and thread signals
@@ -249,7 +235,9 @@ void Printer::bitmapPrint (QPrinter *printer, int fromPage, int toPage)
     connect(m_printWorker, SIGNAL(pagePrinted(int)), this, SLOT(pagePrinted(int)));
 
     //  put up a progress dialog
-    m_pagesToPrint = toPage-fromPage+1;
+    QList<int> pageList = Printer::listFromRange(pageRange,
+                                                     m_window->document()->GetPageCount());
+    m_pagesToPrint = pageList.size();
     m_progress = new QProgressDialog (tr("Printing"), tr("Cancel"), 0, m_pagesToPrint, m_window);
     connect (m_progress, SIGNAL(canceled()), this, SLOT(onCanceled()));
     m_progress->setWindowModality(Qt::WindowModal);
@@ -304,16 +292,73 @@ void Printer::setProgress (int val)
 //-------------------------------------------
 //-------------------------------------------
 
-PrintWorker::PrintWorker(Window *window, QPrinter *printer, int fromPage, int toPage)
+PrintWorker::PrintWorker(Window *window, QPrinter *printer, QString pageRange)
 {
     m_printer = printer;
-    m_fromPage = fromPage;
-    m_toPage = toPage;
+    m_printRange = pageRange;
     m_window = window;
 }
 
 PrintWorker::~PrintWorker()
 {
+}
+
+QList<int> Printer::listFromRange(QString rangeList, int maxPage)
+{
+    //  start with an empty list
+    QList<int> pages;
+    bool error = false;
+
+    //  comma-separated
+    QStringList ranges = rangeList.split(",");
+    for (int i=0; i<ranges.size(); i++)
+    {
+        QString range = ranges.at(i).trimmed();
+        if (!range.isEmpty())
+        {
+            //  this item could be a single page numberm or a range like 3-5
+            QStringList parts = range.split("-");
+
+            if (parts.size()>=3)
+                {error=true; break;}  //  illegal entry
+
+            if (parts.size()==2 && parts.at(1).trimmed().isEmpty())
+                parts.removeAt(1);  //  remove blank entry
+            if (parts.size()==2 && parts.at(0).trimmed().isEmpty())
+                parts.removeAt(0);  //  remove blank entry
+
+            if (parts.size()==1)
+            {
+                //  only one part.  Must be a valid integer.
+                int pg = parts.at(0).toInt();
+                if (pg==0)
+                    {error=true; break;}
+                if (!pages.contains(pg))
+                    pages.append(pg);
+            }
+            else if (parts.size()==2)
+            {
+                //  two parts.  Both must be valid integers.
+                int p1 = parts.at(0).toInt();
+                int p2 = parts.at(1).toInt();
+                if (p1==0 || p2==0)
+                    {error=true; break;}
+                for (int pg=p1; pg<p2+1; pg++)
+                {
+                    if (!pages.contains(pg))
+                        pages.append(pg);
+                }
+            }
+        }
+    }
+
+    if (error)
+        return QList<int>();
+
+    //  now sort
+    qSort(pages);
+
+    return pages;
 }
 
 void PrintWorker::process()
@@ -325,16 +370,23 @@ void PrintWorker::process()
     QPainter painter;
     painter.begin(m_printer);
 
+    //  make a list of the pages based on the range
+    QList<int> pages = Printer::listFromRange(m_printRange,
+                                     m_window->document()->GetPageCount());
+
     //  for each page
-    int page = m_fromPage;
     int nPagesPrinted = 0;
-    while (page <= m_toPage)
+    for (int i = 0; i < pages.size(); ++i)
     {
+        //  killed?
         if (m_killed)
             break;
 
+        //  the page number
+        int page = pages.at(i);
+
         //  if not the first page, start a new page
-        if (page != m_fromPage)
+        if (i != 0)
             m_printer->newPage();
 
         //  compute page size
@@ -356,11 +408,6 @@ void PrintWorker::process()
         delete myImage;
         delete bitmap;
 
-        page++;
-
-        if (m_killed)
-            break;
-
         nPagesPrinted++;
         emit pagePrinted(nPagesPrinted);
     }
@@ -373,4 +420,3 @@ void PrintWorker::process()
     //  done!
     emit finished();
 }
-

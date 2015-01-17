@@ -14,7 +14,7 @@ class PrintWorker : public QObject {
     Q_OBJECT
 
 public:
-    PrintWorker(Window *window, QPrinter *printer, int fromPage, int toPage);
+    PrintWorker(Window *window, QPrinter *printer, QString pageRange);
     ~PrintWorker();
     void kill() {m_killed=true;}
 
@@ -26,9 +26,9 @@ signals:
     void finished();
 
 private:
+
     QPrinter *m_printer;
-    int m_fromPage;
-    int m_toPage;
+    QString m_printRange;
     Window *m_window;
     bool m_killed = false;
 };
@@ -44,8 +44,10 @@ public:
     void print();
     void setWindow (Window *win) {m_window=win;}
 
-    void pdfPrint (QPrinter *printer, QString path, int fromPage, int toPage);
-    void bitmapPrint (QPrinter *printer, int fromPage, int toPage);
+    void pdfPrint (QPrinter *printer, QString path, QString pageRange);
+    void bitmapPrint (QPrinter *printer, QString pageRange);
+
+    static QList<int> listFromRange(QString rangeList, int maxPage);
 
 signals:
 
