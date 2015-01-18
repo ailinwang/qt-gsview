@@ -80,8 +80,9 @@ void Printer::print()
     if (pdialog->exec() != QDialog::Accepted)
         return;  //  user cancelled
 
-    //  get the page range
+    //  get the page range, copies
     QString pageRange = pdialog->printRange();
+    int copies = pdialog->copies();
 
 //    //  debugging - see how many pages are in the range
 //    QList<int> pageList = PrintWorker::listFromRange(pageRange);
@@ -93,9 +94,10 @@ void Printer::print()
     {
         //  print it as is
 #ifdef USE_CUPS
-        pdfPrint (m_printer, m_window->getPath(), pageRange);
+        pdfPrint (m_printer, m_window->getPath(), pageRange, copies);
 #else
-        bitmapPrint (m_printer, pageRange);
+        m_printer->setCopyCount(copies);
+        bitmapPrint (m_printer, pageRange, copies);
 #endif
     }
     else if (fileInfo.suffix().toLower() == QString("xps"))
@@ -117,29 +119,31 @@ void Printer::print()
         process->waitForFinished();
 
         //  print the new one
-        pdfPrint (m_printer, newPath, pageRange);
+        pdfPrint (m_printer, newPath, pageRange, copies);
 #else
-        bitmapPrint (m_printer, pageRange);
+        bitmapPrint (m_printer, pageRange, copies);
 #endif
     }
     else
     {
         //  TODO: convert to PDF.  But for now,
         //  do it with bitmaps.
-        bitmapPrint (m_printer, pageRange);
+        bitmapPrint (m_printer, pageRange, copies);
     }
 }
 
 #ifdef USE_CUPS
 
-void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange)
+void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int copies)
 {
     //  set up options
     int num_options = 0;
     cups_option_t *options = NULL;
 
-    //  construct an option for the page range.
+    //  add options
+    //  pages, copies
     num_options = cupsAddOption("page-ranges", pageRange.toStdString().c_str(), num_options, &options);
+    num_options = cupsAddOption("copies", QString::number(copies).toStdString().c_str(), num_options, &options);
 
     //  start it
     m_jobID = cupsPrintFile (printer->printerName().toStdString().c_str(), path.toStdString().c_str(),
@@ -217,9 +221,9 @@ void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange)
 
 #endif
 
-void Printer::bitmapPrint(QPrinter *printer, QString pageRange)
+void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies)
 {
-    //  make a thread for printing, and a worker that runs ni the thread.
+    //  make a thread for printing, and a worker that runs in the thread.
     m_printThread = new QThread;
     m_printWorker = new PrintWorker(m_window, printer, pageRange);  //  values given are  1-based
     m_printWorker->moveToThread(m_printThread);
@@ -235,8 +239,7 @@ void Printer::bitmapPrint(QPrinter *printer, QString pageRange)
     connect(m_printWorker, SIGNAL(pagePrinted(int)), this, SLOT(pagePrinted(int)));
 
     //  put up a progress dialog
-    QList<int> pageList = Printer::listFromRange(pageRange,
-                                                     m_window->document()->GetPageCount());
+    QList<int> pageList = Printer::listFromRange(pageRange, m_window->document()->GetPageCount());
     m_pagesToPrint = pageList.size();
     m_progress = new QProgressDialog (tr("Printing"), tr("Cancel"), 0, m_pagesToPrint, m_window);
     connect (m_progress, SIGNAL(canceled()), this, SLOT(onCanceled()));

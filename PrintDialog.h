@@ -17,6 +17,7 @@ public:
     ~PrintDialog();
 
     QString printRange();
+    int copies();
 
 private slots:
     void on_cancelButton_clicked();

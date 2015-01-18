@@ -67,6 +67,11 @@ QString PrintDialog::printRange()
     return QString("");
 }
 
+int PrintDialog::copies()
+{
+    return ui->copiesSpinner->value();
+}
+
 void PrintDialog::on_propertiesButton_clicked()
 {
     //  user clicked properties button
