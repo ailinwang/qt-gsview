@@ -117,6 +117,9 @@ void PrintDialog::on_printButton_clicked()
         return;
     }
 
+    //  set selected printer
+    m_printer->setPrinterName(m_printerList.at(ui->printerCombo->currentIndex()).printerName());
+
     QApplication::restoreOverrideCursor();
     qApp->processEvents();
 
