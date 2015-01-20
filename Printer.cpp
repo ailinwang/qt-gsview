@@ -75,7 +75,7 @@ void Printer::print()
     //  create a print dialog
     PrintDialog *pdialog = new PrintDialog (0,
                                             m_window->document()->GetPageCount(),
-                                            m_window->currentPage()+1, m_printer);
+                                            m_window->currentPage()+1, m_printer, m_window->getPath());
     //  run the dialog
     if (pdialog->exec() != QDialog::Accepted)
         return;  //  user cancelled
@@ -84,19 +84,13 @@ void Printer::print()
     QString pageRange = pdialog->printRange();
     int copies = pdialog->copies();
 
-//    //  debugging - see how many pages are in the range
-//    QList<int> pageList = PrintWorker::listFromRange(pageRange);
-//    int np = pageList.size();
-
     QFileInfo fileInfo (m_window->getPath());
-
     if (fileInfo.suffix().toLower() == QString("pdf"))
     {
         //  print it as is
 #ifdef USE_CUPS
         pdfPrint (m_printer, m_window->getPath(), pageRange, copies);
 #else
-        m_printer->setCopyCount(copies);
         bitmapPrint (m_printer, pageRange, copies);
 #endif
     }
@@ -223,6 +217,8 @@ void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int c
 
 void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies)
 {
+    printer->setCopyCount(copies);
+
     //  make a thread for printing, and a worker that runs in the thread.
     m_printThread = new QThread;
     m_printWorker = new PrintWorker(m_window, printer, pageRange);  //  values given are  1-based

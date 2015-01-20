@@ -7,11 +7,12 @@
 #include <QPageSetupDialog>
 #include <QPrintDialog>
 #include <QMessageBox>
+#include <QTimer>
 
-
-PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinter *printer) :
+PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinter *printer, QString path) :
     QDialog(parent),
-    ui(new Ui::PrintDialog)
+    ui(new Ui::PrintDialog),
+    m_path(path)
 {
     //  set up the UI
     ui->setupUi(this);
@@ -26,11 +27,6 @@ PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinte
     //  start with all pages
     ui->allRadioButton->setChecked(true);
 
-    //  set up slider based on the number of pages
-    m_currentPage = currentPage;
-    m_maxPages = maxPages;
-    setupSlider();
-
     //  fill in printer names
     m_printerList=QPrinterInfo::availablePrinters();
     foreach (QPrinterInfo printerInfo, m_printerList)
@@ -39,6 +35,15 @@ PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinte
     //  printer
     m_printer = printer;
 
+    //  document (for rendering)
+    m_document = new Document();
+    m_document->Initialize();
+    m_document->OpenFile(m_path.toStdString().c_str());
+
+    //  set up slider based on the number of pages
+    m_currentPage = currentPage;
+    m_maxPages = maxPages;
+    setupSlider();
 }
 
 PrintDialog::~PrintDialog()
@@ -98,6 +103,15 @@ void PrintDialog::on_cancelButton_clicked()
 {
     //  user clicked cancel
 
+    //  close file
+    if (m_document != NULL)
+    {
+        m_document->CleanUp();
+        delete m_document;
+        m_document = NULL;
+    }
+
+    //  restore cursor
     QApplication::restoreOverrideCursor();
     qApp->processEvents();
 
@@ -117,9 +131,18 @@ void PrintDialog::on_printButton_clicked()
         return;
     }
 
+    //  close file
+    if (m_document != NULL)
+    {
+        m_document->CleanUp();
+        delete m_document;
+        m_document = NULL;
+    }
+
     //  set selected printer
     m_printer->setPrinterName(m_printerList.at(ui->printerCombo->currentIndex()).printerName());
 
+    //  restore cursor
     QApplication::restoreOverrideCursor();
     qApp->processEvents();
 
@@ -130,18 +153,21 @@ void PrintDialog::on_allRadioButton_clicked()
 {
     //  user clicked all pages radio
     setupSlider();
+    updatePreview();
 }
 
 void PrintDialog::on_currentRadioButton_clicked()
 {
     //  user clicked current page radio
     setupSlider();
+    updatePreview();
 }
 
 void PrintDialog::on_pagesRadioButton_clicked()
 {
     //  user clicked pages radio
     setupSlider();
+    updatePreview();
 }
 
 void PrintDialog::on_pageListEdit_textChanged()
@@ -149,6 +175,7 @@ void PrintDialog::on_pageListEdit_textChanged()
     //  user is typing page numbers, so select the radio button
     ui->pagesRadioButton->setChecked(true);
     setupSlider();
+    updatePreview();
 }
 
 void PrintDialog::on_printerCombo_currentIndexChanged(int index)
@@ -185,7 +212,60 @@ void PrintDialog::setupSlider()
     setSliderLabel(1);
 }
 
+void PrintDialog::updatePreview()
+{
+    if (m_timer == NULL)
+    {
+        m_timer = new QTimer(this);
+        connect(m_timer, SIGNAL(timeout()), this, SLOT(onPreviewTimer()));
+    }
+
+    m_timer->stop();
+    m_timer->start(200);
+}
+
+void PrintDialog::onPreviewTimer()
+{
+    renderPreview();
+}
+
+void PrintDialog::renderPreview()
+{
+    ui->previewLabel->clear();
+
+    //  page number
+    QString range = printRange();
+    QList<int> pageList = Printer::listFromRange(range, m_maxPages);
+    if (pageList.isEmpty())
+        return;
+    int index = ui->pageSlider->value()-1;
+    int pageNumber = pageList.at(index) - 1;
+
+    //  scale
+    double scale = 1.0;
+
+    //  delete previous image data
+    if (m_image!=NULL)  delete m_image;  m_image=NULL;
+    if (m_bitmap!=NULL) delete m_bitmap; m_bitmap=NULL;
+
+    //  get dimensions of the widget
+    int w = ui->previewLabel->width();
+    int h = ui->previewLabel->height();
+
+    //  render
+    int numBytes = w * h * 4;
+    m_bitmap = new Byte[numBytes];
+    m_document->RenderPage (pageNumber, scale, m_bitmap, w, h, false);
+
+    //  copy to widget
+    m_image = new QImage(m_bitmap, w, h, QImage::Format_ARGB32);
+    m_pixmap = QPixmap::fromImage(*m_image);
+    ui->previewLabel->setPixmap(m_pixmap);
+    ui->previewLabel->update();
+}
+
 void PrintDialog::on_pageSlider_valueChanged(int value)
 {
     setSliderLabel(value);
+    updatePreview();
 }

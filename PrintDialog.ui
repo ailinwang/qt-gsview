@@ -313,6 +313,19 @@
      <string>1/100</string>
     </property>
    </widget>
+   <widget class="QLabel" name="previewLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>40</y>
+      <width>331</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>
