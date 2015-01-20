@@ -241,9 +241,6 @@ void PrintDialog::renderPreview()
     int index = ui->pageSlider->value()-1;
     int pageNumber = pageList.at(index) - 1;
 
-    //  scale
-    double scale = 1.0;
-
     //  delete previous image data
     if (m_image!=NULL)  delete m_image;  m_image=NULL;
     if (m_bitmap!=NULL) delete m_bitmap; m_bitmap=NULL;
@@ -251,6 +248,13 @@ void PrintDialog::renderPreview()
     //  get dimensions of the widget
     int w = ui->previewLabel->width();
     int h = ui->previewLabel->height();
+
+    //  figure out a scale factor
+    point_t pageSize;
+    m_document->GetPageSize(pageNumber, 1.0, &pageSize);
+    double scaleh = double(h)/pageSize.Y;
+    double scalew = double(w)/pageSize.X;
+    double scale = fmin(scaleh, scalew);
 
     //  render
     int numBytes = w * h * 4;
