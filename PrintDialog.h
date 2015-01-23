@@ -42,6 +42,8 @@ private:
     void setupSlider();
     void updatePreview();
     void renderPreview();
+    void onClose();
+    void onNewPrinter();
 
     Ui::PrintDialog *ui;
     int m_maxPages = 1;
@@ -56,6 +58,11 @@ private:
     QPixmap m_pixmap;
 
     QTimer *m_timer = NULL;
+
+    bool m_portrait = true;
+    bool m_printerListBuilt = false;
+
+    QList<QPair<QString,QSizeF>> m_paperSizes;
 };
 
 #endif // PRINTDIALOG_H

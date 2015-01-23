@@ -100,6 +100,16 @@
      <string>Properties...</string>
     </property>
    </widget>
+   <widget class="QComboBox" name="paperSizeComboBox">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>70</y>
+      <width>241</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="rangeGroupBox">
    <property name="geometry">
@@ -313,18 +323,34 @@
      <string>1/100</string>
     </property>
    </widget>
-   <widget class="QLabel" name="previewLabel">
+   <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>40</y>
-      <width>331</width>
-      <height>191</height>
+      <x>10</x>
+      <y>30</y>
+      <width>351</width>
+      <height>211</height>
      </rect>
     </property>
-    <property name="text">
-     <string/>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
     </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <widget class="QLabel" name="previewLabel">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>81</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>
