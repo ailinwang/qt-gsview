@@ -24,18 +24,16 @@ public:
 private slots:
     void on_cancelButton_clicked();
     void on_printButton_clicked();
-
-    void on_propertiesButton_clicked();
     void on_printerCombo_currentIndexChanged(int index);
-
     void on_allRadioButton_clicked();
     void on_currentRadioButton_clicked();
     void on_pagesRadioButton_clicked();
     void on_pageListEdit_textChanged();
-
     void on_pageSlider_valueChanged(int value);
-
     void onPreviewTimer();
+    void on_paperSizeComboBox_currentIndexChanged(int index);
+    void on_portraitRadio_clicked();
+    void on_landscapeRadio_clicked();
 
 private:
     void setSliderLabel(int val);
@@ -60,9 +58,11 @@ private:
     QTimer *m_timer = NULL;
 
     bool m_portrait = true;
-    bool m_printerListBuilt = false;
 
     QList<QPair<QString,QSizeF>> m_paperSizes;
+
+    double m_paperWidth = 8.5;
+    double m_paperHeight = 11.0;
 };
 
 #endif // PRINTDIALOG_H

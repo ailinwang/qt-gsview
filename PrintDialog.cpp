@@ -28,10 +28,11 @@ PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinte
     ui->allRadioButton->setChecked(true);
 
     //  fill in printer names
+    ui->printerCombo->blockSignals(true);
     m_printerList=QPrinterInfo::availablePrinters();
     foreach (QPrinterInfo printerInfo, m_printerList)
         ui->printerCombo->addItem(printerInfo.description());
-    m_printerListBuilt = true;
+    ui->printerCombo->blockSignals(false);
 
     //  printer
     m_printer = printer;
@@ -46,6 +47,8 @@ PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinte
     m_currentPage = currentPage;
     m_maxPages = maxPages;
     setupSlider();
+
+    ui->portraitRadio->setChecked(true);
 }
 
 PrintDialog::~PrintDialog()
@@ -77,36 +80,6 @@ QString PrintDialog::printRange()
 int PrintDialog::copies()
 {
     return ui->copiesSpinner->value();
-}
-
-void PrintDialog::on_propertiesButton_clicked()
-{
-    QMessageBox::information(0,"","not implemented");
-
-//    //  user clicked properties button
-
-//    //  get info for the currently selected printer
-//    int index = ui->printerCombo->currentIndex();
-//    QPrinterInfo printerInfo = m_printerList.at(index);
-
-//    //  not sure how to resolve this just yet.
-//    //  on OSX, the page setup dialog has a
-//    //  "format for" menu.  It seems to be populated with the last-selected
-//    //  printer in the OS, *not* the one selected in this dialog.
-
-//    m_printer->setPrinterName(printerInfo.printerName());
-//    QPageSetupDialog dlg(m_printer);
-
-//    if (dlg.exec() == QDialog::Accepted)
-//    {
-////        QPrinter::Orientation o = m_printer->orientation();
-////        QString msg(o == QPrinter::Landscape ? "landscape" : "portrait");
-////        QMessageBox::information(this, "Orientation", msg);
-
-//        m_portrait = (m_printer->orientation() == QPrinter::Portrait);
-
-//        updatePreview();
-//    }
 }
 
 void PrintDialog::on_cancelButton_clicked()
@@ -212,7 +185,7 @@ void PrintDialog::updatePreview()
     }
 
     m_timer->stop();
-    m_timer->start(200);
+    m_timer->start(100);
 }
 
 void PrintDialog::onPreviewTimer()
@@ -240,33 +213,26 @@ void PrintDialog::renderPreview()
     double pageWidth = pageSize.X/72.0;
     double pageHeight = pageSize.Y/72.0;
 
-    //  get the printer page dimensions (inches)
-    //  using resolution of the printer (probably 600 DPI)
-    QRect paperRect = m_printer->paperRect();
-    int resolution = m_printer->resolution();
-    double paperWidth  = double(paperRect.width())/double(resolution);
-    double paperHeight = double(paperRect.height())/double(resolution);
-
     //  size and place the preview widget within the frame
     int frameh = ui->frame->height();
     int framew = ui->frame->width();
     double scale = 1.0;
     if (m_portrait)
     {
-        double scale1 = double(framew)/(paperWidth*72.0);
-        double scale2 = double(frameh)/(paperHeight*72.0);
+        double scale1 = double(framew)/(m_paperWidth*72.0);
+        double scale2 = double(frameh)/(m_paperHeight*72.0);
         scale = fmin (scale1, scale2);
-        int w = paperWidth*72.0*scale;
-        int h = paperHeight*72.0*scale;
+        int w = m_paperWidth*72.0*scale;
+        int h = m_paperHeight*72.0*scale;
         ui->previewLabel->setGeometry(framew/2-w/2,frameh/2-h/2,w,h);
     }
     else
     {
-        double scale1 = double(frameh)/(paperWidth*72.0);
-        double scale2 = double(framew)/(paperHeight*72.0);
+        double scale1 = double(frameh)/(m_paperWidth*72.0);
+        double scale2 = double(framew)/(m_paperHeight*72.0);
         scale = fmin (scale1, scale2);
-        int w = paperWidth*72.0*scale;
-        int h = paperHeight*72.0*scale;
+        int w = m_paperWidth*72.0*scale;
+        int h = m_paperHeight*72.0*scale;
         ui->previewLabel->setGeometry(framew/2-h/2,frameh/2-w/2,h,w);
     }
 
@@ -330,14 +296,11 @@ void PrintDialog::onClose()
 
 void PrintDialog::onNewPrinter()
 {
-    //  not while the printer list is being built
-    if (!m_printerListBuilt)
-        return;
-
     //  info for the currently selected printer.
     QPrinterInfo printerInfo = m_printerList.at(ui->printerCombo->currentIndex());
 
     //  get the paper sizes
+    ui->paperSizeComboBox->blockSignals(true);
     ui->paperSizeComboBox->clear();
     m_paperSizes = printerInfo.supportedSizesWithNames();
     for (int i=0; i<m_paperSizes.size() ;i++)
@@ -347,6 +310,7 @@ void PrintDialog::onNewPrinter()
         QSizeF size = paperSize.second;
         ui->paperSizeComboBox->addItem(name);
     }
+    ui->paperSizeComboBox->blockSignals(false);
 
     //  set the printer name
     m_printer->setPrinterName(printerInfo.printerName());
@@ -355,5 +319,34 @@ void PrintDialog::onNewPrinter()
 void PrintDialog::on_pageSlider_valueChanged(int value)
 {
     setSliderLabel(value);
+    updatePreview();
+}
+
+void PrintDialog::on_paperSizeComboBox_currentIndexChanged(int index)
+{
+    //  get selected size
+    QPair<QString,QSizeF> paperSize = m_paperSizes.at(index);
+    QString name = paperSize.first;
+    QSizeF size = paperSize.second;
+
+    //  convert to inches
+    double w = size.width();
+    double h = size.height();
+    m_paperWidth  = w/25.4;
+    m_paperHeight = h/25.4;
+
+    //  re-draw the preview
+    updatePreview();
+}
+
+void PrintDialog::on_portraitRadio_clicked()
+{
+    m_portrait = true;
+    updatePreview();
+}
+
+void PrintDialog::on_landscapeRadio_clicked()
+{
+    m_portrait = false;
     updatePreview();
 }
