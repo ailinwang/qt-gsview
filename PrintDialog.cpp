@@ -49,6 +49,8 @@ PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinte
     setupSlider();
 
     ui->portraitRadio->setChecked(true);
+
+    on_paperSizeComboBox_currentIndexChanged(0);
 }
 
 PrintDialog::~PrintDialog()
@@ -216,21 +218,26 @@ void PrintDialog::renderPreview()
     //  size and place the preview widget within the frame
     int frameh = ui->frame->height();
     int framew = ui->frame->width();
+
+    double scale1 = double(framew)/(m_paperWidth*72.0);
+    double scale2 = double(frameh)/(m_paperHeight*72.0);
+    double scale3 = double(frameh)/(m_paperWidth*72.0);
+    double scale4 = double(framew)/(m_paperHeight*72.0);
+
     double scale = 1.0;
+    if (scale1<scale) scale = scale1;
+    if (scale2<scale) scale = scale2;
+    if (scale3<scale) scale = scale3;
+    if (scale4<scale) scale = scale4;
+
     if (m_portrait)
     {
-        double scale1 = double(framew)/(m_paperWidth*72.0);
-        double scale2 = double(frameh)/(m_paperHeight*72.0);
-        scale = fmin (scale1, scale2);
         int w = m_paperWidth*72.0*scale;
         int h = m_paperHeight*72.0*scale;
         ui->previewLabel->setGeometry(framew/2-w/2,frameh/2-h/2,w,h);
     }
     else
     {
-        double scale1 = double(frameh)/(m_paperWidth*72.0);
-        double scale2 = double(framew)/(m_paperHeight*72.0);
-        scale = fmin (scale1, scale2);
         int w = m_paperWidth*72.0*scale;
         int h = m_paperHeight*72.0*scale;
         ui->previewLabel->setGeometry(framew/2-h/2,frameh/2-w/2,h,w);
@@ -239,12 +246,12 @@ void PrintDialog::renderPreview()
     //  fill widget with white
     ui->previewLabel->setStyleSheet("QLabel { background-color : white; color : white; }");
 
-    //  auto-rotate?
-    bool rotate = false;
-    if (m_portrait && pageWidth>pageHeight)
-        rotate = true;
-    if (!m_portrait && pageWidth<pageHeight)
-        rotate = true;
+//    //  auto-rotate?
+//    bool rotate = false;
+//    if (m_portrait && pageWidth>pageHeight)
+//        rotate = true;
+//    if (!m_portrait && pageWidth<pageHeight)
+//        rotate = true;
 
     //  delete previous image data
     if (m_image!=NULL)  delete m_image;  m_image=NULL;
@@ -257,16 +264,10 @@ void PrintDialog::renderPreview()
     m_bitmap = new Byte[numBytes];
     m_document->RenderPage (pageNumber, scale, m_bitmap, w, h, false);
 
-    //  copy to widget
+    //  make an image
     m_image = new QImage(m_bitmap, w, h, QImage::Format_ARGB32);
 
-    if (rotate)
-    {
-        QTransform rot;
-        rot.rotate(90);
-        *m_image = m_image->transformed(rot, Qt::SmoothTransformation);
-    }
-
+    //  set it in the widget
     m_pixmap = QPixmap::fromImage(*m_image);
     ui->previewLabel->setPixmap(m_pixmap);
     ui->previewLabel->update();
