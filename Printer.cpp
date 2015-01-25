@@ -332,6 +332,8 @@ QList<int> Printer::listFromRange(QString rangeList, int maxPage)
                 int pg = parts.at(0).toInt();
                 if (pg==0)
                     {error=true; break;}
+                if (pg>maxPage)
+                    {error=true; break;}
                 if (!pages.contains(pg))
                     pages.append(pg);
             }
@@ -341,6 +343,8 @@ QList<int> Printer::listFromRange(QString rangeList, int maxPage)
                 int p1 = parts.at(0).toInt();
                 int p2 = parts.at(1).toInt();
                 if (p1==0 || p2==0)
+                    {error=true; break;}
+                if (p1>maxPage || p2>maxPage)
                     {error=true; break;}
                 for (int pg=p1; pg<p2+1; pg++)
                 {

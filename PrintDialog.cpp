@@ -38,7 +38,7 @@ PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinte
     m_printer = printer;
     onNewPrinter();
 
-    //  document (for rendering)
+    //  MuPDF document (for rendering preview)
     m_document = new Document();
     m_document->Initialize();
     m_document->OpenFile(m_path.toStdString().c_str());
