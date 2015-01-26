@@ -138,11 +138,8 @@ void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int c
 
     //  add options
     num_options = cupsAddOption("page-ranges", pageRange.toStdString().c_str(), num_options, &options);
-    num_options = cupsAddOption("copies", QString::number(copies).toStdString().c_str(), num_options, &options);
-    if (landscape)
-        num_options = cupsAddOption("landscape", "true", num_options, &options);
-    else
-        num_options = cupsAddOption("landscape", "false", num_options, &options);
+    num_options = cupsAddOption("copies",      QString::number(copies).toStdString().c_str(), num_options, &options);
+    num_options = cupsAddOption("landscape",   landscape ? "true" : "false", num_options, &options);
 
     //  start it
     m_jobID = cupsPrintFile (printer->printerName().toStdString().c_str(), path.toStdString().c_str(),
@@ -223,11 +220,11 @@ void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int c
 void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies, bool landscape)
 {
     printer->setCopyCount(copies);
+    printer->setOrientation(landscape ? QPrinter::Landscape : QPrinter::Portrait);
 
-    if (landscape)
-        printer->setOrientation(QPrinter::Landscape);
-    else
-        printer->setOrientation(QPrinter::Portrait);
+    //  TODO - which one?
+    //printer->setPageSizeMM();
+    //printer->setPaperSize();
 
     //  make a thread for printing, and a worker that runs in the thread.
     m_printThread = new QThread;

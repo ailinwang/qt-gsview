@@ -204,84 +204,69 @@ void PrintDialog::renderPreview()
     //  clear the preview
     ui->previewLabel->clear();
 
-    //  get page number (zero-based)
+    //  get current page number (zero-based)
     QString range = printRange();
     QList<int> pageList = Printer::listFromRange(range, m_maxPages);
     if (pageList.isEmpty())
         return;  //  no pages
     int pageNumber = pageList.at(ui->pageSlider->value()-1)-1;
 
-    //  get the document page dimensions (inches)
-    //  assumes resolution of 72 DPI
+    //  get the document page dimensions (inches) @ 72DPI
     point_t pageSize;
     m_document->GetPageSize(pageNumber, 1.0, &pageSize);
     double pageWidth = pageSize.X/72.0;
     double pageHeight = pageSize.Y/72.0;
 
-//    //  auto-rotate?
-//    bool rotate = false;
-//    if (m_portrait && pageWidth>pageHeight)
-//        rotate = true;
-//    if (!m_portrait && pageWidth<pageHeight)
-//        rotate = true;
-//    if (rotate)
-//    {
-//        double temp = pageWidth;
-//        pageWidth = pageHeight;
-//        pageHeight = temp;
-//    }
+    //  get current paper size
+    double paperWidth = m_paperWidth;
+    double paperHeight = m_paperHeight;
+
+    //  rotate the paper?
+    if (!m_portrait)
+    {
+        double temp = paperHeight;
+        paperHeight = paperWidth;
+        paperWidth = temp;
+    }
 
     //  size and place the preview widget within the frame
     int frameh = ui->frame->height();
     int framew = ui->frame->width();
-
-    double scale1 = double(framew)/(m_paperWidth*72.0);
-    double scale2 = double(frameh)/(m_paperHeight*72.0);
-    double scale3 = double(frameh)/(m_paperWidth*72.0);
-    double scale4 = double(framew)/(m_paperHeight*72.0);
-
+    double scale1 = double(framew)/(paperWidth*72.0);
+    double scale2 = double(frameh)/(paperHeight*72.0);
+    double scale3 = double(frameh)/(paperWidth*72.0);
+    double scale4 = double(framew)/(paperHeight*72.0);
     double scale = 1.0;
     if (scale1<scale) scale = scale1;
     if (scale2<scale) scale = scale2;
     if (scale3<scale) scale = scale3;
     if (scale4<scale) scale = scale4;
-
-    if (m_portrait)
-    {
-        int w = m_paperWidth*72.0*scale;
-        int h = m_paperHeight*72.0*scale;
-        ui->previewLabel->setGeometry(framew/2-w/2,frameh/2-h/2,w,h);
-    }
-    else
-    {
-        int w = m_paperWidth*72.0*scale;
-        int h = m_paperHeight*72.0*scale;
-        ui->previewLabel->setGeometry(framew/2-h/2,frameh/2-w/2,h,w);
-    }
+    int pw = paperWidth*72.0*scale;
+    int ph = paperHeight*72.0*scale;
+    ui->previewLabel->setGeometry(framew/2-pw/2,frameh/2-ph/2,pw,ph);
 
     //  fill widget with white
     ui->previewLabel->setStyleSheet("QLabel { background-color : white; color : white; }");
 
-    //  delete previous image data
+    //  delete previous page image data
     if (m_image!=NULL)  delete m_image;  m_image=NULL;
     if (m_bitmap!=NULL) delete m_bitmap; m_bitmap=NULL;
 
-    //  render
-    int w = ui->previewLabel->width();
-    int h = ui->previewLabel->height();
-    int numBytes = (w * h * 4);
+    //  render the page
+    int numBytes = (pw * ph * 4);
     m_bitmap = new Byte[numBytes];
-    m_document->RenderPage (pageNumber, scale, m_bitmap, w, h, false);
+    m_document->RenderPage (pageNumber, scale, m_bitmap, pw, ph, false);
 
     //  make an image
-    m_image = new QImage(m_bitmap, w, h, QImage::Format_ARGB32);
+    m_image = new QImage(m_bitmap, pw, ph, QImage::Format_ARGB32);
 
-//    if (rotate)
-//    {
-//        QTransform tf;
-//        tf.rotate(90);
-//        *m_image = m_image->transformed(tf);
-//    }
+    bool rotate = false;//true;  //  TODO
+    if (rotate)
+    {
+        QTransform tf;
+        tf.rotate(90);
+        *m_image = m_image->transformed(tf);
+    }
 
     //  set it in the widget
     m_pixmap = QPixmap::fromImage(*m_image);
