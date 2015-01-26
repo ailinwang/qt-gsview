@@ -252,7 +252,7 @@
      <string>Copies:</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="autoFitCheckBox">
     <property name="geometry">
      <rect>
       <x>20</x>

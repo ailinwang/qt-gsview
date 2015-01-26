@@ -36,6 +36,8 @@ private slots:
     void on_portraitRadio_clicked();
     void on_landscapeRadio_clicked();
 
+    void on_autoFitCheckBox_clicked();
+
 private:
     void setSliderLabel(int val);
     void setupSlider();
@@ -64,6 +66,10 @@ private:
 
     double m_paperWidth = 8.5;
     double m_paperHeight = 11.0;
+
+    bool m_bAutoFit = true;
+    bool m_bAutoFitRotate = false;
+    double m_autoFitScale = 1.0;
 };
 
 #endif // PRINTDIALOG_H

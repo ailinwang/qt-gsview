@@ -244,8 +244,26 @@ void PrintDialog::renderPreview()
     //  fill widget with white
     ui->previewLabel->setStyleSheet("QLabel { background-color : white; color : white; }");
 
-    //  TODO: determine whether to rotate the page.
-    bool rotate = false;
+    //  autofit
+    m_autoFitScale = 1.0;
+    m_bAutoFitRotate = false;
+    if (m_bAutoFit)
+    {
+        double r1 = paperHeight/paperWidth;
+        double r2 = pageHeight/pageWidth;
+
+        if ((r1>1.0 && r2>1.0) || (r1<1.0 && r2<1.0))
+        {
+            m_autoFitScale = fmin( paperWidth/pageWidth, paperHeight/pageHeight);
+        }
+        else
+        {
+            m_autoFitScale = fmin( paperWidth/pageHeight, paperHeight/pageWidth);
+            m_bAutoFitRotate = true;
+        }
+
+        scale = scale * m_autoFitScale;
+    }
 
     //  render the page to an image
     int w = scale*pageSize.X;
@@ -256,7 +274,7 @@ void PrintDialog::renderPreview()
         w = scale*pageSize.Y;
     }
 
-    if (rotate)
+    if (m_bAutoFitRotate)
         { int x = w; w = h; h = x;}
 
     int numBytes = (w * h* 4);
@@ -267,7 +285,7 @@ void PrintDialog::renderPreview()
     m_image = new QImage(m_bitmap, w, h, QImage::Format_ARGB32);
 
     //  rotate
-    if (rotate)
+    if (m_bAutoFitRotate)
     {
         QTransform tf;
         tf.rotate(90);
@@ -354,5 +372,11 @@ void PrintDialog::on_portraitRadio_clicked()
 void PrintDialog::on_landscapeRadio_clicked()
 {
     m_portrait = false;
+    updatePreview();
+}
+
+void PrintDialog::on_autoFitCheckBox_clicked()
+{
+    m_bAutoFit = ui->autoFitCheckBox->isChecked();
     updatePreview();
 }
