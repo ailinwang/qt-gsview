@@ -675,6 +675,7 @@ status_t muctx::RenderPageMT(void *dlist, void *a_dlist, int page_width, int pag
 	fz_try(ctx_clone)
 	{
 		pctm = fz_scale(pctm, scale, scale);
+
 		/* Flip on Y. */
 		if (flipy) 
 		{

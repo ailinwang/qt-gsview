@@ -48,6 +48,7 @@ PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinte
     m_maxPages = maxPages;
     setupSlider();
 
+    //  portait by default
     ui->portraitRadio->setChecked(true);
 
     on_paperSizeComboBox_currentIndexChanged(0);
@@ -145,6 +146,8 @@ void PrintDialog::on_pageListEdit_textChanged()
 
 void PrintDialog::on_printerCombo_currentIndexChanged(int index)
 {
+    UNUSED(index);
+
     //  user changed selected printer
     onNewPrinter();
 }
@@ -215,6 +218,19 @@ void PrintDialog::renderPreview()
     double pageWidth = pageSize.X/72.0;
     double pageHeight = pageSize.Y/72.0;
 
+//    //  auto-rotate?
+//    bool rotate = false;
+//    if (m_portrait && pageWidth>pageHeight)
+//        rotate = true;
+//    if (!m_portrait && pageWidth<pageHeight)
+//        rotate = true;
+//    if (rotate)
+//    {
+//        double temp = pageWidth;
+//        pageWidth = pageHeight;
+//        pageHeight = temp;
+//    }
+
     //  size and place the preview widget within the frame
     int frameh = ui->frame->height();
     int framew = ui->frame->width();
@@ -246,13 +262,6 @@ void PrintDialog::renderPreview()
     //  fill widget with white
     ui->previewLabel->setStyleSheet("QLabel { background-color : white; color : white; }");
 
-//    //  auto-rotate?
-//    bool rotate = false;
-//    if (m_portrait && pageWidth>pageHeight)
-//        rotate = true;
-//    if (!m_portrait && pageWidth<pageHeight)
-//        rotate = true;
-
     //  delete previous image data
     if (m_image!=NULL)  delete m_image;  m_image=NULL;
     if (m_bitmap!=NULL) delete m_bitmap; m_bitmap=NULL;
@@ -266,6 +275,13 @@ void PrintDialog::renderPreview()
 
     //  make an image
     m_image = new QImage(m_bitmap, w, h, QImage::Format_ARGB32);
+
+//    if (rotate)
+//    {
+//        QTransform tf;
+//        tf.rotate(90);
+//        *m_image = m_image->transformed(tf);
+//    }
 
     //  set it in the widget
     m_pixmap = QPixmap::fromImage(*m_image);
@@ -308,7 +324,7 @@ void PrintDialog::onNewPrinter()
     {
         QPair<QString,QSizeF> paperSize = m_paperSizes.at(i);
         QString name = paperSize.first;
-        QSizeF size = paperSize.second;
+//        QSizeF size = paperSize.second;
         ui->paperSizeComboBox->addItem(name);
     }
     ui->paperSizeComboBox->blockSignals(false);

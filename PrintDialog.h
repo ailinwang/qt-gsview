@@ -20,6 +20,7 @@ public:
 
     QString printRange();
     int copies();
+    bool landscape() {return !m_portrait;}
 
 private slots:
     void on_cancelButton_clicked();

@@ -221,9 +221,11 @@ bool Document::RenderPage (int page_num, double scale, unsigned char *bmp_data, 
         return false;
     }
 
+    bool flipy = false;
+
     status_t code = mu_ctx->RenderPageMT (dlist, annotlist, page_width, page_height,
                                     &(bmp_data[0]), bmp_width, bmp_height,
-                                    scale, false, false,
+                                    scale, flipy, false,
                                     { double(0), double(0) },
                                     { double(page_width), double(page_height) });
     if (code != S_ISOK)

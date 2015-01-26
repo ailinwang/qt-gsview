@@ -84,14 +84,16 @@ void Printer::print()
     QString pageRange = pdialog->printRange();
     int copies = pdialog->copies();
 
+    bool landscape = pdialog->landscape();
+
     QFileInfo fileInfo (m_window->getPath());
     if (fileInfo.suffix().toLower() == QString("pdf"))
     {
         //  print it as is
 #ifdef USE_CUPS
-        pdfPrint (m_printer, m_window->getPath(), pageRange, copies);
+        pdfPrint (m_printer, m_window->getPath(), pageRange, copies, landscape);
 #else
-        bitmapPrint (m_printer, pageRange, copies);
+        bitmapPrint (m_printer, pageRange, copies, landscape);
 #endif
     }
     else if (fileInfo.suffix().toLower() == QString("xps"))
@@ -113,31 +115,34 @@ void Printer::print()
         process->waitForFinished();
 
         //  print the new one
-        pdfPrint (m_printer, newPath, pageRange, copies);
+        pdfPrint (m_printer, newPath, pageRange, copies, landscape);
 #else
-        bitmapPrint (m_printer, pageRange, copies);
+        bitmapPrint (m_printer, pageRange, copies, landscape);
 #endif
     }
     else
     {
         //  TODO: convert to PDF.  But for now,
         //  do it with bitmaps.
-        bitmapPrint (m_printer, pageRange, copies);
+        bitmapPrint (m_printer, pageRange, copies, landscape);
     }
 }
 
 #ifdef USE_CUPS
 
-void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int copies)
+void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int copies, bool landscape)
 {
     //  set up options
     int num_options = 0;
     cups_option_t *options = NULL;
 
     //  add options
-    //  pages, copies
     num_options = cupsAddOption("page-ranges", pageRange.toStdString().c_str(), num_options, &options);
     num_options = cupsAddOption("copies", QString::number(copies).toStdString().c_str(), num_options, &options);
+    if (landscape)
+        num_options = cupsAddOption("landscape", "true", num_options, &options);
+    else
+        num_options = cupsAddOption("landscape", "false", num_options, &options);
 
     //  start it
     m_jobID = cupsPrintFile (printer->printerName().toStdString().c_str(), path.toStdString().c_str(),
@@ -215,9 +220,14 @@ void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int c
 
 #endif
 
-void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies)
+void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies, bool landscape)
 {
     printer->setCopyCount(copies);
+
+    if (landscape)
+        printer->setOrientation(QPrinter::Landscape);
+    else
+        printer->setOrientation(QPrinter::Portrait);
 
     //  make a thread for printing, and a worker that runs in the thread.
     m_printThread = new QThread;
