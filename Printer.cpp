@@ -393,7 +393,7 @@ void PrintWorker::process()
             break;
 
         //  the page number
-        int page = pages.at(i);
+        int page = pages.at(i) - 1;
 
         //  if not the first page, start a new page
         if (i != 0)

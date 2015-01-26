@@ -25,7 +25,7 @@ CONFIG(release,debug|release) {
 #  proprocessor
 DEFINES += _QT
 macx: DEFINES += _QT_MAC
-unix: DEFINES += USE_CUPS
+#unix: DEFINES += USE_CUPS
 win32: DEFINES += _QT_WIN
 
 #  debugging can be easier if we don't use native file dialogs
