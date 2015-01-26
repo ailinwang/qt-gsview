@@ -217,17 +217,13 @@ void PrintDialog::renderPreview()
     double pageWidth = pageSize.X/72.0;
     double pageHeight = pageSize.Y/72.0;
 
-    //  get current paper size
+    //  get current paper size (inches)
     double paperWidth = m_paperWidth;
     double paperHeight = m_paperHeight;
 
-    //  rotate the paper?
+    //  rotate the "paper" if landscape
     if (!m_portrait)
-    {
-        double temp = paperHeight;
-        paperHeight = paperWidth;
-        paperWidth = temp;
-    }
+        {double temp = paperWidth;paperWidth = paperHeight;paperHeight = temp;}
 
     //  size and place the preview widget within the frame
     int frameh = ui->frame->height();
@@ -248,19 +244,29 @@ void PrintDialog::renderPreview()
     //  fill widget with white
     ui->previewLabel->setStyleSheet("QLabel { background-color : white; color : white; }");
 
-    //  delete previous page image data
+    //  TODO: determine whether to rotate the page.
+    bool rotate = false;
+
+    //  render the page to an image
+    int w = scale*pageSize.X;
+    int h = scale*pageSize.Y;
+    if (!m_portrait)
+    {
+        h = scale*pageSize.X;
+        w = scale*pageSize.Y;
+    }
+
+    if (rotate)
+        { int x = w; w = h; h = x;}
+
+    int numBytes = (w * h* 4);
     if (m_image!=NULL)  delete m_image;  m_image=NULL;
     if (m_bitmap!=NULL) delete m_bitmap; m_bitmap=NULL;
-
-    //  render the page
-    int numBytes = (pw * ph * 4);
     m_bitmap = new Byte[numBytes];
-    m_document->RenderPage (pageNumber, scale, m_bitmap, pw, ph, false);
+    m_document->RenderPage (pageNumber, scale, m_bitmap, w, h, false);
+    m_image = new QImage(m_bitmap, w, h, QImage::Format_ARGB32);
 
-    //  make an image
-    m_image = new QImage(m_bitmap, pw, ph, QImage::Format_ARGB32);
-
-    bool rotate = false;//true;  //  TODO
+    //  rotate
     if (rotate)
     {
         QTransform tf;
@@ -308,9 +314,7 @@ void PrintDialog::onNewPrinter()
     for (int i=0; i<m_paperSizes.size() ;i++)
     {
         QPair<QString,QSizeF> paperSize = m_paperSizes.at(i);
-        QString name = paperSize.first;
-//        QSizeF size = paperSize.second;
-        ui->paperSizeComboBox->addItem(name);
+        ui->paperSizeComboBox->addItem(paperSize.first);
     }
     ui->paperSizeComboBox->blockSignals(false);
 
