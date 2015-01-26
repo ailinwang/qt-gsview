@@ -22,6 +22,10 @@ public:
     int copies();
     bool landscape() {return !m_portrait;}
 
+    bool autoFit() {return m_bAutoFit;}
+    bool autoFitRotate() {return m_bAutoFitRotate;}
+    double autoFitScale() {return m_autoFitScale;}
+
 private slots:
     void on_cancelButton_clicked();
     void on_printButton_clicked();

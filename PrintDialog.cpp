@@ -88,9 +88,9 @@ int PrintDialog::copies()
 void PrintDialog::on_cancelButton_clicked()
 {
     //  user clicked cancel
-
+    
     onClose();
-
+    
     QDialog::reject();
 }
 

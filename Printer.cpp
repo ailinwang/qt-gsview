@@ -80,11 +80,13 @@ void Printer::print()
     if (pdialog->exec() != QDialog::Accepted)
         return;  //  user cancelled
 
-    //  get the page range, copies
+    //  get options
     QString pageRange = pdialog->printRange();
     int copies = pdialog->copies();
-
     bool landscape = pdialog->landscape();
+    //bool autoFit = pdialog->autoFit();
+    bool rotate =  pdialog->autoFitRotate();
+    double scale = pdialog->autoFitScale();
 
     QFileInfo fileInfo (m_window->getPath());
     if (fileInfo.suffix().toLower() == QString("pdf"))
@@ -93,7 +95,7 @@ void Printer::print()
 #ifdef USE_CUPS
         pdfPrint (m_printer, m_window->getPath(), pageRange, copies, landscape);
 #else
-        bitmapPrint (m_printer, pageRange, copies, landscape);
+        bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale);
 #endif
     }
     else if (fileInfo.suffix().toLower() == QString("xps"))
@@ -117,14 +119,14 @@ void Printer::print()
         //  print the new one
         pdfPrint (m_printer, newPath, pageRange, copies, landscape);
 #else
-        bitmapPrint (m_printer, pageRange, copies, landscape);
+        bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale);
 #endif
     }
     else
     {
         //  TODO: convert to PDF.  But for now,
         //  do it with bitmaps.
-        bitmapPrint (m_printer, pageRange, copies, landscape);
+        bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale);
     }
 }
 
@@ -217,7 +219,7 @@ void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int c
 
 #endif
 
-void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies, bool landscape)
+void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies, bool landscape, bool rotate, double userScale)
 {
     printer->setCopyCount(copies);
     printer->setOrientation(landscape ? QPrinter::Landscape : QPrinter::Portrait);
@@ -228,7 +230,7 @@ void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies, bool
 
     //  make a thread for printing, and a worker that runs in the thread.
     m_printThread = new QThread;
-    m_printWorker = new PrintWorker(m_window, printer, pageRange);  //  values given are  1-based
+    m_printWorker = new PrintWorker(m_window, printer, pageRange, rotate, userScale);  //  values given are  1-based
     m_printWorker->moveToThread(m_printThread);
 
     //  connect worker and thread signals
@@ -298,11 +300,13 @@ void Printer::setProgress (int val)
 //-------------------------------------------
 //-------------------------------------------
 
-PrintWorker::PrintWorker(Window *window, QPrinter *printer, QString pageRange)
+PrintWorker::PrintWorker(Window *window, QPrinter *printer, QString pageRange, bool rotate, double userScale)
 {
     m_printer = printer;
     m_printRange = pageRange;
     m_window = window;
+    m_userScale = userScale;
+    m_rotate = rotate;
 }
 
 PrintWorker::~PrintWorker()
@@ -413,6 +417,16 @@ void PrintWorker::process()
 
         //  copy to printer
         QImage *myImage = new QImage(bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
+
+        //  scale and rotate
+        if (m_rotate || m_userScale!=1.0)
+        {
+            QTransform tf;
+            tf.scale(m_userScale, m_userScale);
+            tf.rotate(90);
+            *myImage = myImage->transformed(tf, Qt::SmoothTransformation);
+        }
+
         painter.drawImage(0, 0, *myImage);
 
         delete myImage;

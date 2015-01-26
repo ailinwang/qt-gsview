@@ -14,7 +14,7 @@ class PrintWorker : public QObject {
     Q_OBJECT
 
 public:
-    PrintWorker(Window *window, QPrinter *printer, QString pageRange);
+    PrintWorker(Window *window, QPrinter *printer, QString pageRange, bool rotate, double userScale);
     ~PrintWorker();
     void kill() {m_killed=true;}
 
@@ -31,6 +31,8 @@ private:
     QString m_printRange;
     Window *m_window;
     bool m_killed = false;
+    bool m_rotate = false;
+    double m_userScale = 1.0;
 };
 
 class QProgressDialog;
@@ -45,7 +47,7 @@ public:
     void setWindow (Window *win) {m_window=win;}
 
     void pdfPrint (QPrinter *printer, QString path, QString pageRange, int copies, bool landscape);
-    void bitmapPrint (QPrinter *printer, QString pageRange, int copies, bool landscape);
+    void bitmapPrint (QPrinter *printer, QString pageRange, int copies, bool landscape, bool rootate, double userScale);
 
     static QList<int> listFromRange(QString rangeList, int maxPage);
 
