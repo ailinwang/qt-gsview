@@ -243,6 +243,7 @@ void PrintDialog::renderPreview()
     ui->previewLabel->setStyleSheet("QLabel { background-color : white; color : white; }");
 
     //  autofit
+    ui->previewLabel->setAlignment(Qt::AlignTop|Qt::AlignLeft);
     m_autoFitScale = 1.0;
     m_bAutoFitRotate = false;
     if (m_bAutoFit)
@@ -254,16 +255,28 @@ void PrintDialog::renderPreview()
         {
             m_bAutoFitRotate = true;
             m_autoFitScale = paperWidth/pageHeight;
+            if (pageAspect>1)
+                ui->previewLabel->setAlignment(Qt::AlignVCenter);
+            else
+                ui->previewLabel->setAlignment(Qt::AlignHCenter);
 
         }
         else if (pageAspect<1&&paperAspect>1)
         {
             m_bAutoFitRotate = true;
             m_autoFitScale = paperHeight/pageWidth;
+            if (pageAspect>1)
+                ui->previewLabel->setAlignment(Qt::AlignVCenter);
+            else
+                ui->previewLabel->setAlignment(Qt::AlignHCenter);
         }
         else
         {
             m_autoFitScale = fmin(paperWidth/pageWidth,paperHeight/pageHeight);
+            if (pageAspect<1)
+                ui->previewLabel->setAlignment(Qt::AlignVCenter);
+            else
+                ui->previewLabel->setAlignment(Qt::AlignHCenter);
         }
     }
     scale = scale * m_autoFitScale;
@@ -287,11 +300,8 @@ void PrintDialog::renderPreview()
         *m_image = m_image->transformed(tf);
     }
 
-//    m_image->save("/Users/fredross-perry/Desktop/preview.png");
-
     //  set it in the widget
     m_pixmap = QPixmap::fromImage(*m_image);
-    ui->previewLabel->setAlignment(Qt::AlignTop|Qt::AlignLeft);
     ui->previewLabel->setPixmap(m_pixmap);
     ui->previewLabel->update();
 }
