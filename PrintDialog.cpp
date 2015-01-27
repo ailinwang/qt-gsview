@@ -228,15 +228,13 @@ void PrintDialog::renderPreview()
     //  size and place the preview widget within the frame
     int frameh = ui->frame->height();
     int framew = ui->frame->width();
-    double scale1 = double(framew)/(paperWidth*72.0);
-    double scale2 = double(frameh)/(paperHeight*72.0);
-    double scale3 = double(frameh)/(paperWidth*72.0);
-    double scale4 = double(framew)/(paperHeight*72.0);
+
     double scale = 1.0;
-    if (scale1<scale) scale = scale1;
-    if (scale2<scale) scale = scale2;
-    if (scale3<scale) scale = scale3;
-    if (scale4<scale) scale = scale4;
+    scale = fmin(scale,double(framew)/(paperWidth*72.0));
+    scale = fmin(scale,double(frameh)/(paperHeight*72.0));
+    scale = fmin(scale,double(frameh)/(paperWidth*72.0));
+    scale = fmin(scale,double(framew)/(paperHeight*72.0));
+
     int pw = paperWidth*72.0*scale;
     int ph = paperHeight*72.0*scale;
     ui->previewLabel->setGeometry(framew/2-pw/2,frameh/2-ph/2,pw,ph);
@@ -249,33 +247,30 @@ void PrintDialog::renderPreview()
     m_bAutoFitRotate = false;
     if (m_bAutoFit)
     {
-        double r1 = paperHeight/paperWidth;
-        double r2 = pageHeight/pageWidth;
+        double pageAspect = pageHeight/pageWidth;
+        double paperAspect = paperHeight/paperWidth;
 
-        if ((r1>1.0 && r2>1.0) || (r1<1.0 && r2<1.0))
+        if (pageAspect>1&&paperAspect<1)
         {
-            m_autoFitScale = fmin( paperWidth/pageWidth, paperHeight/pageHeight);
+            m_bAutoFitRotate = true;
+            m_autoFitScale = paperWidth/pageHeight;
+
+        }
+        else if (pageAspect<1&&paperAspect>1)
+        {
+            m_bAutoFitRotate = true;
+            m_autoFitScale = paperHeight/pageWidth;
         }
         else
         {
-            m_autoFitScale = fmin( paperWidth/pageHeight, paperHeight/pageWidth);
-            m_bAutoFitRotate = true;
+            m_autoFitScale = fmin(paperWidth/pageWidth,paperHeight/pageHeight);
         }
-
-        scale = scale * m_autoFitScale;
     }
+    scale = scale * m_autoFitScale;
 
     //  render the page to an image
     int w = scale*pageSize.X;
     int h = scale*pageSize.Y;
-    if (!m_portrait)
-    {
-        h = scale*pageSize.X;
-        w = scale*pageSize.Y;
-    }
-
-    if (m_bAutoFitRotate)
-        { int x = w; w = h; h = x;}
 
     int numBytes = (w * h* 4);
     if (m_image!=NULL)  delete m_image;  m_image=NULL;
@@ -292,8 +287,11 @@ void PrintDialog::renderPreview()
         *m_image = m_image->transformed(tf);
     }
 
+//    m_image->save("/Users/fredross-perry/Desktop/preview.png");
+
     //  set it in the widget
     m_pixmap = QPixmap::fromImage(*m_image);
+    ui->previewLabel->setAlignment(Qt::AlignTop|Qt::AlignLeft);
     ui->previewLabel->setPixmap(m_pixmap);
     ui->previewLabel->update();
 }
