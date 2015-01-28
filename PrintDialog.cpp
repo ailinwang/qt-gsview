@@ -309,6 +309,10 @@ void PrintDialog::renderPreview()
     m_pixmap = QPixmap::fromImage(*m_image);
     ui->previewLabel->setPixmap(m_pixmap);
     ui->previewLabel->update();
+
+
+    //  update size display
+    updateSizeDisplay();
 }
 
 void PrintDialog::onClose()
@@ -370,6 +374,36 @@ void PrintDialog::onNewPrinter()
     m_printer->setPrinterName(printerInfo.printerName());
 }
 
+QString formatDimension(double val)
+{
+    QString str;
+    if (val==(int)val)
+        str.sprintf("%d", (int)val);
+    else
+        str.sprintf("%.1f", val);
+    return str;
+}
+
+void PrintDialog::updateSizeDisplay()
+{
+    //  get current paper size (inches)
+    double paperWidth = m_paperWidth;
+    double paperHeight = m_paperHeight;
+    //  rotate the "paper" if landscape
+    if (!m_portrait)
+        {double temp = paperWidth;paperWidth = paperHeight;paperHeight = temp;}
+
+    //  convert to cm
+    if (ui->cmRadioButton->isChecked())
+    {
+        paperWidth = 2.54 * paperWidth;
+        paperHeight = 2.54 * paperHeight;
+    }
+
+    QString str = formatDimension(paperWidth) + QString(" x ") + formatDimension(paperHeight);
+    ui->sizeLabel->setText(str);
+}
+
 void PrintDialog::on_pageSlider_valueChanged(int value)
 {
     setSliderLabel(value);
@@ -409,4 +443,14 @@ void PrintDialog::on_autoFitCheckBox_clicked()
 {
     m_bAutoFit = ui->autoFitCheckBox->isChecked();
     updatePreview();
+}
+
+void PrintDialog::on_inchesRadioButton_clicked()
+{
+    updateSizeDisplay();
+}
+
+void PrintDialog::on_cmRadioButton_clicked()
+{
+    updateSizeDisplay();
 }

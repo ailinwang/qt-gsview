@@ -40,8 +40,11 @@ private slots:
     void on_paperSizeComboBox_currentIndexChanged(int index);
     void on_portraitRadio_clicked();
     void on_landscapeRadio_clicked();
-
     void on_autoFitCheckBox_clicked();
+
+    void on_inchesRadioButton_clicked();
+
+    void on_cmRadioButton_clicked();
 
 private:
     void setSliderLabel(int val);
@@ -50,6 +53,7 @@ private:
     void renderPreview();
     void onClose();
     void onNewPrinter();
+    void updateSizeDisplay();
 
     Ui::PrintDialog *ui;
     int m_maxPages = 1;
