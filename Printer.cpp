@@ -419,15 +419,23 @@ void PrintWorker::process()
         QImage *myImage = new QImage(bitmap, (int)pageSize.X, (int)pageSize.Y, QImage::Format_ARGB32);
 
         //  scale and rotate
+        int dx = 0;
+        int dy = 0;
         if (m_rotate || m_userScale!=1.0)
         {
             QTransform tf;
             tf.scale(m_userScale, m_userScale);
-            tf.rotate(90);
+            if (m_rotate)
+                tf.rotate(90);
             *myImage = myImage->transformed(tf, Qt::SmoothTransformation);
+
+            //  center on page
+            dx = (m_printer->width()-myImage->width())/2;
+            dy = (m_printer->height()-myImage->height())/2;
         }
 
-        painter.drawImage(0, 0, *myImage);
+        //  draw
+        painter.drawImage(dx, dy, *myImage);
 
         delete myImage;
         delete bitmap;
