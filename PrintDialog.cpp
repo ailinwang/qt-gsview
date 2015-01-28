@@ -8,6 +8,7 @@
 #include <QPrintDialog>
 #include <QMessageBox>
 #include <QTimer>
+#include <QPainter>
 
 PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinter *printer, QString path) :
     QDialog(parent),
@@ -242,7 +243,14 @@ void PrintDialog::renderPreview()
 
     int pw = paperWidth*72.0*scale;
     int ph = paperHeight*72.0*scale;
-    ui->previewLabel->setGeometry(framew/2-pw/2,frameh/2-ph/2,pw,ph);
+    int px = framew/2-pw/2;
+    int py = frameh/2-ph/2;
+
+    int offset = 15;
+    py +=15;
+    ph -=15;
+
+    ui->previewLabel->setGeometry(px,py,pw,ph);
 
     //  fill widget with white
     ui->previewLabel->setStyleSheet("QLabel { background-color : white; color : white; }");
@@ -310,6 +318,10 @@ void PrintDialog::renderPreview()
     ui->previewLabel->setPixmap(m_pixmap);
     ui->previewLabel->update();
 
+    //  set the geomatry for the size labels.
+    //  these get drawn elsewhere.
+    ui->widthLabel->setGeometry(px, py-offset-2, pw, offset);
+    ui->heightLabel->setGeometry(px+pw+3, py, offset, ph);
 
     //  update size display
     updateSizeDisplay();
@@ -377,11 +389,31 @@ void PrintDialog::onNewPrinter()
 QString formatDimension(double val)
 {
     QString str;
-    if (val==(int)val)
+    if (fabs(val - round(val)) < 0.000001)
         str.sprintf("%d", (int)val);
     else
         str.sprintf("%.1f", val);
     return str;
+}
+
+void drawText(QPainter & painter, const QPointF & point, int flags,
+              const QString & text, QRectF * boundingRect = 0)
+{
+   const qreal size = 32767.0;
+   QPointF corner(point.x(), point.y() - size);
+   if (flags & Qt::AlignHCenter) corner.rx() -= size/2.0;
+   else if (flags & Qt::AlignRight) corner.rx() -= size;
+   if (flags & Qt::AlignVCenter) corner.ry() += size/2.0;
+   else if (flags & Qt::AlignTop) corner.ry() += size;
+   else flags |= Qt::AlignBottom;
+   QRectF rect(corner, QSizeF(size, size));
+   painter.drawText(rect, flags, text, boundingRect);
+}
+
+void drawText(QPainter & painter, qreal x, qreal y, int flags,
+              const QString & text, QRectF * boundingRect = 0)
+{
+   drawText(painter, QPointF(x,y), flags, text, boundingRect);
 }
 
 void PrintDialog::updateSizeDisplay()
@@ -400,8 +432,73 @@ void PrintDialog::updateSizeDisplay()
         paperHeight = 2.54 * paperHeight;
     }
 
-    QString str = formatDimension(paperWidth) + QString(" x ") + formatDimension(paperHeight);
-    ui->sizeLabel->setText(str);
+//    QString str = formatDimension(paperWidth) + QString(" x ") + formatDimension(paperHeight);
+//    ui->sizeLabel->setText(str);
+    ui->sizeLabel->clear();
+
+    //  draw pixmaps and set them into the labels
+    //  for the width and height
+
+    {
+        ui->widthLabel->clear();
+        int w = ui->widthLabel->width();
+        int h = ui->widthLabel->height();
+        QPixmap pixmap(w, h);
+        pixmap.fill(QColor("transparent"));
+        QPainter painter(&pixmap);
+        painter.setRenderHint( QPainter::Antialiasing );
+        painter.setPen(QPen(Qt::black,2));
+
+        int l = (w-40)/2;
+        painter.drawLine(0,h/2,7,h/2-3);
+        painter.drawLine(0,h/2,7,h/2+3);
+        painter.drawLine(0,h/2,l,h/2);
+        painter.drawLine(w,h/2,w-7,h/2-3);
+        painter.drawLine(w,h/2,w-7,h/2+3);
+        painter.drawLine(w,h/2,w-l,h/2);
+
+        QString s = formatDimension(paperWidth);
+        QPointF pt(w/2,h/2);
+        painter.setFont(QFont("Helvetica", 10));
+        drawText(painter, pt, Qt::AlignVCenter | Qt::AlignHCenter, s);
+
+        ui->widthLabel->setPixmap(pixmap);
+    }
+
+    {
+        ui->heightLabel->clear();
+        int w = ui->heightLabel->width();
+        int h = ui->heightLabel->height();
+        QPixmap pixmap(w, h);
+        pixmap.fill(QColor("transparent"));
+        QPainter painter(&pixmap);
+        painter.setRenderHint( QPainter::Antialiasing );
+        painter.setPen(QPen(Qt::black,2));
+
+        int l = (h-40)/2;
+        painter.drawLine(w/2,0,w/2+3,7);
+        painter.drawLine(w/2,0,w/2-3,7);
+        painter.drawLine(w/2,0,w/2,l);
+        painter.drawLine(w/2,h,w/2+3,h-7);
+        painter.drawLine(w/2,h,w/2-3,h-7);
+        painter.drawLine(w/2,h,w/2,h-l);
+
+        QString s = formatDimension(paperHeight);
+        QPointF pt(w/2,h/2);
+        painter.setFont(QFont("Helvetica", 10));
+
+//        drawText(painter, pt, Qt::AlignVCenter | Qt::AlignHCenter, s);
+
+        //  TODO: move this rotation into the local drawText() function
+        painter.save();
+        painter.translate(pt.x()-4, pt.y()-5);
+        painter.rotate(90); // or 270
+        painter.drawText(0, 0, s);
+        painter.restore();
+
+        ui->heightLabel->setPixmap(pixmap);
+    }
+
 }
 
 void PrintDialog::on_pageSlider_valueChanged(int value)
