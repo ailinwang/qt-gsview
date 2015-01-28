@@ -338,15 +338,32 @@ void PrintDialog::onNewPrinter()
     //  info for the currently selected printer.
     QPrinterInfo printerInfo = m_printerList.at(ui->printerCombo->currentIndex());
 
-    //  get the paper sizes
+    //  remember the current page size name
+    QString currentSizeName = "US Letter";
+    if (m_paperSizes.size()>0 && ui->paperSizeComboBox->currentIndex()<m_paperSizes.size())
+    {
+        QPair<QString,QSizeF> paperSize = m_paperSizes.at(ui->paperSizeComboBox->currentIndex());
+        currentSizeName = paperSize.first;
+    }
+
+    //  get the new paper sizes
     ui->paperSizeComboBox->blockSignals(true);
     ui->paperSizeComboBox->clear();
     m_paperSizes = printerInfo.supportedSizesWithNames();
+    int matching = -1;
     for (int i=0; i<m_paperSizes.size() ;i++)
     {
         QPair<QString,QSizeF> paperSize = m_paperSizes.at(i);
         ui->paperSizeComboBox->addItem(paperSize.first);
+
+        //  see if this is the one we remembered above
+        if (currentSizeName.compare(paperSize.first)==0)
+            matching = i;
     }
+    //  restore the remembered size.
+    if (matching!=-1)
+        ui->paperSizeComboBox->setCurrentIndex(matching);
+
     ui->paperSizeComboBox->blockSignals(false);
 
     //  set the printer name
