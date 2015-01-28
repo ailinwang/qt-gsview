@@ -25,6 +25,7 @@ public:
     bool autoFit() {return m_bAutoFit;}
     bool autoFitRotate() {return m_bAutoFitRotate;}
     double autoFitScale() {return m_autoFitScale;}
+    QPair<QString,QSizeF> paperSize();
 
 private slots:
     void on_cancelButton_clicked();

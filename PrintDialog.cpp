@@ -85,6 +85,11 @@ int PrintDialog::copies()
     return ui->copiesSpinner->value();
 }
 
+QPair<QString, QSizeF> PrintDialog::paperSize()
+{
+    return m_paperSizes.at(ui->paperSizeComboBox->currentIndex());
+}
+
 void PrintDialog::on_cancelButton_clicked()
 {
     //  user clicked cancel

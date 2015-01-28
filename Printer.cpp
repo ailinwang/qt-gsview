@@ -87,15 +87,16 @@ void Printer::print()
     //bool autoFit = pdialog->autoFit();
     bool rotate =  pdialog->autoFitRotate();
     double scale = pdialog->autoFitScale();
+    QPair<QString,QSizeF> paperSize = pdialog->paperSize();
 
     QFileInfo fileInfo (m_window->getPath());
     if (fileInfo.suffix().toLower() == QString("pdf"))
     {
         //  print it as is
 #ifdef USE_CUPS
-        pdfPrint (m_printer, m_window->getPath(), pageRange, copies, landscape);
+        pdfPrint (m_printer, m_window->getPath(), pageRange, copies, landscape, paperSize);
 #else
-        bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale);
+        bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale, paperSize);
 #endif
     }
     else if (fileInfo.suffix().toLower() == QString("xps"))
@@ -119,20 +120,20 @@ void Printer::print()
         //  print the new one
         pdfPrint (m_printer, newPath, pageRange, copies, landscape);
 #else
-        bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale);
+        bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale, paperSize);
 #endif
     }
     else
     {
         //  TODO: convert to PDF.  But for now,
         //  do it with bitmaps.
-        bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale);
+        bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale, paperSize);
     }
 }
 
 #ifdef USE_CUPS
 
-void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int copies, bool landscape)
+void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int copies, bool landscape, QPair<QString,QSizeF> paperSize)
 {
     //  set up options
     int num_options = 0;
@@ -219,14 +220,12 @@ void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int c
 
 #endif
 
-void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies, bool landscape, bool rotate, double userScale)
+void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies, bool landscape,
+                          bool rotate, double userScale, QPair<QString,QSizeF> paperSize)
 {
     printer->setCopyCount(copies);
     printer->setOrientation(landscape ? QPrinter::Landscape : QPrinter::Portrait);
-
-    //  TODO - which one?
-    //printer->setPageSizeMM();
-    //printer->setPaperSize();
+    printer->setPageSizeMM(paperSize.second);
 
     //  make a thread for printing, and a worker that runs in the thread.
     m_printThread = new QThread;
