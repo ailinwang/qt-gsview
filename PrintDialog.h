@@ -79,9 +79,6 @@ private:
     bool m_bAutoFit = true;
     bool m_bAutoFitRotate = false;
     double m_autoFitScale = 1.0;
-
-    QPixmap *m_widthPixmap;
-    QPixmap *m_heightPixmap;
 };
 
 #endif // PRINTDIALOG_H

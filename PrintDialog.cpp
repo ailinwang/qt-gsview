@@ -319,7 +319,7 @@ void PrintDialog::renderPreview()
     ui->previewLabel->update();
 
     //  set the geomatry for the size labels.
-    //  these get drawn elsewhere.
+    //  these get drawn in updateSizeDisplay()
     ui->widthLabel->setGeometry(px, py-offset-2, pw, offset);
     ui->heightLabel->setGeometry(px+pw+3, py, offset, ph);
 
@@ -416,6 +416,43 @@ void drawText(QPainter & painter, qreal x, qreal y, int flags,
    drawText(painter, QPointF(x,y), flags, text, boundingRect);
 }
 
+void drawSizeLabel(QLabel *label, double value, bool rotate)
+{
+    label->clear();
+
+    int w = label->width();
+    int h = label->height();
+    if (rotate) {int x=w;w=h;h=x;}
+
+    QPixmap pixmap(w, h);
+    pixmap.fill(QColor("transparent"));
+    QPainter painter(&pixmap);
+    painter.setRenderHint( QPainter::Antialiasing );
+    painter.setPen(QPen(Qt::black,1));
+
+    int l = (w-40)/2;
+    painter.drawLine(0,h/2,7,h/2-3);
+    painter.drawLine(0,h/2,7,h/2+3);
+    painter.drawLine(0,h/2,l,h/2);
+    painter.drawLine(w,h/2,w-7,h/2-3);
+    painter.drawLine(w,h/2,w-7,h/2+3);
+    painter.drawLine(w,h/2,w-l,h/2);
+
+    QPointF pt(w/2,h/2);
+    painter.setFont(QFont("Helvetica", 10));
+    drawText(painter, pt, Qt::AlignVCenter | Qt::AlignHCenter, formatDimension(value));
+
+    painter.end();  // we're done with this painter.
+
+    if (rotate)
+    {
+        QTransform tf; tf.rotate(90);
+        pixmap = pixmap.transformed(tf, Qt::SmoothTransformation);
+    }
+
+    label->setPixmap( pixmap );
+}
+
 void PrintDialog::updateSizeDisplay()
 {
     //  get current paper size (inches)
@@ -432,73 +469,11 @@ void PrintDialog::updateSizeDisplay()
         paperHeight = 2.54 * paperHeight;
     }
 
-//    QString str = formatDimension(paperWidth) + QString(" x ") + formatDimension(paperHeight);
-//    ui->sizeLabel->setText(str);
-    ui->sizeLabel->clear();
-
     //  draw pixmaps and set them into the labels
     //  for the width and height
 
-    {
-        ui->widthLabel->clear();
-        int w = ui->widthLabel->width();
-        int h = ui->widthLabel->height();
-        QPixmap pixmap(w, h);
-        pixmap.fill(QColor("transparent"));
-        QPainter painter(&pixmap);
-        painter.setRenderHint( QPainter::Antialiasing );
-        painter.setPen(QPen(Qt::black,2));
-
-        int l = (w-40)/2;
-        painter.drawLine(0,h/2,7,h/2-3);
-        painter.drawLine(0,h/2,7,h/2+3);
-        painter.drawLine(0,h/2,l,h/2);
-        painter.drawLine(w,h/2,w-7,h/2-3);
-        painter.drawLine(w,h/2,w-7,h/2+3);
-        painter.drawLine(w,h/2,w-l,h/2);
-
-        QString s = formatDimension(paperWidth);
-        QPointF pt(w/2,h/2);
-        painter.setFont(QFont("Helvetica", 10));
-        drawText(painter, pt, Qt::AlignVCenter | Qt::AlignHCenter, s);
-
-        ui->widthLabel->setPixmap(pixmap);
-    }
-
-    {
-        ui->heightLabel->clear();
-        int w = ui->heightLabel->width();
-        int h = ui->heightLabel->height();
-        QPixmap pixmap(w, h);
-        pixmap.fill(QColor("transparent"));
-        QPainter painter(&pixmap);
-        painter.setRenderHint( QPainter::Antialiasing );
-        painter.setPen(QPen(Qt::black,2));
-
-        int l = (h-40)/2;
-        painter.drawLine(w/2,0,w/2+3,7);
-        painter.drawLine(w/2,0,w/2-3,7);
-        painter.drawLine(w/2,0,w/2,l);
-        painter.drawLine(w/2,h,w/2+3,h-7);
-        painter.drawLine(w/2,h,w/2-3,h-7);
-        painter.drawLine(w/2,h,w/2,h-l);
-
-        QString s = formatDimension(paperHeight);
-        QPointF pt(w/2,h/2);
-        painter.setFont(QFont("Helvetica", 10));
-
-//        drawText(painter, pt, Qt::AlignVCenter | Qt::AlignHCenter, s);
-
-        //  TODO: move this rotation into the local drawText() function
-        painter.save();
-        painter.translate(pt.x()-4, pt.y()-5);
-        painter.rotate(90); // or 270
-        painter.drawText(0, 0, s);
-        painter.restore();
-
-        ui->heightLabel->setPixmap(pixmap);
-    }
-
+    drawSizeLabel(ui->widthLabel,  paperWidth, false);
+    drawSizeLabel(ui->heightLabel, paperHeight, true);
 }
 
 void PrintDialog::on_pageSlider_valueChanged(int value)
@@ -544,10 +519,10 @@ void PrintDialog::on_autoFitCheckBox_clicked()
 
 void PrintDialog::on_inchesRadioButton_clicked()
 {
-    updateSizeDisplay();
+    updatePreview();
 }
 
 void PrintDialog::on_cmRadioButton_clicked()
 {
-    updateSizeDisplay();
+   updatePreview();
 }
