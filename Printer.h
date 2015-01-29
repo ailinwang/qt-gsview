@@ -46,8 +46,8 @@ public:
     void print();
     void setWindow (Window *win) {m_window=win;}
 
-    void pdfPrint (QPrinter *printer, QString path, QString pageRange, int copies, bool landscape, QPair<QString,QSizeF> paperSize);
-    void bitmapPrint (QPrinter *printer, QString pageRange, int copies, bool landscape, bool rootate, double userScale, QPair<QString,QSizeF> paperSize);
+    void pdfPrint (QPrinter *printer, QString path, QString pageRange, int copies, bool landscape, bool rotate, double userScale, QPair<QString,QSizeF> paperSize);
+    void bitmapPrint (QPrinter *printer, QString pageRange, int copies, bool landscape, bool rotate, double userScale, QPair<QString,QSizeF> paperSize);
 
     static QList<int> listFromRange(QString rangeList, int maxPage);
 

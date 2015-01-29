@@ -94,7 +94,7 @@ void Printer::print()
     {
         //  print it as is
 #ifdef USE_CUPS
-        pdfPrint (m_printer, m_window->getPath(), pageRange, copies, landscape, paperSize);
+        pdfPrint (m_printer, m_window->getPath(), pageRange, copies, landscape, rotate, scale, paperSize);
 #else
         bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale, paperSize);
 #endif
@@ -118,7 +118,7 @@ void Printer::print()
         process->waitForFinished();
 
         //  print the new one
-        pdfPrint (m_printer, newPath, pageRange, copies, landscape);
+        pdfPrint (m_printer, newPath, pageRange, copies, landscape, rotate, scale, paperSize);
 #else
         bitmapPrint (m_printer, pageRange, copies, landscape, rotate, scale, paperSize);
 #endif
@@ -133,7 +133,7 @@ void Printer::print()
 
 #ifdef USE_CUPS
 
-void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int copies, bool landscape, QPair<QString,QSizeF> paperSize)
+void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int copies, bool landscape, bool rotate, double scale, QPair<QString,QSizeF> paperSize)
 {
     //  set up options
     int num_options = 0;
@@ -142,7 +142,12 @@ void Printer::pdfPrint(QPrinter *printer, QString path, QString pageRange, int c
     //  add options
     num_options = cupsAddOption("page-ranges", pageRange.toStdString().c_str(), num_options, &options);
     num_options = cupsAddOption("copies",      QString::number(copies).toStdString().c_str(), num_options, &options);
-    num_options = cupsAddOption("landscape",   landscape ? "true" : "false", num_options, &options);
+    num_options = cupsAddOption("media",       paperSize.first.toStdString().c_str() , num_options, &options);
+
+//    num_options = cupsAddOption("fitplot",     (scale=1.0) ? "false" : "true", num_options, &options);
+//    num_options = cupsAddOption("landscape",   landscape ? "true" : "false", num_options, &options);
+//    num_options = cupsAddOption("position",    (scale=1.0)  ? "center" : "center", num_options, &options);
+//    num_options = cupsAddOption("scaling",     "50", num_options, &options);
 
     //  start it
     m_jobID = cupsPrintFile (printer->printerName().toStdString().c_str(), path.toStdString().c_str(),
