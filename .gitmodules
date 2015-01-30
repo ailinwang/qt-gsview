@@ -1,0 +1,6 @@
+[submodule "mupdf"]
+	path = mupdf
+	url = git://git.ghostscript.com/mupdf.git
+[submodule "ghostpdl"]
+	path = ghostpdl
+	url = git://git.ghostscript.com/ghostpdl.git
