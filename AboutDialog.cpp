@@ -12,4 +12,3 @@ AboutDialog::~AboutDialog()
 {
     delete ui;
 }
-

@@ -12,7 +12,7 @@ macx: QMAKE_CXXFLAGS += -stdlib=libstdc++
 
 #  include file paths
 INCPATH+=.
-INCPATH+=../../include/
+INCPATH+=mupdf/include
 
 #  look for shared libs in ./libs
 #  unix only, release only
@@ -80,7 +80,7 @@ SOURCES       = \
     FileInfoDialog.cpp \
     ContentsList.cpp \
     FileSave.cpp \
-    ../../source/tools/pdfclean.c \
+    mupdf/source/tools/pdfclean.c \
     MessagesDialog.cpp \
     GSViewApp.cpp \
     FileSaveDialog.cpp \
@@ -105,7 +105,8 @@ RESOURCES += \
 
 #  Libraries to link to
 #  the order of the libraries here is very important.
-LIBS += -L$$PWD/../../build/debug/
+LIBS += -L$$PWD/mupdf/build/debug/
+
 unix:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs -lcups
 win32: LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
 macx:  LIBS += -lssl -lcrypto
@@ -130,6 +131,7 @@ macx {
     QMAKE_POST_LINK += $$quote(mkdir -p ./apps $$escape_expand(\n\t))
     QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gs ./apps/gs $$escape_expand(\n\t))
     QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gxps ./apps/gxps $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/resources/gsview_mac.plist $$OUT_PWD/gsview.app/Contents/Info.plist $$escape_expand(\n\t))
 }
 
 #win32 {
@@ -146,7 +148,6 @@ macx {
     OTHER_FILES += resources/gsview_app.icns
     ICON = resources/gsview_app.icns
     OTHER_FILES += resources/gsview_mac.plist
-    QMAKE_INFO_PLIST = '''resources/gsview_mac.plist'''
 }
 
 #  post-link step to get some shared files for the release build
