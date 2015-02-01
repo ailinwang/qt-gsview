@@ -6,16 +6,18 @@
 
 
 #  C and C++ compiler configuration
+
 CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
 macx: QMAKE_CXXFLAGS += -stdlib=libstdc++
 
 #  include file paths
+
 INCPATH+=.
 INCPATH+=mupdf/include
 
-#  look for shared libs in ./libs
-#  linux only, release only
+#  Linux/release: look for shared libs in ./libs
+
 CONFIG(release,debug|release) {
     unix:!macx {
         QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN/libs\'"
@@ -23,15 +25,19 @@ CONFIG(release,debug|release) {
 }
 
 #  preprocessor
+
 DEFINES += _QT
 macx: DEFINES += _QT_MAC
+#  CUPS is not currently working.
 #unix: DEFINES += USE_CUPS
 win32: DEFINES += _QT_WIN
 
 #  debugging can be easier if we don't use native file dialogs
+
 DEFINES += USE_NATIVE_FILE_DIALOGS=true
 
 #  Qt configuration
+
 QT += core gui
 qtHaveModule(printsupport): QT += printsupport
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -39,6 +45,7 @@ TARGET = gsview
 TEMPLATE = app
 
 #  various files
+
 HEADERS       = \
     muctx.h \
     status.h \
@@ -107,9 +114,7 @@ RESOURCES += \
 #  the order of the libraries here is very important.
 
 LIBS += -L$$PWD/mupdf/build/debug/
-
 unix:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs -lcups
-win32: LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
 macx:  LIBS += -lssl -lcrypto
 
 #  copy executable files from ghostpdl
@@ -140,4 +145,3 @@ CONFIG(release,debug|release) {
         QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5Core.so.5.3.2 ./libs/libQt5Core.so.5 $$escape_expand(\n\t))
     }
 }
-
