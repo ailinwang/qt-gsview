@@ -15,14 +15,14 @@ INCPATH+=.
 INCPATH+=mupdf/include
 
 #  look for shared libs in ./libs
-#  unix only, release only
+#  linux only, release only
 CONFIG(release,debug|release) {
     unix:!macx {
         QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN/libs\'"
     }
 }
 
-#  proprocessor
+#  preprocessor
 DEFINES += _QT
 macx: DEFINES += _QT_MAC
 #unix: DEFINES += USE_CUPS
@@ -32,7 +32,7 @@ win32: DEFINES += _QT_WIN
 DEFINES += USE_NATIVE_FILE_DIALOGS=true
 
 #  Qt configuration
-QT       += core gui
+QT += core gui
 qtHaveModule(printsupport): QT += printsupport
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = gsview
@@ -105,49 +105,26 @@ RESOURCES += \
 
 #  Libraries to link to
 #  the order of the libraries here is very important.
+
 LIBS += -L$$PWD/mupdf/build/debug/
 
 unix:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs -lcups
 win32: LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
 macx:  LIBS += -lssl -lcrypto
 
-#  The stuff below copies some executable files, and controls where the
-#  main app will look for them
+#  copy executable files from ghostpdl
 
-unix:!macx {
-    OTHER_FILES += \
-        linuxApps/gs \
-        linuxApps/gxps
-
+unix {
     QMAKE_POST_LINK += $$quote(mkdir -p ./apps $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/linuxApps/gs ./apps/gs $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/linuxApps/gxps ./apps/gxps $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/gs/bin/gs ./apps/gs $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/xps/obj/gxps ./apps/gxps $$escape_expand(\n\t))
 }
 
-macx {
-    OTHER_FILES += \
-        macApps/gs \
-        macApps/gxps
-    QMAKE_POST_LINK += $$quote(mkdir -p ./apps $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gs ./apps/gs $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/macApps/gxps ./apps/gxps $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/resources/gsview_mac.plist $$OUT_PWD/gsview.app/Contents/Info.plist $$escape_expand(\n\t))
-}
-
-#win32 {
-#    OTHER_FILES += \
-#        winApps/gs \
-#        winApps/gxps
-#    QMAKE_POST_LINK += $$quote(rmdir /S /Q apps $$escape_expand(\n\t))
-#    QMAKE_POST_LINK += $$quote(mkdir apps $$escape_expand(\n\t))
-#    QMAKE_POST_LINK += $$quote(xcopy $$PWD/winApps/gs apps/gs $$escape_expand(\n\t))
-#    QMAKE_POST_LINK += $$quote(xcopy $$PWD/winApps/gxps apps/gxps $$escape_expand(\n\t))
-#}
+#  mac: icon and plist file
 
 macx {
-    OTHER_FILES += resources/gsview_app.icns
     ICON = resources/gsview_app.icns
-    OTHER_FILES += resources/gsview_mac.plist
+    QMAKE_POST_LINK += $$quote(cp $$PWD/resources/gsview_mac.plist $$OUT_PWD/gsview.app/Contents/Info.plist $$escape_expand(\n\t))
 }
 
 #  post-link step to get some shared files for the release build
