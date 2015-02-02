@@ -23,8 +23,8 @@ DMG_FINAL="${VOL_NAME}.dmg"         # final DMG name will be "SuperCoolApp 1.0.0
 STAGING_DIR="./Install"             # we copy all our stuff into this dir
 
 #  edit these two lines depending on your setup.
-QTBIN="/Applications/Qt/5.3/clang_64/bin"
-PROJECT="/Users/fredross-perry/Desktop/artifex/mupdf/platform/Qt"
+QTBIN="/Applications/Qt/5.4/clang_64/bin"
+PROJECT="`dirname "${0}"`/.."
 
 # Check the background image DPI and convert it if it isn't 72x72
 _BACKGROUND_IMAGE_DPI_H=`sips -g dpiHeight ${DMG_BACKGROUND_IMG} | grep -Eo '[0-9]+\.[0-9]+'`
