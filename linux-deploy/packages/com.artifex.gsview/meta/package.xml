@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+     <DisplayName>gsview</DisplayName>
+     <Description>Install gsview.</Description>
+     <Version>6.0</Version>
+     <ReleaseDate>2014-12-05</ReleaseDate>
+     <Name>com.artifex.gsview</Name>
+     <Default>true</Default>
+     <Script>installscript.qs</Script>
+</Package>
+
