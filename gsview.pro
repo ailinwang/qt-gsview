@@ -119,10 +119,10 @@ macx:  LIBS += -lssl -lcrypto
 
 #  copy executable files from ghostpdl
 
-unix!macx {
-    QMAKE_POST_LINK += $$quote(mkdir -p ./apps $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/gs/bin/gs ./apps/gs $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/xps/obj/gxps ./apps/gxps $$escape_expand(\n\t))
+unix:!macx {
+    QMAKE_POST_LINK += $$quote(mkdir -p $$OUT_PWD/apps $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/gs/bin/gs $$OUT_PWD/apps/gs $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/xps/obj/gxps $$OUT_PWD/apps/gxps $$escape_expand(\n\t))
 }
 
 macx {
