@@ -3,28 +3,25 @@
 #  based on:
 #      http://asmaloney.com/2013/07/howto/packaging-a-mac-os-x-application-using-a-dmg/
  
-#  make sure we are in the correct dir when we double-click a .command file
-dir=${0%/*}
-if [ -d "$dir" ]; then
-  cd "$dir"
-fi
+
+#  go to the directory containing this script
+cd `dirname "${0}"`
+
+#  edit this line depending on your setup.
+QTBIN="/Applications/Qt/5.4/clang_64/bin"
+
+#  project is one level up
+PROJECT="`dirname "${0}"`/.."
  
 #  set up your app name, version number, and background image file name
 APP_NAME="GSView"
 VERSION="6.0"
 DMG_BACKGROUND_IMG="dmgbackground.png"
  
-# you should not need to change these
-APP_FOLDER="${APP_NAME} ${VERSION}"
- 
 VOL_NAME="${APP_NAME} ${VERSION}"   # volume name will be "SuperCoolApp 1.0.0"
 DMG_TMP="${VOL_NAME}-temp.dmg"
 DMG_FINAL="${VOL_NAME}.dmg"         # final DMG name will be "SuperCoolApp 1.0.0.dmg"
 STAGING_DIR="./Install"             # we copy all our stuff into this dir
-
-#  edit these two lines depending on your setup.
-QTBIN="/Applications/Qt/5.4/clang_64/bin"
-PROJECT="`dirname "${0}"`/.."
 
 # Check the background image DPI and convert it if it isn't 72x72
 _BACKGROUND_IMAGE_DPI_H=`sips -g dpiHeight ${DMG_BACKGROUND_IMG} | grep -Eo '[0-9]+\.[0-9]+'`
@@ -46,9 +43,7 @@ rm -rf "${STAGING_DIR}" "${DMG_TMP}" "${DMG_FINAL}"
  
 # copy over the stuff we want in the final disk image to our staging dir
 mkdir -p "${STAGING_DIR}"
-mkdir "${STAGING_DIR}/${APP_FOLDER}"
-cp -rfp ${PROJECT}/build/release/gsview.app "${STAGING_DIR}/${APP_FOLDER}"
-cp -rfp ${PROJECT}/build/release/apps "${STAGING_DIR}/${APP_FOLDER}"
+cp -rfp ${PROJECT}/build/release/gsview.app "${STAGING_DIR}"
 
 # figure out how big our DMG needs to be
 #  assumes our contents are at least 1M!
@@ -96,7 +91,7 @@ echo '
            set arrangement of viewOptions to not arranged
            set icon size of viewOptions to 72
 	   set background picture of viewOptions to file ".background:'${DMG_BACKGROUND_IMG}'"
-           set position of item "'${APP_FOLDER}'" of container window to {160, 190}
+           set position of item "gsview.app" of container window to {160, 190}
            set position of item "Applications" of container window to {360, 190}
            close
            open

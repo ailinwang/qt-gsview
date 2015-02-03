@@ -8,8 +8,10 @@
 #  2.  The Qt project is currently set to make a release build
 #  3.  qmake has been run
 
-#  edit these two lines depending on your setup.
+#  edit this line depending on your setup.
 QTBIN="/Applications/Qt/5.4/clang_64/bin"
+
+#  project is one level up
 PROJECT="`dirname "${0}"`/.."
 
 #  remove any old release build.
