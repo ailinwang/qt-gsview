@@ -119,10 +119,16 @@ macx:  LIBS += -lssl -lcrypto
 
 #  copy executable files from ghostpdl
 
-unix {
+unix!macx {
     QMAKE_POST_LINK += $$quote(mkdir -p ./apps $$escape_expand(\n\t))
     QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/gs/bin/gs ./apps/gs $$escape_expand(\n\t))
     QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/xps/obj/gxps ./apps/gxps $$escape_expand(\n\t))
+}
+
+macx {
+    QMAKE_POST_LINK += $$quote(mkdir -p $$OUT_PWD/gsview.app/Contents/MacOS/apps $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/gs/bin/gs $$OUT_PWD/gsview.app/Contents/MacOS/apps/gs $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/xps/obj/gxps $$OUT_PWD/gsview.app/Contents/MacOS/apps/gxps $$escape_expand(\n\t))
 }
 
 #  mac: icon and plist file

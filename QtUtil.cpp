@@ -14,10 +14,6 @@ QString getRealAppDirPath()
     if (!path.endsWith( QDir::separator()))
         path +=  QDir::separator();
 
-#ifdef _QT_MAC
-    path += QString("../../../");
-#endif
-
     return path;
 }
 
