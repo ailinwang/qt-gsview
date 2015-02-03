@@ -143,7 +143,7 @@ macx {
 QTLIBPATH = /home/fred/Qt5.3.2/5.3/gcc_64/lib
 CONFIG(release,debug|release) {
     unix:!macx {
-        QMAKE_POST_LINK += $$quote(rmdir --ignore-fail-on-non-empty ./libs $$escape_expand(\n\t))
+        QMAKE_POST_LINK += $$quote(rm -rf ./libs $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(mkdir -p ./libs $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5PrintSupport.so.5.3.2 ./libs/libQt5PrintSupport.so.5 $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5Widgets.so.5.3.2 ./libs/libQt5Widgets.so.5 $$escape_expand(\n\t))
