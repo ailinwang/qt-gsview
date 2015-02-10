@@ -65,12 +65,13 @@ void FileSave::run()
         return;
     }
 
-    //  where is the desktop?
+    //  get the last-visited directory.  Default is desktop
+    QSettings settings;
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
-    QString desktop = desktopLocations.first();
+    QString lastDir  = settings.value("LastSaveFileDir", desktopLocations.first()).toString();
 
     //  set up the dialog
-    FileSaveDialog dialog(m_window, tr("Save"), desktop);
+    FileSaveDialog dialog(m_window, tr("Save"), lastDir);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
 
@@ -103,6 +104,9 @@ void FileSave::run()
     int result = dialog.exec();
     if (result == QDialog::Accepted)
     {
+        //  remember the last-visited directory
+        settings.setValue("LastSaveFileDir", dialog.directory().absolutePath());
+
         QString dst = dialog.selectedFiles().first();
         QString filter = dialog.selectedNameFilter();
         QString filterExt = QtUtil::extensionFromFilter(filter);

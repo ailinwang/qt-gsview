@@ -116,10 +116,13 @@ void ICCDialog2::refreshUI()
 
 QString ICCDialog2::askForProfile()
 {
-    //  create a dialog for choosing a file
+    //  get the last-visited directory.  Default is desktop
+    QSettings settings;
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
-    QFileDialog dialog(NULL, tr("Choose a Color Profile"),
-                       desktopLocations.isEmpty() ? QDir::currentPath() : desktopLocations.first());
+    QString lastDir  = settings.value("LastOpenFileDir", desktopLocations.first()).toString();
+
+    //  create a dialog for choosing a file
+    QFileDialog dialog(NULL, tr("Choose a Color Profile"), lastDir);
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     dialog.setFileMode(QFileDialog::ExistingFile);
@@ -132,6 +135,9 @@ QString ICCDialog2::askForProfile()
 
     if (result == QDialog::Accepted)
     {
+        //  remember the last-visited directory
+        settings.setValue("LastOpenFileDir", dialog.directory().absolutePath());
+
         return dialog.selectedFiles().first();
     }
 

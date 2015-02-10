@@ -472,8 +472,7 @@ void Window::saveAction()
 // static
 void Window::open()
 {
-    //  get the last-visited directory.
-    //  Default is desktop
+    //  get the last-visited directory.  Default is desktop
     QSettings settings;
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
     QString lastDir  = settings.value("LastOpenFileDir", desktopLocations.first()).toString();

@@ -9,6 +9,7 @@
 #include <QStandardPaths>
 #include <QProcess>
 #include <QProgressDialog>
+#include <QSettings>
 
 std::vector<device_t> devices = {
 
@@ -171,12 +172,13 @@ void ExtractPagesDialog::doSave()
         return;
     }
 
-    //  where is the desktop?
+    //  get the last-visited directory.  Default is desktop
+    QSettings settings;
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
-    QString desktop = desktopLocations.first();
+    QString lastDir  = settings.value("LastSaveFileDir", desktopLocations.first()).toString();
 
     //  set up the dialog
-    QFileDialog dialog(m_window, tr("Save"), desktop);
+    QFileDialog dialog(m_window, tr("Save"), lastDir);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     QString theFilter = QString(tr("%1 files (*.%2)")).arg(m_device.label, m_device.extension);
@@ -189,6 +191,10 @@ void ExtractPagesDialog::doSave()
     if (result == QDialog::Accepted)
     {
         hide();
+
+        //  remember the last-visited directory
+        settings.setValue("LastSaveFileDir", dialog.directory().absolutePath());
+
         m_destination = dialog.selectedFiles().first();
 
         //  if the user gave no extension, use the filter
