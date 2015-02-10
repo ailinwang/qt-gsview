@@ -20,7 +20,7 @@ INCPATH+=mupdf/include
 
 CONFIG(release,debug|release) {
     unix:!macx {
-        QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN/libs\'"
+        QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN/libs\''
     }
 }
 
@@ -141,13 +141,18 @@ macx {
 #  post-link step to get some shared files for the release build
 
 QTLIBPATH = /home/fred/Qt5.3.2/5.3/gcc_64/lib
+QTPLUGINPATH = /home/fred/Qt5.3.2/5.3/gcc_64/plugins/platforms
 CONFIG(release,debug|release) {
     unix:!macx {
         QMAKE_POST_LINK += $$quote(rm -rf ./libs $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(mkdir -p ./libs $$escape_expand(\n\t))
+        QMAKE_POST_LINK += $$quote(rm -rf ./platforms $$escape_expand(\n\t))
+        QMAKE_POST_LINK += $$quote(mkdir -p ./platforms $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5PrintSupport.so.5.3.2 ./libs/libQt5PrintSupport.so.5 $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5Widgets.so.5.3.2 ./libs/libQt5Widgets.so.5 $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5Gui.so.5.3.2 ./libs/libQt5Gui.so.5 $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5Core.so.5.3.2 ./libs/libQt5Core.so.5 $$escape_expand(\n\t))
+        QMAKE_POST_LINK += $$quote(cp $$QTLIBPATH/libQt5DBus.so.5.3.2 ./libs/libQt5DBus.so.5 $$escape_expand(\n\t))
+        QMAKE_POST_LINK += $$quote(cp $$QTPLUGINPATH/libqxcb.so ./platforms/libqxcb.so $$escape_expand(\n\t))
     }
 }
