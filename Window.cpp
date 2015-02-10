@@ -472,10 +472,14 @@ void Window::saveAction()
 // static
 void Window::open()
 {
-    //  create a dialog for choosing a file
+    //  get the last-visited directory.
+    //  Default is desktop
+    QSettings settings;
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
-    QFileDialog dialog(qApp->activeWindow(), tr("Open File"),
-                       desktopLocations.isEmpty() ? QDir::currentPath() : desktopLocations.first());
+    QString lastDir  = settings.value("LastOpenFileDir", desktopLocations.first()).toString();
+
+    //  create a dialog for choosing a file
+    QFileDialog dialog(qApp->activeWindow(), tr("Open File"),lastDir);
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     dialog.setFileMode(QFileDialog::ExistingFile);
@@ -499,6 +503,9 @@ void Window::open()
 
         //  hide the dialog
         dialog.hide();
+
+        //  remember the last-visited directory
+        settings.setValue("LastOpenFileDir", dialog.directory().absolutePath());
 
         //  show the window at 85%
         newWindow->resize(QDesktopWidget().availableGeometry(newWindow).size() * 0.85);
