@@ -232,6 +232,12 @@ void Printer::bitmapPrint(QPrinter *printer, QString pageRange, int copies, bool
     printer->setOrientation(landscape ? QPrinter::Landscape : QPrinter::Portrait);
     printer->setPageSizeMM(paperSize.second);
 
+    //  set the file's name as the print job name
+    QFile file(m_window->getPath());
+    QFileInfo fileInfo(file.fileName());
+    QString name(fileInfo.fileName());
+    printer->setDocName(name);
+
     //  make a thread for printing, and a worker that runs in the thread.
     m_printThread = new QThread;
     m_printWorker = new PrintWorker(m_window, printer, pageRange, rotate, userScale);  //  values given are  1-based
