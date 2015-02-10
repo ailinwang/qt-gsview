@@ -501,10 +501,7 @@ void Window::open()
         dialog.hide();
 
         //  show the window at 85%
-        QDesktopWidget dw;
-        int x=dw.width()*0.85;
-        int y=dw.height()*0.85;
-        newWindow->setFixedSize(x,y);
+        newWindow->resize(QDesktopWidget().availableGeometry(newWindow).size() * 0.85);
         newWindow->show();
 
         //  attempt to load the file
