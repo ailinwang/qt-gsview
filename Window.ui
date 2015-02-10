@@ -444,6 +444,9 @@
    <property name="text">
     <string>Thumbnails</string>
    </property>
+   <property name="toolTip">
+    <string>Show Thumbnails</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
    </property>
@@ -470,6 +473,9 @@
    </property>
    <property name="text">
     <string>Annotations</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Annotations</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -534,6 +540,9 @@
    <property name="text">
     <string>Contents</string>
    </property>
+   <property name="toolTip">
+    <string>Show Contents</string>
+   </property>
   </action>
   <action name="actionLinks">
    <property name="checkable">
@@ -545,6 +554,9 @@
    </property>
    <property name="text">
     <string>Links</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Links</string>
    </property>
   </action>
   <action name="actionAAHigh">

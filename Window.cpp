@@ -106,9 +106,6 @@ Window::Window(QWidget *parent) :
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
 
-    ui->actionAnnotations->setText(tr("Show Annotations"));
-    ui->actionAnnotations->setToolTip(tr("Show Annotations"));
-
     countWindowUp();
 }
 
@@ -658,8 +655,6 @@ void Window::toggleAnnotations()
         m_pages->annot (m_showAnnotations);
         if (ui->leftScrollArea->isVisible())
             m_thumbnails->annot (m_showAnnotations);
-//        ui->actionAnnotations->setText(tr("Hide Annotations"));
-//        ui->actionAnnotations->setToolTip(tr("Hide Annotations"));
     }
     else
     {
@@ -667,8 +662,6 @@ void Window::toggleAnnotations()
         m_pages->annot (m_showAnnotations);
         if (ui->leftScrollArea->isVisible())
             m_thumbnails->annot (m_showAnnotations);
-//        ui->actionAnnotations->setText(tr("Show Annotations"));
-//        ui->actionAnnotations->setToolTip(tr("Show Annotations"));
     }
 }
 
