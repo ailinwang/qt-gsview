@@ -11,6 +11,10 @@ int main(int argc, char *argv[])
     {
         //  create a GUI app and run it
         GSViewApp app (argc, argv);
+
+        //  not sure about this.
+//        app.setQuitOnLastWindowClosed(false);
+
         return app.exec();
     }
     else
