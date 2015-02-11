@@ -106,7 +106,51 @@ Window::Window(QWidget *parent) :
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
 
-    countWindowUp();
+    countWindow(1);
+}
+
+void Window::countWindow(int val)
+{
+    m_numWindows += val;
+    if (m_numWindows<0)
+        m_numWindows = 0;
+
+    bool bEnable = true;
+    if (numWindows()<=0)
+        bEnable = false;
+
+    ui->actionSave->setEnabled(bEnable);
+    ui->actionClose->setEnabled(bEnable);
+    ui->actionPrint->setEnabled(bEnable);
+    ui->actionInfo->setEnabled(bEnable);
+    ui->actionExract_Pages->setEnabled(bEnable);
+    ui->actionSave_Selection->setEnabled(bEnable);
+
+    ui->actionCopy_Text->setEnabled(bEnable);
+    ui->actionDeselect_Text->setEnabled(bEnable);
+    ui->actionSelect_All_Text->setEnabled(bEnable);
+    ui->actionFindDialog->setEnabled(bEnable);
+    ui->actionCopy_Page->setEnabled(bEnable);
+
+    ui->actionZoom_In->setEnabled(bEnable);
+    ui->actionZoom_Out->setEnabled(bEnable);
+    ui->actionZoom_Normal->setEnabled(bEnable);
+    ui->actionFit_Page->setEnabled(bEnable);
+    ui->actionFit_Width->setEnabled(bEnable);
+
+    ui->actionPage_Up->setEnabled(bEnable);
+    ui->actionPage_Down->setEnabled(bEnable);
+    ui->actionHome->setEnabled(bEnable);
+    ui->actionEnd->setEnabled(bEnable);
+
+    ui->actionThumbnails->setEnabled(bEnable);
+    ui->actionFull_Screen->setEnabled(bEnable);
+    ui->actionAnnotations->setEnabled(bEnable);
+    ui->actionContents->setEnabled(bEnable);
+    ui->actionLinks->setEnabled(bEnable);
+
+    ui->actionOutput_Intents->setEnabled(bEnable);
+    ui->menuAntiAlias->setEnabled(bEnable);
 }
 
 void Window::setupToolbar()
@@ -182,7 +226,7 @@ void Window::setupToolbar()
 
 Window::~Window()
 {
-    countWindowDown();
+
 }
 
 void Window::pageEditReturnPressed()
@@ -1092,4 +1136,6 @@ void Window::closeEvent(QCloseEvent *event)
     delete m_contents;
     delete m_thumbnails;
     delete m_pages;
+
+    countWindow(-1);
 }

@@ -141,8 +141,8 @@ private:
     //  counting open windows
     static int m_numWindows;
     static int numWindows() {return m_numWindows;}
-    static void countWindowUp() {m_numWindows++;}
-    static void countWindowDown() {if (m_numWindows>0) m_numWindows--;}
+    void countWindow(int val);
+    void enableMenus();
 
     bool m_showAnnotations = true;
     bool m_showLinks = false;
