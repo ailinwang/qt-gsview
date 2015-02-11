@@ -29,10 +29,18 @@ PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinte
     ui->allRadioButton->setChecked(true);
 
     //  fill in printer names
+    //  pre-select the current default printer
+    QPrinterInfo defaultInfo = QPrinterInfo::defaultPrinter();
     ui->printerCombo->blockSignals(true);
     m_printerList=QPrinterInfo::availablePrinters();
+    int ndx = 0;
     foreach (QPrinterInfo printerInfo, m_printerList)
+    {
         ui->printerCombo->addItem(printerInfo.description());
+        if (printerInfo.description() == defaultInfo.description())
+            ui->printerCombo->setCurrentIndex(ndx);
+        ndx++;
+    }
     ui->printerCombo->blockSignals(false);
 
     //  printer
