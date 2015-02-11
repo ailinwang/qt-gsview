@@ -437,28 +437,59 @@ void ImageWidget::deleteImageData()
     m_bitmap=NULL;
 }
 
-void ImageWidget::render (bool showAnnotations, bool showLinks)
+void ImageWidget::render (bool showAnnotations, bool showLinks, bool lowRes)
 {
-    deleteImageData();
+    if (lowRes)
+    {
+        deleteImageData();
 
-    point_t thePageSize = pageSize();
+        //  smaller page
+        point_t thePageSize = pageSize();
+        thePageSize.X /=5;
+        thePageSize.Y /=5;
+        double scale2 = scale()/5;
 
-    //  render
-    int numBytes = (int)thePageSize.X * (int)thePageSize.Y * 4;
-    m_bitmap = new Byte[numBytes];
-    m_document->RenderPage (m_pageNumber, scale(), m_bitmap, thePageSize.X, thePageSize.Y, showAnnotations);
+        //  render
+        int numBytes = (int)thePageSize.X * (int)thePageSize.Y * 4;
+        m_bitmap = new Byte[numBytes];
+        m_document->RenderPage (m_pageNumber, scale2, m_bitmap, thePageSize.X, thePageSize.Y, showAnnotations);
+        m_image = new QImage(m_bitmap, (int)thePageSize.X, (int)thePageSize.Y, QImage::Format_ARGB32);
 
-    m_document->ComputeTextBlocks(m_pageNumber);
+        //  copy to a scaled pixmap
+        QPixmap pix = QPixmap::fromImage(*m_image);
+        QPixmap pix2 = pix.scaled(pageSize().X, pageSize().Y, Qt::KeepAspectRatio);
+        setPixmap(pix2);
 
-    //  copy to widget
-    m_image = new QImage(m_bitmap, (int)thePageSize.X, (int)thePageSize.Y, QImage::Format_ARGB32);
-    QPixmap pix = QPixmap::fromImage(*m_image);
-    setPixmap(pix);
+        //  tell image to show or hide the links.
+//        setShowLinks(showLinks);
+//        setRendered(true);
+        update();
 
-    //  tell image to show or hide the links.
-    setShowLinks(showLinks);
-    setRendered(true);
-    update();
+    }
+    else
+    {
+        deleteImageData();
+
+        point_t thePageSize = pageSize();
+
+        //  render
+        int numBytes = (int)thePageSize.X * (int)thePageSize.Y * 4;
+        m_bitmap = new Byte[numBytes];
+        m_document->RenderPage (m_pageNumber, scale(), m_bitmap, thePageSize.X, thePageSize.Y, showAnnotations);
+
+        m_document->ComputeTextBlocks(m_pageNumber);
+
+        //  copy to widget
+        m_image = new QImage(m_bitmap, (int)thePageSize.X, (int)thePageSize.Y, QImage::Format_ARGB32);
+        QPixmap pix = QPixmap::fromImage(*m_image);
+        setPixmap(pix);
+
+        //  tell image to show or hide the links.
+        setShowLinks(showLinks);
+        setRendered(true);
+        update();
+    }
+
 }
 
 

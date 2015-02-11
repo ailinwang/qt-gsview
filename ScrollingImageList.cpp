@@ -29,6 +29,11 @@ void ScrollingImageList::setScrollArea(QScrollArea *scrollArea)
     //  install an event filter on the scrolling area.
     QWidget* contentWidget = m_scrollArea->widget();
     contentWidget->installEventFilter(this);
+
+    //  create a timer for rendering
+    m_rendertimer = new QTimer(this);
+    m_rendertimer->stop();
+    connect(m_rendertimer, SIGNAL(timeout()), this, SLOT(onRenderTimer()));
 }
 
 void ScrollingImageList::show()
@@ -217,16 +222,47 @@ void ScrollingImageList::valueChangedSlot(int val)
     QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
     if (!slider->isSliderDown())
     {
+        //  probably clicked in the trough
+        //  render immediately
         renderVisibleImages();
+    }
+    else
+    {
+        //  we're scrolling
+        //  queue up a render (a timer will do it)
+        startTimedRender();
     }
 }
 
-void ScrollingImageList::renderImage(int i)
+void ScrollingImageList::startTimedRender()
 {
-    m_images[i].render(m_showAnnotations, m_showLinks);
+    int nPages = m_document->GetPageCount();
+
+    for (int i=0; i<nPages; i++)
+    {
+        if (isImageVisible(i))
+        {
+            if (!m_images[i].rendered())
+                m_images[i].render(m_showAnnotations, m_showLinks, true);
+        }
+    }
+
+    if (!m_rendertimer->isActive())
+        m_rendertimer->start(500);
 }
 
-void ScrollingImageList::renderVisibleImages()
+void ScrollingImageList::onRenderTimer()
+{
+    m_rendertimer->stop();
+    renderVisibleImages();
+}
+
+void ScrollingImageList::renderImage(int i, bool lowRes)
+{
+    m_images[i].render(m_showAnnotations, m_showLinks, lowRes);
+}
+
+void ScrollingImageList::renderVisibleImages(bool lowRes /* =false*/)
 {
     int nPages = m_document->GetPageCount();
 
@@ -236,7 +272,7 @@ void ScrollingImageList::renderVisibleImages()
         {
             if (!m_images[i].rendered())
             {
-                renderImage(i);
+                renderImage(i, lowRes);
             }
             else
             {

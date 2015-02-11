@@ -67,7 +67,7 @@ public:
 
     void cleanup();
 
-    void render (bool showAnnotations, bool showLinks);
+    void render (bool showAnnotations, bool showLinks, bool lowRes);
     void setRendered(bool rendered);
 
     void onMouseRelease(QEvent *event);

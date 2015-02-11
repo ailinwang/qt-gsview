@@ -52,15 +52,17 @@ protected:
 public slots:
     void sliderReleasedSlot();
     void valueChangedSlot(int val);
+    void onRenderTimer();
 
 signals:
     void imagesReady();
 
 private:
-    void renderVisibleImages();
-    void renderImage(int index);
+    void renderVisibleImages(bool lowRes=false);
+    void renderImage(int index, bool lowRes);
     bool isImageVisible(int nPage);
     void onImagesReady();
+    void startTimedRender();
 
     QScrollArea *m_scrollArea = NULL;
     ImageWidget *m_images = NULL;
@@ -69,6 +71,7 @@ private:
     double m_scale = 1.0;
     bool m_showAnnotations = true;
     bool m_showLinks = false;
+    QTimer *m_rendertimer = NULL;
 };
 
 #endif  //  SCROLLINGIMAGELIST_H
