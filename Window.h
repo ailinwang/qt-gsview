@@ -43,6 +43,7 @@ public:
     bool getShowAnnotations() {return m_showAnnotations;}
     QString getPath() {return m_path;}
     void goToPage(int nPage);
+    void setCurrentPage(int nPage);
 
     QString password() const;
     void setPassword(const QString &password);

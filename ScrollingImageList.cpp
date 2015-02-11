@@ -229,12 +229,13 @@ void ScrollingImageList::valueChangedSlot(int val)
     else
     {
         //  we're scrolling
-        //  queue up a render (a timer will do it)
-        startTimedRender();
+        renderVisibleImagesLow();
     }
+
+    onScrollChange();
 }
 
-void ScrollingImageList::startTimedRender()
+void ScrollingImageList::renderVisibleImagesLow()
 {
     int nPages = m_document->GetPageCount();
 

@@ -45,9 +45,13 @@ public:
 
     void cleanup();
 
+    virtual void onScrollChange() {}
+
 protected:
     QScrollArea *getScrollArea() {return m_scrollArea;}
     ImageWidget *images() {return m_images;}
+    Document *m_document = NULL;
+    bool isImageVisible(int nPage);
 
 public slots:
     void sliderReleasedSlot();
@@ -60,14 +64,12 @@ signals:
 private:
     void renderVisibleImages(bool lowRes=false);
     void renderImage(int index, bool lowRes);
-    bool isImageVisible(int nPage);
     void onImagesReady();
-    void startTimedRender();
+    void renderVisibleImagesLow();
 
     QScrollArea *m_scrollArea = NULL;
     ImageWidget *m_images = NULL;
     bool m_imagesBuilt = false;
-    Document *m_document = NULL;
     double m_scale = 1.0;
     bool m_showAnnotations = true;
     bool m_showLinks = false;

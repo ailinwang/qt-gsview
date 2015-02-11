@@ -638,8 +638,13 @@ void Window::pagesReady()
 
 void Window::goToPage(int nPage)
 {
-    m_currentPage = nPage;
+    setCurrentPage(nPage);
     m_pages->goToPage (nPage, true);
+}
+
+void Window::setCurrentPage(int nPage)
+{
+    m_currentPage = nPage;
 
     m_thumbnails->hilightImage(nPage);
     m_thumbnails->goToPage(nPage);
