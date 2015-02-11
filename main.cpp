@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     GSViewApp app (argc, argv);
 
     //  don't quit when the last file is closed.
+    //  this seems only to work for OS X, which has a menu bar
     app.setQuitOnLastWindowClosed(false);
 
     return app.exec();
