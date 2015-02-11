@@ -12,9 +12,11 @@ int main(int argc, char *argv[])
     //  create a GUI app and run it
     GSViewApp app (argc, argv);
 
+#ifdef _QT_MAC
     //  don't quit when the last file is closed.
-    //  this seems only to work for OS X, which has a menu bar
+    //  this only works for OS X, which has a menu bar
     app.setQuitOnLastWindowClosed(false);
+#endif
 
     return app.exec();
 
