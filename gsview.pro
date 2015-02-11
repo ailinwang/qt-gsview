@@ -4,6 +4,7 @@
 #
 #-------------------------------------------------
 
+message ($$QMAKESPEC)
 
 #  C and C++ compiler configuration
 
@@ -140,10 +141,12 @@ macx {
 
 #  post-link step to get some shared files for the release build
 
-QTLIBPATH = /home/fred/Qt5.3.2/5.3/gcc_64/lib
-QTPLUGINPATH = /home/fred/Qt5.3.2/5.3/gcc_64/plugins/platforms
 CONFIG(release,debug|release) {
     unix:!macx {
+
+        QTLIBPATH = /home/fred/Qt5.3.2/5.3/gcc_64/lib
+        QTPLUGINPATH = /home/fred/Qt5.3.2/5.3/gcc_64/plugins/platforms
+
         QMAKE_POST_LINK += $$quote(rm -rf ./libs $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(mkdir -p ./libs $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(rm -rf ./platforms $$escape_expand(\n\t))
