@@ -528,6 +528,9 @@ void Window::open()
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz *.ps *.eps)"));
 
+    //  get current window count
+    int windowCount = numWindows();
+
     //  create a window that will show the file.
     Window *newWindow = new Window();
 
@@ -577,8 +580,11 @@ void Window::open()
         qApp->setActiveWindow(priorWindow);
 
     //  if no windows are open, quit.
-    if (numWindows()<=0)
+    if (windowCount==0)
+    {
+        qApp->processEvents();
         exit(0);
+    }
 }
 
 int Window::m_numWindows = 0;
