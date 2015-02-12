@@ -363,7 +363,16 @@ void PrintDialog::onNewPrinter()
     QPrinterInfo printerInfo = m_printerList.at(ui->printerCombo->currentIndex());
 
     //  remember the current page size name
-    QString currentSizeName = "US Letter";
+    //  this is a bit of a hack since we really should get the current default
+    //  from the printer itself.
+    QLocale locale;
+    QString countrys = QLocale::countryToString(locale.country());
+    QString currentSizeName = "";
+    if (countrys == "UnitedStates")
+        currentSizeName = "US Letter";
+    else
+        currentSizeName = "A4";
+
     if (m_paperSizes.size()>0 && ui->paperSizeComboBox->currentIndex()<m_paperSizes.size())
     {
         QPair<QString,QSizeF> paperSize = m_paperSizes.at(ui->paperSizeComboBox->currentIndex());
@@ -387,6 +396,8 @@ void PrintDialog::onNewPrinter()
     //  restore the remembered size.
     if (matching!=-1)
         ui->paperSizeComboBox->setCurrentIndex(matching);
+
+    on_paperSizeComboBox_currentIndexChanged(ui->paperSizeComboBox->currentIndex());
 
     ui->paperSizeComboBox->blockSignals(false);
 
