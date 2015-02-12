@@ -14,4 +14,5 @@ cp -r ../build/release/apps ./packages/com.artifex.gsview/data/apps
 cp -r ../build/release/libs ./packages/com.artifex.gsview/data/libs
 cp -r ../build/release/platforms ./packages/com.artifex.gsview/data/platforms
 
-./binarycreator -c config/config.xml -p packages gsview-installer
+./binarycreator -c config/config.xml -p packages GSView-6.0-Installer
+
