@@ -369,7 +369,11 @@ void PrintDialog::onNewPrinter()
     QString countrys = QLocale::countryToString(locale.country());
     QString currentSizeName = "";
     if (countrys == "UnitedStates")
+#ifdef _QT_MAC
         currentSizeName = "US Letter";
+#else
+        currentSizeName = "Letter";
+#endif
     else
         currentSizeName = "A4";
 
