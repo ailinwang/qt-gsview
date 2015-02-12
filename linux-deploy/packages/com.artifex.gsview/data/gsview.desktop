@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=gsview
-Exec=$USER_INSTALL_DIR$$/$gsview
-Icon=$USER_INSTALL_DIR$$/$gsview_app.png
-Terminal=false
-
