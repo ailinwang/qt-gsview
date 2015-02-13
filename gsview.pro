@@ -4,8 +4,6 @@
 #
 #-------------------------------------------------
 
-message ($$QMAKESPEC)
-
 #  C and C++ compiler configuration
 
 CONFIG += c++11

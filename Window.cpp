@@ -464,6 +464,8 @@ bool Window::OpenFile2 (QString path)
     m_pages->setScale(m_scalePage);
     m_pages->buildImages();
 
+    m_isOpen = true;
+
     return true;
 }
 
@@ -572,6 +574,8 @@ void Window::open()
             break;
     }
 
+    qApp->processEvents();
+
     //  user gave up, so delete the window we created.
     delete newWindow;
 
@@ -582,7 +586,6 @@ void Window::open()
     //  if no windows are open, quit.
     if (windowCount==0)
     {
-        qApp->processEvents();
         exit(0);
     }
 }
@@ -1118,6 +1121,11 @@ bool Window::eventFilter(QObject *object, QEvent *e)
 void Window::closeEvent(QCloseEvent *event)
 {
     UNUSED(event);
+
+    //  don't do this twice
+    if (!m_isOpen)
+        return;
+    m_isOpen = false;
 
     //  delete things that were allocated
     if (NULL!=m_copiedImage)

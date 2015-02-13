@@ -171,6 +171,8 @@ private:
     QImage *m_copiedImage = NULL;
 
     QString m_password;  //  the one the user supplied when the file was opened
+
+    bool m_isOpen = false;
 };
 
 #endif  //  WINDOW_H
