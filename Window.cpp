@@ -574,8 +574,6 @@ void Window::open()
             break;
     }
 
-    qApp->processEvents();
-
     //  user gave up, so delete the window we created.
     delete newWindow;
 
@@ -586,7 +584,8 @@ void Window::open()
     //  if no windows are open, quit.
     if (windowCount==0)
     {
-        exit(0);
+        qApp->processEvents();
+        qApp->exit(0);
     }
 }
 
