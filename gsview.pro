@@ -142,8 +142,12 @@ macx {
 CONFIG(release,debug|release) {
     unix:!macx {
 
-        QTLIBPATH = /home/fred/Qt5.3.2/5.3/gcc_64/lib
-        QTPLUGINPATH = /home/fred/Qt5.3.2/5.3/gcc_64/plugins/platforms
+#        QTLIBPATH = /home/fred/Qt5.3.2/5.3/gcc_64/lib
+#        QTPLUGINPATH = /home/fred/Qt5.3.2/5.3/gcc_64/plugins/platforms
+
+        #  this assumes a relative position of these dirs relative to qmake
+        QTLIBPATH    = $$clean_path($$dirname(QMAKE_QMAKE)/..)/lib
+        QTPLUGINPATH = $$clean_path($$dirname(QMAKE_QMAKE)/..)/plugins/platforms
 
         QMAKE_POST_LINK += $$quote(rm -rf ./libs $$escape_expand(\n\t))
         QMAKE_POST_LINK += $$quote(mkdir -p ./libs $$escape_expand(\n\t))
