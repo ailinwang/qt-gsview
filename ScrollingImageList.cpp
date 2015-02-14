@@ -248,13 +248,16 @@ void ScrollingImageList::renderVisibleImagesLow()
         }
     }
 
-    if (!m_rendertimer->isActive())
-        m_rendertimer->start(500);
+    //  renderVisibleImagesLow() is called more-or-less continuously during scrolling.
+    //  Stopping the timer and restarting it defers high-res rendering
+    //  until the scrolling stops.
+
+    m_rendertimer->stop();
+    m_rendertimer->start(250);
 }
 
 void ScrollingImageList::onRenderTimer()
 {
-    m_rendertimer->stop();
     renderVisibleImages();
 }
 
