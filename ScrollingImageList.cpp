@@ -8,6 +8,8 @@
 #include <QScrollBar>
 #include <QDebug>
 
+static bool inGoToPage = false;
+
 ScrollingImageList::ScrollingImageList(QObject *parent) :
     QObject(parent)
 {
@@ -232,7 +234,8 @@ void ScrollingImageList::valueChangedSlot(int val)
         renderVisibleImagesLow();
     }
 
-    onScrollChange();
+    if (!inGoToPage)
+        onScrollChange();
 }
 
 void ScrollingImageList::renderVisibleImagesLow()
@@ -328,7 +331,10 @@ void ScrollingImageList::goToPage (int nPage, bool evenIfVisible)
     int scrollTo = r.top()-10;  //  so we see a little margin above
     if (scrollTo<0)
         scrollTo = 0;
+
+    inGoToPage = true;
     m_scrollArea->verticalScrollBar()->setValue(scrollTo);
+    inGoToPage = false;
 
     qApp->processEvents();
     this->renderVisibleImages();
