@@ -86,6 +86,8 @@ void Cache::Add(int value, int width_in, int height_in, fz_display_list *dlist,
 
 fz_display_list* Cache::Use(int value, int *width_out, int *height_out, fz_context *mu_ctx)
 {
+    UNUSED(mu_ctx);
+
 	std::lock_guard<std::mutex> lock(cache_lock);
 	cache_entry_t *curr_entry = this->head;
 

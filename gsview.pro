@@ -68,7 +68,8 @@ HEADERS       = \
     ICCDialog.h \
     ICCDialog2.h \
     SelectionFrame.h \
-    PrintDialog.h
+    PrintDialog.h \
+    mupdf/include/mupdf/fitz/stream.h
 
 SOURCES       = \
     main.cpp \
