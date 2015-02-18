@@ -23,6 +23,9 @@ CONFIG(release,debug|release) {
     }
 }
 
+#  turn off warnings
+CONFIG += warn_off
+
 #  preprocessor
 
 DEFINES += _QT
