@@ -485,6 +485,15 @@ bool Window::OpenFile2 (QString path)
     m_pages->setScale(m_scalePage);
     m_pages->buildImages();
 
+    //  calculate an initial superScale based on the window width.
+    //  get native size of current page
+    point_t pageSize;
+    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
+    int scrollBarWidth = 20;  //  TODO
+    m_superScale  = double(m_pages->width()-scrollBarWidth)  / pageSize.X;
+
+    normalSize();
+
     m_isOpen = true;
 
     return true;
@@ -653,7 +662,7 @@ void Window::zoom (double newScale)
     if (m_scalePage < m_minScale)
         m_scalePage = m_minScale;
 
-    m_pages->zoom (m_scalePage);
+    m_pages->zoom (m_scalePage*m_superScale);
     m_percentage->setText(QString::number((int)(100*m_scalePage)));
 }
 
@@ -786,7 +795,7 @@ void Window::fitPage()
 
     //  get native size of current page
     point_t pageSize;
-    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
+    m_document->GetPageSize(m_currentPage, m_superScale, &pageSize);
     double page_height = pageSize.Y;
     double page_width  = pageSize.X;
 
@@ -806,7 +815,7 @@ void Window::fitWidth()
 
     //  get native size of current page
     point_t pageSize;
-    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
+    m_document->GetPageSize(m_currentPage, m_superScale, &pageSize);
     double page_width  = pageSize.X;
 
     //  calculate zoom

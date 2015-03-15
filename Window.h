@@ -182,6 +182,8 @@ private:
     QProcess *m_gsProcess;
 
     bool m_setupComplete = false;
+
+    double m_superScale = 1.0;
 };
 
 #endif  //  WINDOW_H
