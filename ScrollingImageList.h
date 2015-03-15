@@ -47,8 +47,9 @@ public:
 
     virtual void onScrollChange() {}
 
-protected:
     QScrollArea *getScrollArea() {return m_scrollArea;}
+
+protected:
     ImageWidget *images() {return m_images;}
     Document *m_document = NULL;
     bool isImageVisible(int nPage);

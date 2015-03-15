@@ -489,8 +489,9 @@ bool Window::OpenFile2 (QString path)
     //  get native size of current page
     point_t pageSize;
     m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
-    int scrollBarWidth = 20;  //  TODO
-    m_superScale  = double(m_pages->width()-scrollBarWidth)  / pageSize.X;
+    int pw = m_pages->width();
+    pw -=20;
+    m_superScale  = double(pw)  / pageSize.X;
 
     normalSize();
 
@@ -810,19 +811,15 @@ void Window::fitPage()
 
 void Window::fitWidth()
 {
-    //  get viewport size
-    double width  = m_pages->width();
-
+    //  calculate an initial superScale based on the window width.
     //  get native size of current page
     point_t pageSize;
-    m_document->GetPageSize(m_currentPage, m_superScale, &pageSize);
-    double page_width  = pageSize.X;
+    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
+    int pw = m_pages->width();
+    pw -=20;
+    m_superScale  = double(pw)  / pageSize.X;
 
-    //  calculate zoom
-    double scale  = double(width)  / page_width;
-
-    //  zoom it
-    zoom (scale);
+    normalSize();
 }
 
 static QString makeRow(QString label, QString value)
@@ -1218,4 +1215,21 @@ void Window::changeEvent(QEvent *)
     m_protectRecursion = false;
 
 #endif
+}
+
+void Window::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+
+    if (!m_isOpen)
+        return;
+
+    point_t pageSize;
+    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
+    int pw = m_pages->width();
+    pw -= 20;
+
+    m_superScale  = double(pw)  / pageSize.X;
+
+    zoom(m_scalePage);
 }

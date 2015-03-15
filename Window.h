@@ -51,6 +51,7 @@ public:
     int currentPage() {return m_currentPage;}
 
     void changeEvent(QEvent *);
+    void resizeEvent(QResizeEvent *event);
 
 protected:
     void keyPressEvent(QKeyEvent* event);
