@@ -90,6 +90,8 @@ void ScrollingImageList::buildImages()
             contentWidget->layout()->addWidget(&(m_images[i]));
         }
 
+        contentWidget->layout()->setAlignment(Qt::AlignHCenter);
+
         m_imagesBuilt = true;
     }
 }

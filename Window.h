@@ -50,6 +50,8 @@ public:
 
     int currentPage() {return m_currentPage;}
 
+    void changeEvent(QEvent *);
+
 protected:
     void keyPressEvent(QKeyEvent* event);
     void customEvent(QEvent *event);
@@ -96,6 +98,7 @@ private slots:
     void extractPages();
     void outputIntents();
     void copyPage();
+    void printOutput();
 
 public slots:
     void saveSelection();
@@ -173,6 +176,12 @@ private:
     QString m_password;  //  the one the user supplied when the file was opened
 
     bool m_isOpen = false;
+
+    bool m_protectRecursion = false;
+
+    QProcess *m_gsProcess;
+
+    bool m_setupComplete = false;
 };
 
 #endif  //  WINDOW_H

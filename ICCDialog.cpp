@@ -34,6 +34,12 @@ void ICCDialog::on_selectButton_clicked()
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
     QString lastDir  = settings.value("LastOpenFileDir", desktopLocations.first()).toString();
 
+    //  if the location does not exist (maybe it was deleted/moved),
+    //  fall back to the desktop
+    QFile *f = new QFile(lastDir);
+    if (!f->exists())
+        lastDir = desktopLocations.first();
+
     //  create a dialog for choosing a file
     QFileDialog dialog(NULL, tr("Choose a Color Profile"), lastDir);
     dialog.setAcceptMode(QFileDialog::AcceptOpen);

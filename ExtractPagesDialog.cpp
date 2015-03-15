@@ -177,6 +177,12 @@ void ExtractPagesDialog::doSave()
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
     QString lastDir  = settings.value("LastSaveFileDir", desktopLocations.first()).toString();
 
+    //  if the location does not exist (maybe it was deleted/moved),
+    //  fall back to the desktop
+    QFile *f = new QFile(lastDir);
+    if (!f->exists())
+        lastDir = desktopLocations.first();
+
     //  set up the dialog
     QFileDialog dialog(m_window, tr("Save"), lastDir);
     dialog.setAcceptMode(QFileDialog::AcceptSave);

@@ -21,6 +21,7 @@ Window::Window(QWidget *parent) :
     //  set up the UI
     ui->setupUi(this);
     setupToolbar();
+    m_setupComplete = true;
 
     m_fileSave = new FileSave(this);
 
@@ -170,6 +171,7 @@ void Window::setupToolbar()
     ui->toolBar->addAction(ui->actionEnd);
     m_pageNumber = new QLineEdit();
     m_pageNumber->setMaximumWidth(30);
+    m_pageNumber->setMinimumWidth(30);
     connect ( m_pageNumber, SIGNAL(returnPressed()), SLOT(pageEditReturnPressed()));
     m_totalPages = new QLabel();
     QLabel *slash = new QLabel();  slash->setText(tr("/"));
@@ -184,6 +186,7 @@ void Window::setupToolbar()
 
     m_percentage = new QLineEdit();
     m_percentage->setMaximumWidth(30);
+    m_percentage->setMinimumWidth(30);
     connect ( m_percentage, SIGNAL(returnPressed()), SLOT(percentageEditReturnPressed()));
     QLabel *pct = new QLabel();  pct->setText(tr("%"));
     ui->toolBar->insertWidget(NULL, m_percentage);
@@ -207,6 +210,7 @@ void Window::setupToolbar()
     ui->toolBar->addAction(ui->actionFindDialog);
     m_search = new QLineEdit();
     m_search->setMaximumWidth(120);
+    m_search->setMinimumWidth(120);
     ui->toolBar->insertWidget(NULL, m_search);
 
     ui->toolBar->addAction(ui->actionFind_Previous);
@@ -403,10 +407,17 @@ bool Window::OpenFile (QString path)
         command += " -c .setpdfwrite ";
         command += "-f \"" + path + "\"";
 
+        MessagesDialog::addMessage(command+"\n\n");
+
         //  create a process to do it, and wait
-        QProcess *process = new QProcess(this);
-        process->start(command);
-        process->waitForFinished();
+        m_gsProcess = new QProcess(this);
+        m_gsProcess->setProcessChannelMode(QProcess::MergedChannels);
+        connect (m_gsProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(printOutput()));
+        m_gsProcess->start(command);
+        m_gsProcess->waitForFinished();
+        disconnect (m_gsProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(printOutput()));
+
+        MessagesDialog::addMessage(command+"\n");
 
         //  now open the temp file.
         return OpenFile2(newPath);
@@ -415,6 +426,16 @@ bool Window::OpenFile (QString path)
     {
         //  open directly
         return OpenFile2(path);
+    }
+}
+
+void Window::printOutput()
+{
+    QByteArray byteArray = m_gsProcess->readAllStandardOutput();
+    QStringList strLines = QString(byteArray).split("\n");
+
+    foreach (QString line, strLines) {
+        MessagesDialog::addMessage(line+"\n");
     }
 }
 
@@ -522,6 +543,12 @@ void Window::open()
     QSettings settings;
     const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
     QString lastDir  = settings.value("LastOpenFileDir", desktopLocations.first()).toString();
+
+    //  if the location does not exist (maybe it was deleted/moved),
+    //  fall back to the desktop
+    QFile *f = new QFile(lastDir);
+    if (!f->exists())
+        lastDir = desktopLocations.first();
 
     //  create a dialog for choosing a file
     QFileDialog dialog(qApp->activeWindow(), tr("Open File"),lastDir);
@@ -1151,4 +1178,35 @@ void Window::closeEvent(QCloseEvent *event)
     delete m_pages;
 
     countWindow(-1);
+}
+
+void Window::changeEvent(QEvent *)
+{
+#ifdef _QT_MAC
+
+    //  for mac, we want to hide the (menu bar and) tool bar when
+    //  we're full-screen.
+    //  because we use the native menu bar, we don't need to hide it.
+
+    if (m_protectRecursion)
+        return;
+    m_protectRecursion = true;
+
+    if (ui->toolBar && m_setupComplete)
+    {
+        if (isFullScreen())
+        {
+            ui->toolBar->setVisible(false);
+            //ui->menubar->setVisible(false);
+        }
+        else
+        {
+            ui->toolBar->setVisible(true);
+            //ui->menubar->setVisible(true);
+        }
+    }
+
+    m_protectRecursion = false;
+
+#endif
 }
