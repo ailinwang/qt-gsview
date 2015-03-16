@@ -155,6 +155,7 @@ private:
     const double m_minScale = 0.05;
     const double m_maxScale = 5;
     const double m_zoomInc  = 0.25;
+    const int m_scrollbarAllowance = 20;
 
     QString m_path = NULL;
 

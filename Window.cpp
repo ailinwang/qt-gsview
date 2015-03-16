@@ -485,18 +485,21 @@ bool Window::OpenFile2 (QString path)
     m_pages->setScale(m_scalePage);
     m_pages->buildImages();
 
-    //  calculate an initial superScale based on the window width.
-    //  get native size of current page
+    //  calculate an initial superScale such that the
+    //  pages are shown actual size.
+    QScreen *screen = QApplication::screens().at(0);
+    qreal dpi = (qreal)screen->physicalDotsPerInchX();
+    m_superScale = dpi / 72;  //  72 determined empirically
+
+    //  adjust if we're too big
     point_t pageSize;
-    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
-    int pw = m_pages->width();
-    pw -=20;
-    m_superScale  = double(pw)  / pageSize.X;
+    m_document->GetPageSize(m_currentPage, m_superScale, &pageSize);
+    if (pageSize.X > (m_pages->width()-m_scrollbarAllowance))
+        m_superScale = m_superScale * (m_pages->width()-m_scrollbarAllowance) / pageSize.X;
 
     normalSize();
 
     m_isOpen = true;
-
     return true;
 }
 
@@ -799,6 +802,7 @@ void Window::fitPage()
     m_document->GetPageSize(m_currentPage, m_superScale, &pageSize);
     double page_height = pageSize.Y;
     double page_width  = pageSize.X;
+    page_width -= m_scrollbarAllowance;
 
     //  calculate zoom
     double height_scale = double(height) / page_height;
@@ -816,10 +820,12 @@ void Window::fitWidth()
     point_t pageSize;
     m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
     int pw = m_pages->width();
-    pw -=20;
-    m_superScale  = double(pw)  / pageSize.X;
+    pw -= m_scrollbarAllowance;
+    double scale = double(pw)  / pageSize.X;
+    scale /= m_superScale;
 
-    normalSize();
+    zoom(scale);
+
 }
 
 static QString makeRow(QString label, QString value)
@@ -1221,15 +1227,15 @@ void Window::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
 
-    if (!m_isOpen)
-        return;
+//    if (!m_isOpen)
+//        return;
 
-    point_t pageSize;
-    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
-    int pw = m_pages->width();
-    pw -= 20;
+//    point_t pageSize;
+//    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
+//    int pw = m_pages->width();
+//    pw -= m_scrollbarAllowance;
 
-    m_superScale  = double(pw)  / pageSize.X;
+//    m_superScale  = double(pw)  / pageSize.X;
 
-    zoom(m_scalePage);
+//    zoom(m_scalePage);
 }
