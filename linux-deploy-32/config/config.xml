@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+     <Name>gsview</Name>
+     <Version>6.0</Version>
+     <Title>gsview Installer</Title>
+     <Publisher>Artifex Software</Publisher>
+     <StartMenuDir>gsview</StartMenuDir>
+     <TargetDir>@homeDir@/gsview</TargetDir>
+</Installer>
+
