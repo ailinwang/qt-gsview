@@ -116,7 +116,8 @@ RESOURCES += \
 #  the order of the libraries here is very important.
 
 LIBS += -L$$PWD/mupdf/build/debug/
-unix:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs -lcups
+unix:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
+#unix:  LIBS += -lcups
 macx:  LIBS += -lssl -lcrypto
 
 #  copy executable files from ghostpdl
