@@ -117,8 +117,9 @@ RESOURCES += \
 
 LIBS += -L$$PWD/mupdf/build/debug/
 unix:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
+#  not using CUPS
 #unix:  LIBS += -lcups
-macx:  LIBS += -lssl -lcrypto
+unix:  LIBS += -lssl -lcrypto
 
 #  copy executable files from ghostpdl
 
@@ -145,9 +146,6 @@ macx {
 
 CONFIG(release,debug|release) {
     unix:!macx {
-
-#        QTLIBPATH = /home/fred/Qt5.3.2/5.3/gcc_64/lib
-#        QTPLUGINPATH = /home/fred/Qt5.3.2/5.3/gcc_64/plugins/platforms
 
         #  this assumes a relative position of these dirs relative to qmake
         QTLIBPATH    = $$clean_path($$dirname(QMAKE_QMAKE)/..)/lib
