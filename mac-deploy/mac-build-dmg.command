@@ -8,7 +8,7 @@
 cd `dirname "${0}"`
 
 #  edit this line depending on your setup.
-QTBIN="/Applications/Qt/5.4/clang_64/bin"
+QTBIN=$HOME/Qt5.4.1/5.4/clang_64/bin
 
 #  project is one level up
 PROJECT="`dirname "${0}"`/.."
