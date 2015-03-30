@@ -63,6 +63,12 @@ PrintDialog::PrintDialog(QWidget *parent, int maxPages, int currentPage, QPrinte
     on_paperSizeComboBox_currentIndexChanged(0);
 }
 
+int PrintDialog::countPrinters()
+{
+    QList<QPrinterInfo> printerList = QPrinterInfo::availablePrinters();
+    return printerList.count();
+}
+
 PrintDialog::~PrintDialog()
 {
     delete ui;

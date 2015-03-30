@@ -26,6 +26,7 @@ public:
     bool autoFitRotate() {return m_bAutoFitRotate;}
     double autoFitScale() {return m_autoFitScale;}
     QPair<QString,QSizeF> paperSize();
+    static int countPrinters();
 
 private slots:
     void on_cancelButton_clicked();

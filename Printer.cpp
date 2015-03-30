@@ -69,6 +69,12 @@ ipp_jstate_t getJobState(int jobID)
 
 void Printer::print()
 {
+    if (PrintDialog::countPrinters()<=0)
+    {
+        QMessageBox::information(m_window, "", tr("There are no printers defined."));
+        return;
+    }
+
     //  make a printer
     m_printer = new QPrinter(QPrinter::HighResolution);
 
