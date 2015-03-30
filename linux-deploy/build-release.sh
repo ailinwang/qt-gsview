@@ -22,7 +22,7 @@ mkdir ./release
 cd ./release
 
 #  make the makefile.
-$QTBIN/qmake $PROJECT/gsview.pro -r -spec linux-g++ CONFIG+=x86_64
+$QTBIN/qmake ../../gsview.pro -r -spec linux-g++ CONFIG+=x86_64
 
 #  make the app
 make clean
