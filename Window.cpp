@@ -447,7 +447,6 @@ bool Window::OpenFile2 (QString path)
     bool result = m_document->OpenFile(path.toStdString());
     if (!result)
     {
-        QMessageBox::critical(NULL, "", tr("Error opening file"));
         return false;
     }
 
@@ -607,6 +606,7 @@ void Window::open()
             return;
         }
         newWindow->hide();
+        QMessageBox::critical(NULL, "", tr("Error opening file"));
 
         //  if this was the 2nd (or higher) open file,
         //  break out so we don't hit the dialog again.
