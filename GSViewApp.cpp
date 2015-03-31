@@ -14,6 +14,10 @@ GSViewApp::GSViewApp ( int &argc, char **argv ) : QApplication(argc, argv)
     QCoreApplication::setApplicationName("gsview");
 
     QGuiApplication::setApplicationDisplayName(tr("gsview"));
+
+    //  on Linux, we may be asked to open a file on the command line
+    if (argc>1)
+        m_fileToOpen = argv[1];
 }
 
 bool GSViewApp::event(QEvent *ev)
@@ -54,14 +58,15 @@ void GSViewApp::onStarted()
     {
         //  we were, try and load it
         Window *newWindow = new Window();
+        newWindow->show();
         if (newWindow->OpenFile(m_fileToOpen))
         {
             //  success
-            newWindow->show();
             return;
         }
 
         //  error
+        newWindow->hide();
         delete newWindow;
         QMessageBox::information(NULL, tr(""), tr("Error opening %1").arg(m_fileToOpen));
     }
