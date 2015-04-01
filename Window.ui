@@ -333,7 +333,7 @@
      <normaloff>:/new/prefix1/resources/forward.png</normaloff>:/new/prefix1/resources/forward.png</iconset>
    </property>
    <property name="text">
-    <string>Page Down</string>
+    <string>Next Page</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
@@ -345,7 +345,7 @@
      <normaloff>:/new/prefix1/resources/back.png</normaloff>:/new/prefix1/resources/back.png</iconset>
    </property>
    <property name="text">
-    <string>Page Up</string>
+    <string>Previous Page</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+U</string>
