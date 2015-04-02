@@ -170,8 +170,9 @@ void Window::setupToolbar()
     ui->toolBar->addAction(ui->actionPage_Down);
     ui->toolBar->addAction(ui->actionEnd);
     m_pageNumber = new QLineEdit();
-    m_pageNumber->setMaximumWidth(30);
-    m_pageNumber->setMinimumWidth(30);
+    m_pageNumber->setMaximumWidth(40);
+    m_pageNumber->setMinimumWidth(40);
+    m_pageNumber->setAlignment(Qt::AlignRight);
     connect ( m_pageNumber, SIGNAL(returnPressed()), SLOT(pageEditReturnPressed()));
     m_totalPages = new QLabel();
     QLabel *slash = new QLabel();  slash->setText(tr("/"));
