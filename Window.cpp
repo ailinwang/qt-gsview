@@ -466,8 +466,8 @@ bool Window::OpenFile2 (QString path)
 
     updateActions();
 
-    while(qApp->hasPendingEvents())
-        qApp->processEvents();
+//    while(qApp->hasPendingEvents())
+//        qApp->processEvents();
 
 
     //  set initial page number and count into the toolbar
@@ -596,8 +596,8 @@ void Window::open()
         if (result != QDialog::Accepted)
             break;
 
-//        //  hide the dialog
-//        dialog.hide();
+        //  hide the dialog
+        dialog.hide();
 //        qApp->processEvents();
 
         //  remember the last-visited directory
@@ -606,14 +606,14 @@ void Window::open()
         //  show the window at 85%
         newWindow->resize(QDesktopWidget().availableGeometry(newWindow).size() * 0.85);
         newWindow->show();
-        qApp->setActiveWindow(newWindow);
-        while(qApp->hasPendingEvents())
-            qApp->processEvents();
+//        qApp->setActiveWindow(newWindow);
+//        while(qApp->hasPendingEvents())
+//            qApp->processEvents();
 
-        //  hide the dialog
-        dialog.hide();
-        while(qApp->hasPendingEvents())
-            qApp->processEvents();
+//        //  hide the dialog
+//        dialog.hide();
+//        while(qApp->hasPendingEvents())
+//            qApp->processEvents();
 
         //  attempt to load the file
         if (newWindow->OpenFile(dialog.selectedFiles().first()))
