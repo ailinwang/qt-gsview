@@ -88,9 +88,8 @@ void ScrollingImageList::buildImages()
             m_images[i].setDocument(document());
 
             contentWidget->layout()->addWidget(&(m_images[i]));
+            contentWidget->layout()->setAlignment(&(m_images[i]), Qt::AlignHCenter);
         }
-
-        contentWidget->layout()->setAlignment(Qt::AlignHCenter);
 
         m_imagesBuilt = true;
     }
@@ -150,24 +149,28 @@ void ScrollingImageList::zoom (double theScale)
         double zoomRatio = theScale/m_scale;
         int nPages = m_document->GetPageCount();
 
-        //  estimate where the slider should go and send it there.
-        QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
-        int oldVal = slider->value();
+        //  estimate where the vertical slider should go and send it there.
+        QAbstractSlider *vslider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
+        int oldVal = vslider->value();
         int newVal = oldVal * zoomRatio;
 
         //  hide the scroll area widget while we do the rest to avoid flickering
         m_scrollArea->widget()->hide();
 
-        slider->setValue(newVal);
+        vslider->setValue(newVal);
 
         //  set the new scale value
         m_scale = theScale;
 
         //  resize all the images and mark them as not rendered
+        int maxW = 0;
         for (int i=0; i<nPages; i++)
         {
             point_t pageSize;
             m_document->GetPageSize(i, m_scale, &pageSize);
+
+            if (pageSize.X>maxW)
+                maxW = pageSize.X;
 
             m_images[i].setFixedWidth(pageSize.X);
             m_images[i].setFixedHeight(pageSize.Y);
@@ -200,6 +203,10 @@ void ScrollingImageList::zoom (double theScale)
         qApp->processEvents();
         renderVisibleImages();
         qApp->processEvents();
+
+        //  center the slider
+        QAbstractSlider *hslider = (QAbstractSlider *) m_scrollArea->horizontalScrollBar();
+        hslider->setValue((maxW-hslider->size().width())/2);
 
         emit imagesReady();
     }
