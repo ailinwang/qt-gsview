@@ -596,24 +596,17 @@ void Window::open()
         if (result != QDialog::Accepted)
             break;
 
-        //  hide the dialog
-        dialog.hide();
-//        qApp->processEvents();
-
         //  remember the last-visited directory
         settings.setValue("LastOpenFileDir", dialog.directory().absolutePath());
 
         //  show the window at 85%
         newWindow->resize(QDesktopWidget().availableGeometry(newWindow).size() * 0.85);
         newWindow->show();
-//        qApp->setActiveWindow(newWindow);
-//        while(qApp->hasPendingEvents())
-//            qApp->processEvents();
+        qApp->setActiveWindow(newWindow);
 
-//        //  hide the dialog
-//        dialog.hide();
-//        while(qApp->hasPendingEvents())
-//            qApp->processEvents();
+        //  hide the dialog
+        dialog.hide();
+        qApp->processEvents();
 
         //  attempt to load the file
         if (newWindow->OpenFile(dialog.selectedFiles().first()))
