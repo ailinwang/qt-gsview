@@ -12,6 +12,7 @@ cp -r ../build/release/apps ./packages/com.artifex.gsview/data/apps
 
 #  build the installer
 ./binarycreator -c config/config.xml -p packages GSView-6.0-Installer-32
+chmod 755 GSView-6.0-Installer-32
 
 #  delete the now-not-needed apps
 rm -f ./packages/com.artifex.gsview/data/gsview
