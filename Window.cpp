@@ -606,7 +606,13 @@ void Window::open()
 
         //  hide the dialog
         dialog.hide();
+
+#ifdef _QT_MAC
         qApp->processEvents();
+#else
+        while (qApp->hasPendingEvents())
+            qApp->processEvents();
+#endif
 
         //  attempt to load the file
         if (newWindow->OpenFile(dialog.selectedFiles().first()))
