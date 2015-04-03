@@ -463,8 +463,12 @@ bool Window::OpenFile2 (QString path)
 
     updateActions();
 
-//    while(qApp->hasPendingEvents())
-//        qApp->processEvents();
+#ifdef _QT_MAC
+        qApp->processEvents();
+#else
+        while (qApp->hasPendingEvents())
+            qApp->processEvents();
+#endif
 
 
     //  set initial page number and count into the toolbar
