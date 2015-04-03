@@ -14,7 +14,7 @@ Component.prototype.createOperations = function()
     {
         component.addOperation("CreateDesktopEntry", "@TargetDir@/gsview.desktop","Version=6.0\nType=Application\nTerminal=false\nExec=@TargetDir@/gsview\nName=GSView 6.0\nIcon=@TargetDir@/gsview_app.png\nName[en_US]=GSView 6.0");
 
-	component.addOperation("Execute", "ln", "-s", "@TargetDir@/gsview.desktop", "@HomeDir@/Desktop/gsview.desktop", "UNDOEXECUTE", "rm", "@HomeDir@/Desktop/gsview.desktop");
+	component.addOperation("Execute", "ln", "-sf", "@TargetDir@/gsview.desktop", "@HomeDir@/Desktop/gsview.desktop", "UNDOEXECUTE", "rm", "@HomeDir@/Desktop/gsview.desktop");
 
     }
 

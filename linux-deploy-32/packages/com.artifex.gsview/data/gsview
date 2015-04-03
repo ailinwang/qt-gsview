@@ -1,0 +1,9 @@
+#!/bin/sh
+
+#  go to the dir containing this script
+this_dir=`dirname "${0}"`
+cd "$this_dir"
+
+#  launch the program
+./gsview.exe
+
