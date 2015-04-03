@@ -457,9 +457,6 @@ bool Window::OpenFile2 (QString path)
     this->setWindowTitle(path);
     m_path = path;
 
-    //  size and position
-    setInitialSizeAndPosition();
-
     //  ask for password if required
     if (!handlePassword())
         return false;
@@ -601,6 +598,7 @@ void Window::open()
 
         //  show the window at 85%
         newWindow->resize(QDesktopWidget().availableGeometry(newWindow).size() * 0.85);
+        newWindow->setInitialSizeAndPosition();
         newWindow->show();
         qApp->setActiveWindow(newWindow);
 
