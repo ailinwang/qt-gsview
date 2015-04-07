@@ -43,7 +43,7 @@ public:
     bool getShowAnnotations() {return m_showAnnotations;}
     QString getPath() {return m_path;}
     void goToPage(int nPage);
-    void setCurrentPage(int nPage);
+    void setCurrentPage(int nPage, bool updateHistory=true);
 
     QString password() const;
     void setPassword(const QString &password);
@@ -100,6 +100,8 @@ private slots:
     void outputIntents();
     void copyPage();
     void printOutput();
+    void back();
+    void forward();
 
 public slots:
     void saveSelection();
@@ -186,6 +188,12 @@ private:
     bool m_setupComplete = false;
 
     double m_superScale = 1.0;
+
+    //  data for the update history stack
+    QList<int> m_pageHistory;
+    int m_pageHistoryIndex = -1;
+    void updatePageHistory(int nPage);
+    bool m_historyUpdateAllowed = true;
 };
 
 #endif  //  WINDOW_H

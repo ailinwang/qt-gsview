@@ -224,14 +224,20 @@ void ScrollingImageList::onImagesReady()
 void ScrollingImageList::sliderReleasedSlot()
 {
     renderVisibleImages();
+    onSliderReleased();
+}
+
+bool ScrollingImageList::isSliderDown()
+{
+    QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
+    return slider->isSliderDown();
 }
 
 void ScrollingImageList::valueChangedSlot(int val)
 {
     UNUSED(val);
 
-    QAbstractSlider *slider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
-    if (!slider->isSliderDown())
+    if (!isSliderDown())
     {
         //  probably clicked in the trough
         //  render immediately

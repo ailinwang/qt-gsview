@@ -77,6 +77,8 @@ Window::Window(QWidget *parent) :
     connect(ui->actionPage_Down, SIGNAL(triggered()), this, SLOT(pageDown()));
     connect(ui->actionHome, SIGNAL(triggered()), this, SLOT(homeSlot()));
     connect(ui->actionEnd, SIGNAL(triggered()), this, SLOT(endSlot()));
+    connect(ui->actionBack, SIGNAL(triggered()), this, SLOT(back()));
+    connect(ui->actionForward, SIGNAL(triggered()), this, SLOT(forward()));
 
     connect(ui->actionThumbnails, SIGNAL(triggered()), this, SLOT(actionThumbnails()));
     connect(ui->actionFull_Screen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
@@ -232,6 +234,52 @@ void Window::setupToolbar()
 Window::~Window()
 {
 
+}
+
+void Window::back()
+{
+    if (m_pageHistoryIndex > 0)
+    {
+        m_historyUpdateAllowed = false;
+        m_pageHistoryIndex--;
+        this->goToPage(m_pageHistory.at(m_pageHistoryIndex));
+        m_historyUpdateAllowed = true;
+    }
+}
+
+void Window::forward()
+{
+    if (m_pageHistoryIndex < m_pageHistory.length()-1)
+    {
+        m_historyUpdateAllowed = false;
+        m_pageHistoryIndex++;
+        this->goToPage(m_pageHistory.at(m_pageHistoryIndex));
+        m_historyUpdateAllowed = true;
+    }
+}
+
+void Window::updatePageHistory(int nPage)
+{
+    if (m_historyUpdateAllowed)
+    {
+        //  if the current history page is the same, do nothing
+        if (m_pageHistoryIndex>=0 && m_pageHistoryIndex<=m_pageHistory.length()-1)
+            if (m_pageHistory.at(m_pageHistoryIndex) == nPage)
+                return;
+
+        //  remove history items that are after the current pointer
+        int i = m_pageHistory.length()-1;
+        while (i>m_pageHistoryIndex)
+        {
+            m_pageHistory.removeAt(i);
+            i--;
+        }
+
+        //  add the page and increment the pointer.
+        m_pageHistory.append(nPage);
+        m_pageHistoryIndex = m_pageHistory.length()-1;
+        qDebug() << "new page = " << nPage << ", history length = " << m_pageHistory.length();
+    }
 }
 
 void Window::pageEditReturnPressed()
@@ -507,6 +555,8 @@ bool Window::OpenFile2 (QString path)
 
     normalSize();
 
+    updatePageHistory(0);
+
     m_isOpen = true;
     return true;
 }
@@ -752,7 +802,7 @@ void Window::goToPage(int nPage)
     m_pages->goToPage (nPage, true);
 }
 
-void Window::setCurrentPage(int nPage)
+void Window::setCurrentPage(int nPage, bool updateHistory /* =true */)
 {
     m_currentPage = nPage;
 
@@ -760,6 +810,10 @@ void Window::setCurrentPage(int nPage)
     m_thumbnails->goToPage(nPage);
 
     m_pageNumber->setText(QString::number(m_currentPage+1));
+
+    if (updateHistory)
+        updatePageHistory(m_currentPage);
+
 }
 
 void Window::toggleAnnotations()

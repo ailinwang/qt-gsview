@@ -28,6 +28,7 @@ public:
     void saveSelection(FileSave *fileSave);
     virtual void zoom (double scale);
     virtual void onScrollChange();
+    virtual void onSliderReleased();
 
 private:
 

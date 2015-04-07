@@ -674,22 +674,29 @@ void PageList::onMenuSelectAll()
     selectAllText();
 }
 
+void PageList::onSliderReleased()
+{
+    onScrollChange();
+}
+
 void PageList::onScrollChange()
 {
     //  get first visible page number
     int nPages = m_document->GetPageCount();
-    int visiblePgae = -1;
+    int visiblePage = -1;
     for (int i=0; i<nPages; i++)
     {
         if (isImageVisible(i))
         {
-            visiblePgae = i;
+            visiblePage = i;
             break;
         }
     }
 
     //  tell Window to change the page number
-    if (visiblePgae != -1)
-        m_window->setCurrentPage(visiblePgae);
+    if (visiblePage != -1)
+    {
+        m_window->setCurrentPage(visiblePage, !isSliderDown());
+    }
 }
 

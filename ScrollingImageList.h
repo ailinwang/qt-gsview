@@ -46,8 +46,11 @@ public:
     void cleanup();
 
     virtual void onScrollChange() {}
+    virtual void onSliderReleased() {}
 
     QScrollArea *getScrollArea() {return m_scrollArea;}
+
+    bool isSliderDown();
 
 protected:
     ImageWidget *images() {return m_images;}
