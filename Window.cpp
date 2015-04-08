@@ -242,7 +242,7 @@ void Window::back()
     {
         m_historyUpdateAllowed = false;
         m_pageHistoryIndex--;
-        this->goToPage(m_pageHistory.at(m_pageHistoryIndex));
+        goToPage(m_pageHistory.at(m_pageHistoryIndex));
         m_historyUpdateAllowed = true;
     }
 }
@@ -253,8 +253,12 @@ void Window::forward()
     {
         m_historyUpdateAllowed = false;
         m_pageHistoryIndex++;
-        this->goToPage(m_pageHistory.at(m_pageHistoryIndex));
+        goToPage(m_pageHistory.at(m_pageHistoryIndex));
         m_historyUpdateAllowed = true;
+    }
+    else
+    {
+        pageDown();
     }
 }
 
@@ -278,7 +282,7 @@ void Window::updatePageHistory(int nPage)
         //  add the page and increment the pointer.
         m_pageHistory.append(nPage);
         m_pageHistoryIndex = m_pageHistory.length()-1;
-        qDebug() << "new page = " << nPage << ", history length = " << m_pageHistory.length();
+//        qDebug() << "new page = " << nPage << ", history length = " << m_pageHistory.length();
     }
 }
 
@@ -356,6 +360,10 @@ void Window::keyPressEvent(QKeyEvent* event)
 
     case Qt::Key_Escape:
         exitFullScreen();
+        break;
+
+    case Qt::Key_Backspace:
+        back();
         break;
 
     default:

@@ -695,7 +695,7 @@
     <string>Back</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+[</string>
+    <string>Ctrl+Left</string>
    </property>
   </action>
   <action name="actionForward">
@@ -703,7 +703,7 @@
     <string>Forward</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+]</string>
+    <string>Ctrl+Right</string>
    </property>
   </action>
  </widget>
