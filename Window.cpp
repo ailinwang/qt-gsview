@@ -109,7 +109,12 @@ Window::Window(QWidget *parent) :
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
     connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
 
+    //  account for this window
     countWindow(1);
+
+    //  set initial size and placement
+    resize(QDesktopWidget().availableGeometry(this).size() * 0.85);
+    setInitialSizeAndPosition();
 }
 
 void Window::countWindow(int val)
@@ -658,9 +663,7 @@ void Window::open()
         //  remember the last-visited directory
         settings.setValue("LastOpenFileDir", dialog.directory().absolutePath());
 
-        //  show the window at 85%
-        newWindow->resize(QDesktopWidget().availableGeometry(newWindow).size() * 0.85);
-        newWindow->setInitialSizeAndPosition();
+        //  show the window
         newWindow->show();
         qApp->setActiveWindow(newWindow);
 

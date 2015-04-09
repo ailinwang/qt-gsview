@@ -59,6 +59,7 @@ void GSViewApp::onStarted()
         //  we were, try and load it
         Window *newWindow = new Window();
         newWindow->show();
+
         if (newWindow->OpenFile(m_fileToOpen))
         {
             //  success

@@ -5,5 +5,5 @@ this_dir=`dirname "${0}"`
 cd "$this_dir"
 
 #  launch the program
-./gsview.exe
+./gsview.exe "${1}"
 
