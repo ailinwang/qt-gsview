@@ -722,16 +722,28 @@ void Window::print()
 
 void Window::zoomIn()
 {
+    ui->actionZoom_Normal->setChecked(false);
+    ui->actionFit_Page->setChecked(false);
+    ui->actionFit_Width->setChecked(false);
+
     zoom(m_scalePage+m_zoomInc);
 }
 
 void Window::zoomOut()
 {
+    ui->actionZoom_Normal->setChecked(false);
+    ui->actionFit_Page->setChecked(false);
+    ui->actionFit_Width->setChecked(false);
+
     zoom(m_scalePage-m_zoomInc);
 }
 
 void Window::normalSize()
 {
+    ui->actionZoom_Normal->setChecked(true);
+    ui->actionFit_Page->setChecked(false);
+    ui->actionFit_Width->setChecked(false);
+
     zoom (1.0);
 }
 
@@ -876,6 +888,10 @@ void Window::selectAllText()
 
 void Window::fitPage()
 {
+    ui->actionZoom_Normal->setChecked(false);
+    ui->actionFit_Page->setChecked(true);
+    ui->actionFit_Width->setChecked(false);
+
     //  get viewport size
     double height = m_pages->height();
     double width  = m_pages->width();
@@ -898,6 +914,10 @@ void Window::fitPage()
 
 void Window::fitWidth()
 {
+    ui->actionZoom_Normal->setChecked(false);
+    ui->actionFit_Page->setChecked(false);
+    ui->actionFit_Width->setChecked(true);
+
     //  calculate an initial superScale based on the window width.
     //  get native size of current page
     point_t pageSize;

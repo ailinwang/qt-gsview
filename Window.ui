@@ -397,6 +397,9 @@
    </property>
   </action>
   <action name="actionZoom_Normal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/new/prefix1/resources/ActualSize48.png</normaloff>:/new/prefix1/resources/ActualSize48.png</iconset>
@@ -518,6 +521,9 @@
    </property>
   </action>
   <action name="actionFit_Page">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/new/prefix1/resources/ExpandFill48.png</normaloff>:/new/prefix1/resources/ExpandFill48.png</iconset>
@@ -527,6 +533,9 @@
    </property>
   </action>
   <action name="actionFit_Width">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/new/prefix1/resources/FitWidth.png</normaloff>:/new/prefix1/resources/FitWidth.png</iconset>
