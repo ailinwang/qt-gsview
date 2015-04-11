@@ -102,6 +102,7 @@ private slots:
     void printOutput();
     void back();
     void forward();
+    void onResizeTimer();
 
 public slots:
     void saveSelection();
@@ -118,7 +119,7 @@ private:
     void exitFullScreen();
     bool handlePassword();
 
-    void zoom(double scale);
+    void zoom(double scale, bool resizing);
 
     void hilightCurrentSearchText();
 
@@ -194,6 +195,9 @@ private:
     int m_pageHistoryIndex = -1;
     void updatePageHistory(int nPage);
     bool m_historyUpdateAllowed = true;
+
+    QTimer *m_resizetimer= NULL;
+    bool m_isResizing = false;
 };
 
 #endif  //  WINDOW_H

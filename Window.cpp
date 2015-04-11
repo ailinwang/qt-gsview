@@ -115,6 +115,11 @@ Window::Window(QWidget *parent) :
     //  set initial size and placement
     resize(QDesktopWidget().availableGeometry(this).size() * 0.85);
     setInitialSizeAndPosition();
+
+    //  create a timer for resizing
+    m_resizetimer = new QTimer(this);
+    m_resizetimer->stop();
+    connect(m_resizetimer, SIGNAL(timeout()), this, SLOT(onResizeTimer()));
 }
 
 void Window::countWindow(int val)
@@ -332,7 +337,7 @@ void Window::percentageEditReturnPressed()
             if ( f>=m_minScale && f<=m_maxScale )
             {
                 m_scalePage = f;
-                m_pages->zoom (m_scalePage);
+                m_pages->zoom (m_scalePage, false);
                 return;
             }
         }
@@ -726,7 +731,7 @@ void Window::zoomIn()
     ui->actionFit_Page->setChecked(false);
     ui->actionFit_Width->setChecked(false);
 
-    zoom(m_scalePage+m_zoomInc);
+    zoom(m_scalePage+m_zoomInc, false);
 }
 
 void Window::zoomOut()
@@ -735,7 +740,7 @@ void Window::zoomOut()
     ui->actionFit_Page->setChecked(false);
     ui->actionFit_Width->setChecked(false);
 
-    zoom(m_scalePage-m_zoomInc);
+    zoom(m_scalePage-m_zoomInc, false);
 }
 
 void Window::normalSize()
@@ -744,10 +749,10 @@ void Window::normalSize()
     ui->actionFit_Page->setChecked(false);
     ui->actionFit_Width->setChecked(false);
 
-    zoom (1.0);
+    zoom (1.0, false);
 }
 
-void Window::zoom (double newScale)
+void Window::zoom (double newScale, bool resizing)
 {
     m_scalePage = newScale;
 
@@ -757,7 +762,7 @@ void Window::zoom (double newScale)
     if (m_scalePage < m_minScale)
         m_scalePage = m_minScale;
 
-    m_pages->zoom (m_scalePage*m_superScale);
+    m_pages->zoom (m_scalePage*m_superScale, resizing);
     m_percentage->setText(QString::number((int)(100*m_scalePage)));
 }
 
@@ -909,7 +914,7 @@ void Window::fitPage()
     double scale = std::min(height_scale, width_scale);
 
     //  zoom it
-    zoom (scale);
+    zoom (scale, m_isResizing);
 }
 
 void Window::fitWidth()
@@ -927,7 +932,7 @@ void Window::fitWidth()
     double scale = double(pw)  / pageSize.X;
     scale /= m_superScale;
 
-    zoom(scale);
+    zoom(scale, m_isResizing);
 
 }
 
@@ -1326,19 +1331,38 @@ void Window::changeEvent(QEvent *)
 #endif
 }
 
+void Window::onResizeTimer()
+{
+    m_isResizing = false;
+
+    //  do the hi-res thing
+    zoom(m_scalePage, false);
+}
+
 void Window::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
 
-//    if (!m_isOpen)
-//        return;
+    if (!m_isOpen)
+        return;
 
-//    point_t pageSize;
-//    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
-//    int pw = m_pages->width();
-//    pw -= m_scrollbarAllowance;
+    if (ui->actionFit_Page->isChecked() || ui->actionFit_Width->isChecked())
+    {
+        m_isResizing = true;
 
-//    m_superScale  = double(pw)  / pageSize.X;
+        //  kill previous timer
+        if (m_resizetimer!=NULL && m_resizetimer->isActive())
+            m_resizetimer->stop();
 
-//    zoom(m_scalePage);
+        if (ui->actionFit_Page->isChecked())
+            fitPage();
+
+        if (ui->actionFit_Width->isChecked())
+            fitWidth();
+
+        //  start timer
+        if (m_resizetimer!=NULL)
+            m_resizetimer->start(500);
+    }
+
 }

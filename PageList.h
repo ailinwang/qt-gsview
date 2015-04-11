@@ -26,7 +26,7 @@ public:
 
     bool isAreaSelected();
     void saveSelection(FileSave *fileSave);
-    virtual void zoom (double scale);
+    virtual void zoom (double scale, bool resizing);
     virtual void onScrollChange();
     virtual void onSliderReleased();
 

@@ -142,7 +142,7 @@ void ScrollingImageList::cleanup()
     }
 }
 
-void ScrollingImageList::zoom (double theScale)
+void ScrollingImageList::zoom (double theScale, bool resizing)
 {
     if (theScale != m_scale)
     {
@@ -155,7 +155,8 @@ void ScrollingImageList::zoom (double theScale)
         int newVal = oldVal * zoomRatio;
 
         //  hide the scroll area widget while we do the rest to avoid flickering
-        m_scrollArea->widget()->hide();
+        if (!resizing)
+            m_scrollArea->widget()->hide();
 
         vslider->setValue(newVal);
 
@@ -179,30 +180,34 @@ void ScrollingImageList::zoom (double theScale)
             m_images[i].setRendered(false);
             m_images[i].setBackgroundRole(QPalette::Dark);
 
+            if (resizing)
+                m_images[i].update();
+
             //  first just substitute a scaled version of the old pixmap.
             //  then later, when the rendering takes place, it will be replaced
             //  with a better version.  But in the meantime, the zooming
             //  will appear instantaneously.
 
-            const QPixmap *pm = m_images[i].pixmap();
-            if (pm)
+            if (!resizing)
             {
-                QPixmap scaledPixmap = pm->scaled(m_images[i].size(), Qt::KeepAspectRatio);
-                m_images[i].setPixmap(scaledPixmap);
+                const QPixmap *pm = m_images[i].pixmap();
+                if (pm)
+                {
+                    QPixmap scaledPixmap = pm->scaled(m_images[i].size(), Qt::KeepAspectRatio);
+                    m_images[i].setPixmap(scaledPixmap);
+                }
             }
-
-            //  render if it will become visible later.
-//            if (i>=minVis && i<=maxVis)
-//                renderImage(i);
         }
 
-        //  now show the scroll area again
-        //  and render
+        //  now show the scroll area again and render
         qApp->processEvents();
-        m_scrollArea->widget()->show();
-        qApp->processEvents();
-        renderVisibleImages();
-        qApp->processEvents();
+        if (!resizing)
+        {
+            m_scrollArea->widget()->show();
+            qApp->processEvents();
+            renderVisibleImages();
+            qApp->processEvents();
+        }
 
         //  center the slider
         QAbstractSlider *hslider = (QAbstractSlider *) m_scrollArea->horizontalScrollBar();
