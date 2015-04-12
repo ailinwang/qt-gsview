@@ -7,7 +7,7 @@
 #include "QtUtil.h"
 
 #define SELECTED_BORDER_COLOR "#24A719"
-#define LINK_COLOR            "#506EB3E8"
+#define LINK_COLOR            "#50FF66FF"
 #define SELECTED_TEXT_COLOR   "#506EB3E8"
 #define FOUND_TEXT_COLOR      "#506EB3E8"
 
