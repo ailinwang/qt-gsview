@@ -3,7 +3,10 @@
 #include <QClipboard>
 #include <QMessageBox>
 #include <QProcess>
+#include <QtDebug>
 #include <FileSave.h>
+#include <QScrollBar.h>
+#include <QTimer.h>
 
 #include "PageList.h"
 #include "QtUtil.h"
@@ -13,6 +16,14 @@
 PageList::PageList(Window *parent)
 {
     m_window = parent;
+
+    m_scrollingTimer = new QTimer();
+    m_scrollingTimer->stop();
+
+    m_scrollingTimer = new QTimer(this);
+    m_scrollingTimer->stop();
+    connect(m_scrollingTimer, SIGNAL(timeout()), this, SLOT(onScrollingTimer()));
+
 }
 
 void PageList::onMousePress(QEvent *e)
@@ -67,6 +78,7 @@ void PageList::onMousePress(QEvent *e)
 
     //  if the shift key is pressed,
     //  update the current selection instead of starting a new one.
+    //  TODO:  this need to work when we're spanning multiple pages
     if(me->modifiers() & Qt::ShiftModifier)
     {
         updateSelection(e);
@@ -76,8 +88,17 @@ void PageList::onMousePress(QEvent *e)
     //  clear current selections
     deselectText();
 
-    //  remember mouse location in global coordinates
-    m_origin = getScrollArea()->mapToGlobal(((QMouseEvent *)e)->pos());
+    //  remember current mouse location
+    //  in content-relative coordinates
+    m_origin = mapToContent(getScrollArea(), ((QMouseEvent *)e)->pos());
+}
+
+QPoint PageList::mapToContent(QWidget *w, QPoint p)
+{
+    QPoint global = w->mapToGlobal(p);
+    QWidget *contentWidget = getScrollArea()->widget();
+    QPoint local = contentWidget->mapFromGlobal(global);
+    return local;
 }
 
 void PageList::deselectText()
@@ -284,7 +305,7 @@ bool isBetween (int val, int a, int b)
     return false;
 }
 
-int charIndex(TextLine *line, ImageWidget *widget, QPoint pos)
+int PageList::charIndex(TextLine *line, ImageWidget *widget, QPoint pos)
 {
     int num_chars = line->char_list->size();
     for (int ii = 0; ii < num_chars; ii++)
@@ -292,8 +313,9 @@ int charIndex(TextLine *line, ImageWidget *widget, QPoint pos)
         TextCharacter *theChar = (line->char_list->at(ii));
         QRect cRect ( widget->scale()*theChar->X, widget->scale()*theChar->Y,
                       widget->scale()*theChar->Width, widget->scale()*theChar->Height);
-        cRect.setTopLeft(widget->mapToGlobal(cRect.topLeft()));
-        cRect.setBottomRight(widget->mapToGlobal(cRect.bottomRight()));
+
+        cRect.setTopLeft    (mapToContent(widget, cRect.topLeft()));
+        cRect.setBottomRight(mapToContent(widget, cRect.bottomRight()));
 
         if (ii==0)
         {
@@ -307,8 +329,9 @@ int charIndex(TextLine *line, ImageWidget *widget, QPoint pos)
             TextCharacter *theChar2 = (line->char_list->at(ii-1));
             QRect cRect2 ( widget->scale()*theChar2->X, widget->scale()*theChar2->Y,
                            widget->scale()*theChar2->Width, widget->scale()*theChar2->Height);
-            cRect2.setTopLeft(widget->mapToGlobal(cRect2.topLeft()));
-            cRect2.setBottomRight(widget->mapToGlobal(cRect2.bottomRight()));
+
+            cRect2.setTopLeft    (mapToContent(widget, cRect2.topLeft()));
+            cRect2.setBottomRight(mapToContent(widget, cRect2.bottomRight()));
 
             if (isBetween(pos.x(), cRect2.right(), cRect.left()))
                 return ii;
@@ -321,11 +344,17 @@ int charIndex(TextLine *line, ImageWidget *widget, QPoint pos)
 
 void PageList::updateSelection(QEvent *e)
 {
-    //  new mouse location in global coords
-    QPoint newPosGlobal = getScrollArea()->mapToGlobal(((QMouseEvent *)e)->pos());
+    updateSelection(((QMouseEvent *)e)->pos());
+}
 
-    bool movingDown  = (newPosGlobal.y() >= m_origin.y());
-    bool movingRight = (newPosGlobal.x() >= m_origin.x());
+
+void PageList::updateSelection(QPoint point)
+{
+    //  new mouse location in global coords
+    QPoint newPos = mapToContent(getScrollArea(),point);
+
+    bool movingDown  = (newPos.y() >= m_origin.y());
+    bool movingRight = (newPos.x() >= m_origin.x());
 
     //  which widget are we "in"?
     ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
@@ -348,27 +377,28 @@ void PageList::updateSelection(QEvent *e)
                 //  global rect of the current line
                 QRect lineRect ( widget->scale()*line->X, widget->scale()*line->Y,
                                  widget->scale()*line->Width, widget->scale()*line->Height);
-                lineRect.setTopLeft(widget->mapToGlobal(lineRect.topLeft()));
-                lineRect.setBottomRight(widget->mapToGlobal(lineRect.bottomRight()));
+
+                lineRect.setTopLeft    (mapToContent(widget, lineRect.topLeft()));
+                lineRect.setBottomRight(mapToContent(widget, lineRect.bottomRight()));
 
                 //  check to see if the line should be included
 
                 bool bAdd = false;
-                if (lineRect.contains(m_origin) || lineRect.contains(newPosGlobal))
+                if (lineRect.contains(m_origin) || lineRect.contains(newPos))
                     bAdd = true;
-                if (isBetween(lineRect.top(), m_origin.y(), newPosGlobal.y()))
+                if (isBetween(lineRect.top(), m_origin.y(), newPos.y()))
                     bAdd = true;
-                if (isBetween(lineRect.bottom(), m_origin.y(), newPosGlobal.y()))
+                if (isBetween(lineRect.bottom(), m_origin.y(), newPos.y()))
                     bAdd = true;
 
                 if ( bAdd)
                 {
                     int num_chars = line->char_list->size();
 
-                    if (lineRect.contains(m_origin) && lineRect.contains(newPosGlobal))
+                    if (lineRect.contains(m_origin) && lineRect.contains(newPos))
                     {
                         int i1 = charIndex(line, widget, m_origin);
-                        int i2 = charIndex(line, widget, newPosGlobal);
+                        int i2 = charIndex(line, widget, newPos);
                         if (movingRight)
                         {
                             widget->addToSelection(line, i1, i2);
@@ -390,9 +420,9 @@ void PageList::updateSelection(QEvent *e)
                             widget->addToSelection(line, 0, i1);
                         }
                     }
-                    else if (lineRect.contains(newPosGlobal))
+                    else if (lineRect.contains(newPos))
                     {
-                        int i1 = charIndex(line, widget, newPosGlobal);
+                        int i1 = charIndex(line, widget, newPos);
                         if (movingDown)
                         {
                             widget->addToSelection(line, 0, i1);
@@ -677,6 +707,59 @@ void PageList::onMenuSelectAll()
 void PageList::onSliderReleased()
 {
     onScrollChange();
+}
+
+void PageList::onMouseEnter()
+{
+    m_scrollingTimer->stop();
+}
+
+void PageList::onMouseLeave()
+{
+    if (qApp->mouseButtons() == Qt::LeftButton)
+    {
+        //  button is being held, so we're dragging
+
+        //  remember where we left
+        m_leftAt = getScrollArea()->mapFromGlobal(QCursor::pos());
+
+        //  start auto scrolling
+        autoScroll();
+    }
+}
+
+enum {AUTOSCROLL_DELTA = 25, AUTOSCROLL_REPEAT = 50, AUTOSCROLL_MARGIN = 10};
+
+void PageList::autoScroll()
+{
+    //  determine whether we're scrolling down or up.
+    int delta = 0;
+    if (m_leftAt.y() < AUTOSCROLL_MARGIN)
+        delta = -AUTOSCROLL_DELTA;
+    if (m_leftAt.y() > getScrollArea()->height()-AUTOSCROLL_MARGIN)
+        delta = AUTOSCROLL_DELTA;
+
+    //  scroll
+    if (delta != 0)
+    {
+        int val = getScrollArea()->verticalScrollBar()->value();
+        val += delta;
+        getScrollArea()->verticalScrollBar()->setValue(val);
+        valueChangedSlot(0);
+
+        //  update the selection
+        //  TODO
+    }
+
+    //  repeat util we enter again.
+    m_scrollingTimer->stop();
+    m_scrollingTimer->start(AUTOSCROLL_REPEAT);
+}
+
+void PageList::onScrollingTimer()
+{
+    m_scrollingTimer->stop();
+    onMouseLeave();
 }
 
 void PageList::onScrollChange()

@@ -213,7 +213,7 @@ void Window::setupToolbar()
     ui->toolBar->addSeparator();
 
     ui->toolBar->addAction(ui->actionThumbnails);
-    ui->toolBar->addAction(ui->actionAnnotations);
+//    ui->toolBar->addAction(ui->actionAnnotations);
     ui->toolBar->addAction(ui->actionContents);
     ui->toolBar->addAction(ui->actionLinks);
 

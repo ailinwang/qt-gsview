@@ -29,6 +29,12 @@ public:
     virtual void zoom (double scale, bool resizing);
     virtual void onScrollChange();
     virtual void onSliderReleased();
+    virtual void onMouseEnter();
+    virtual void onMouseLeave();
+
+public slots:
+
+    virtual void onScrollingTimer();
 
 private:
 
@@ -37,6 +43,7 @@ private:
     void onMouseMove(QEvent *e);
     void manageCursor(QEvent *e);
     void updateSelection(QEvent *e);
+    void updateSelection(QPoint p);
     void onRightClick(QEvent *e);
     void onRightClickArea(QEvent *e);
 
@@ -49,6 +56,9 @@ private:
 
     QString collectSelectedText();
 
+    int charIndex(TextLine *line, ImageWidget *widget, QPoint pos);
+    QPoint mapToContent(QWidget *w, QPoint p);
+
     QPoint m_origin;
 
     SelectionFrame *m_rubberBand=NULL;
@@ -60,6 +70,10 @@ private:
     QRect m_rubberbandRect;
 
     Window *m_window=NULL;
+
+    QTimer *m_scrollingTimer= NULL;
+    QPoint m_leftAt;
+    void autoScroll();
 };
 
 #endif // PAGELIST_H

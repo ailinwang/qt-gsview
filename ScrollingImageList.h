@@ -47,6 +47,8 @@ public:
 
     virtual void onScrollChange() {}
     virtual void onSliderReleased() {}
+    virtual void onMouseEnter() {}
+    virtual void onMouseLeave() {}
 
     QScrollArea *getScrollArea() {return m_scrollArea;}
 
@@ -61,6 +63,7 @@ public slots:
     void sliderReleasedSlot();
     void valueChangedSlot(int val);
     void onRenderTimer();
+    virtual void onScrollingTimer() {}
 
 signals:
     void imagesReady();

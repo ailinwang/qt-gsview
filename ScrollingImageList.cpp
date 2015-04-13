@@ -371,6 +371,16 @@ bool ScrollingImageList::eventFilter(QObject *target, QEvent *event)
         onImagesReady();
     }
 
+    if (event->type() == QEvent::Enter)
+    {
+        onMouseEnter();
+    }
+
+    if (event->type() == QEvent::Leave)
+    {
+        onMouseLeave();
+    }
+
     //  done
     return result;
 }
