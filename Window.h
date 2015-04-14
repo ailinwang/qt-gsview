@@ -103,6 +103,7 @@ private slots:
     void back();
     void forward();
     void onResizeTimer();
+    void openRecent();
 
 public slots:
     void saveSelection();
@@ -198,6 +199,15 @@ private:
 
     QTimer *m_resizetimer= NULL;
     bool m_isResizing = false;
+
+    //  recent file stuff
+    const int maxFileNr = 10;
+    QList<QAction*> recentFileActionList;
+
+    void addRecentlyOpened(QString path);
+    void setupRecent();
+    void updateRecentActionList();
+    void removeFromRecentFiles(QString path);
 };
 
 #endif  //  WINDOW_H
