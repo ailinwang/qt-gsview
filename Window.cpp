@@ -121,14 +121,13 @@ Window::Window(QWidget *parent) :
     m_resizetimer->stop();
     connect(m_resizetimer, SIGNAL(timeout()), this, SLOT(onResizeTimer()));
 
-    setupRecent();
-    updateRecentActionList();
+    setupRecentActions();
 }
 
-void Window::setupRecent()
+void Window::setupRecentActions()
 {
     QAction* recentFileAction = 0;
-    for(int i = 0; i < maxFileNr; i++){
+    for(int i = 0; i < QtUtil::maxRecentFiles; i++){
         recentFileAction = new QAction(this);
         recentFileAction->setVisible(false);
         QObject::connect(recentFileAction, SIGNAL(triggered()),
@@ -138,23 +137,17 @@ void Window::setupRecent()
 
     QMenu *fileMenu = ui->menuFile;
     QMenu *recentFilesMenu = fileMenu->addMenu(tr("Open Recent"));
-    for(int i = 0; i < maxFileNr; i++)
+    for(int i = 0; i < QtUtil::maxRecentFiles; i++)
         recentFilesMenu->addAction(recentFileActionList.at(i));
 }
 
-void Window::updateRecentActionList()
+void Window::updateRecentActions()
 {
     //  get the list
-    QString key("RecentFilesList");
-    QString separator("|");
-    QSettings settings;
-    QString recent = settings.value(key,"").toString();
-    QStringList recentFilePaths;
-    if (recent.length()>0)
-        recentFilePaths = recent.split(separator);
+    QStringList recentFilePaths = QtUtil::getRecentFileList();
 
     //  hide all the menus
-    for (int i = 0; i < maxFileNr; i++)
+    for (int i = 0; i < QtUtil::maxRecentFiles; i++)
         recentFileActionList.at(i)->setVisible(false);
 
     //  set up and show
@@ -189,8 +182,8 @@ void Window::openRecent()
         delete newWindow;
 
         //  remove from the list.
-        updateRecentActionList();
-        removeFromRecentFiles(path);
+        QtUtil::removeRecentFile(path);
+        updateRecentActions();
 
         QMessageBox::information(NULL, tr(""), tr("Error opening %1").arg(path));
     }
@@ -602,7 +595,8 @@ bool Window::OpenFile2 (QString path)
         return false;
 
     //  update recently opened files list
-    addRecentlyOpened(path);
+    QtUtil::addRecentFile(path);
+    updateRecentActions();
 
     updateActions();
 
@@ -1443,55 +1437,3 @@ void Window::resizeEvent(QResizeEvent *event)
     }
 
 }
-
-void Window::removeFromRecentFiles(QString path)
-{
-    QString key("RecentFilesList");
-    QString separator("|");
-
-    //  get the current list and parse it
-    QSettings settings;
-    QString recent = settings.value(key,"").toString();
-    QStringList recentList;
-    if (recent.length()>0)
-        recentList = recent.split(separator);
-
-    //  remove this path if it's already on the list
-    int i = recentList.indexOf(path);
-    if (i >= 0)
-        recentList.removeAt(i);
-
-    //  save
-    recent = recentList.join(separator);
-    settings.setValue(key,recent);
-}
-
-void Window::addRecentlyOpened(QString path)
-{
-    QString key("RecentFilesList");
-    QString separator("|");
-
-    //  get the current list and parse it
-    QSettings settings;
-    QString recent = settings.value(key,"").toString();
-    QStringList recentList;
-    if (recent.length()>0)
-        recentList = recent.split(separator);
-
-    //  remove this path if it's already on the list
-    int i = recentList.indexOf(path);
-    if (i >= 0)
-        recentList.removeAt(i);
-
-    //  add it at the front
-    recentList.insert(0,path);
-
-    //  enforce the limit
-    while (recentList.length()>maxFileNr)
-        recentList.removeLast();
-
-    //  save
-    recent = recentList.join(separator);
-    settings.setValue(key,recent);
-}
-

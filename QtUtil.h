@@ -18,6 +18,12 @@ public:
     static QString extensionFromFilter(QString filter);
     static QRect mapToGlobal ( QWidget*widget, QRect r);
     static QRect mapFromGlobal ( QWidget*widget, QRect r);
+
+    static QStringList getRecentFileList();
+    static void setRecentFileList (QStringList list);
+    static void addRecentFile(QString path);
+    static void removeRecentFile(QString path);
+    static const int maxRecentFiles = 10;
 };
 
 #endif // QTUTIL_H

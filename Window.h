@@ -201,13 +201,9 @@ private:
     bool m_isResizing = false;
 
     //  recent file stuff
-    const int maxFileNr = 10;
     QList<QAction*> recentFileActionList;
-
-    void addRecentlyOpened(QString path);
-    void setupRecent();
-    void updateRecentActionList();
-    void removeFromRecentFiles(QString path);
+    void setupRecentActions();
+    void updateRecentActions();
 };
 
 #endif  //  WINDOW_H

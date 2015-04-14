@@ -105,3 +105,61 @@ QRect QtUtil::mapFromGlobal ( QWidget*widget, QRect r)
     QRect r2(tl, br);
     return r2;
 }
+
+static const QString key("RecentFilesList");
+static const QString separator("|");
+
+QStringList QtUtil::getRecentFileList()
+{
+    //  get the list
+    QSettings settings;
+    QString recent = settings.value(key,"").toString();
+    QStringList recentFilePaths;
+    if (recent.length()>0)
+        recentFilePaths = recent.split(separator);
+
+    return recentFilePaths;
+}
+
+void QtUtil::setRecentFileList (QStringList list)
+{
+    QString recent = list.join(separator);
+    QSettings settings;
+    settings.setValue(key,recent);
+}
+
+void QtUtil::addRecentFile(QString path)
+{
+    //  get the current list
+    QStringList recentList = getRecentFileList();
+
+    //  remove this path if it's already on the list
+    int i = recentList.indexOf(path);
+    if (i >= 0)
+        recentList.removeAt(i);
+
+    //  add it at the front
+    recentList.insert(0,path);
+
+    //  enforce the limit
+    while (recentList.length() > maxRecentFiles)
+        recentList.removeLast();
+
+    //  save
+    setRecentFileList(recentList);
+}
+
+void QtUtil::removeRecentFile(QString path)
+{
+    //  get the current list
+    QStringList recentList = getRecentFileList();
+
+    //  remove
+    int i = recentList.indexOf(path);
+    if (i >= 0)
+        recentList.removeAt(i);
+
+    //  save
+    setRecentFileList(recentList);
+}
+
