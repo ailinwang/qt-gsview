@@ -69,6 +69,10 @@ void GSViewApp::onStarted()
         //  error
         newWindow->hide();
         delete newWindow;
+
+        //  remove from the recent list.
+        QtUtil::removeRecentFile(m_fileToOpen);
+
         QMessageBox::information(NULL, tr(""), tr("Error opening %1").arg(m_fileToOpen));
     }
 

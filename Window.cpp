@@ -127,18 +127,19 @@ Window::Window(QWidget *parent) :
 void Window::setupRecentActions()
 {
     QAction* recentFileAction = 0;
-    for(int i = 0; i < QtUtil::maxRecentFiles; i++){
+    for(int i = 0; i < QtUtil::maxRecentFiles; i++)
+    {
         recentFileAction = new QAction(this);
         recentFileAction->setVisible(false);
         QObject::connect(recentFileAction, SIGNAL(triggered()),
                                      this, SLOT(openRecent()));
-        recentFileActionList.append(recentFileAction);
+        m_recentFileActionList.append(recentFileAction);
     }
 
     QMenu *fileMenu = ui->menuFile;
     QMenu *recentFilesMenu = fileMenu->addMenu(tr("Open Recent"));
     for(int i = 0; i < QtUtil::maxRecentFiles; i++)
-        recentFilesMenu->addAction(recentFileActionList.at(i));
+        recentFilesMenu->addAction(m_recentFileActionList.at(i));
 }
 
 void Window::updateRecentActions()
@@ -148,15 +149,15 @@ void Window::updateRecentActions()
 
     //  hide all the menus
     for (int i = 0; i < QtUtil::maxRecentFiles; i++)
-        recentFileActionList.at(i)->setVisible(false);
+        m_recentFileActionList.at(i)->setVisible(false);
 
     //  set up and show
     for (int i = 0; i < recentFilePaths.length(); i++)
     {
         QString strippedName = QFileInfo(recentFilePaths.at(i)).fileName();
-        recentFileActionList.at(i)->setText(strippedName);
-        recentFileActionList.at(i)->setData(recentFilePaths.at(i));
-        recentFileActionList.at(i)->setVisible(true);
+        m_recentFileActionList.at(i)->setText(strippedName);
+        m_recentFileActionList.at(i)->setData(recentFilePaths.at(i));
+        m_recentFileActionList.at(i)->setVisible(true);
     }
 }
 
@@ -181,7 +182,7 @@ void Window::openRecent()
         newWindow->hide();
         delete newWindow;
 
-        //  remove from the list.
+        //  remove from the recent list.
         QtUtil::removeRecentFile(path);
         updateRecentActions();
 
@@ -1371,7 +1372,7 @@ void Window::closeEvent(QCloseEvent *event)
     countWindow(-1);
 }
 
-void Window::changeEvent(QEvent *)
+void Window::changeEvent(QEvent *e)
 {
 #ifdef _QT_MAC
 
@@ -1400,6 +1401,12 @@ void Window::changeEvent(QEvent *)
     m_protectRecursion = false;
 
 #endif
+
+    if ( e->type() == QEvent::ActivationChange)
+    {
+        updateRecentActions();
+    }
+
 }
 
 void Window::onResizeTimer()

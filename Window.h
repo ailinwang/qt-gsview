@@ -201,7 +201,7 @@ private:
     bool m_isResizing = false;
 
     //  recent file stuff
-    QList<QAction*> recentFileActionList;
+    QList<QAction*> m_recentFileActionList;
     void setupRecentActions();
     void updateRecentActions();
 };
