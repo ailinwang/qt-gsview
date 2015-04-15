@@ -281,7 +281,7 @@ void Window::setupToolbar()
     ui->toolBar->addSeparator();
 
     ui->toolBar->addAction(ui->actionThumbnails);
-//    ui->toolBar->addAction(ui->actionAnnotations);
+//    ui->toolBar->addAction(ui->actionAnnotations);  //  hiding this unless we can find a better icon
     ui->toolBar->addAction(ui->actionContents);
     ui->toolBar->addAction(ui->actionLinks);
 
@@ -1111,90 +1111,100 @@ void Window::ghostscriptMessages()
     m_messagesDialog->show();
 }
 
-QTimer *timer = NULL;
-
 void Window::onFind()
 {
-    if (timer == NULL)
-    {
-        timer = new QTimer(this);
-        connect(timer, SIGNAL(timeout()), this, SLOT(onFindTimer()));
-    }
+    //  terminate previous thread
+    if (NULL != m_searchWorker)
+        m_searchWorker->kill();
 
-    timer->stop();
-    timer->start(750);
-}
+    //  the thread just terminated will shut down normally, but will no longer
+    //  deliver new resuts to this thread.
 
-void Window::onFindDialog()
-{
-    bool ok;
-    QString text = QInputDialog::getText(this, NULL,
-                                              tr("Text to find:"), QLineEdit::Normal,
-                                              NULL, &ok);
-    if (ok && !text.isEmpty())
-    {
-        m_search->setText(text);
-        onFindTimer();
-    }
-}
-
-void Window::onFindTimer()
-{
-    if (timer != NULL)
-        timer->stop();
-
-    m_searchLabel->setText(tr("searching..."));
-    qApp->processEvents();
-
-    //  clear existing search text
+    //  start fresh
+    m_searchLabel->setText(tr(""));
     m_pages->clearSearchText();
     m_searchLabel->clear();
     m_searchItems.clear();
+    m_searchHits = 0;
+    m_searchCounter = -1;
 
     //  get text to find
     QString text = m_search->text();
 
-    m_searchHits = 0;
-    m_searchCounter = 0;
-    if (!text.isEmpty())
+    if (text.length() > 0)
     {
-        //  give each page its list of found items
-        //  and make a copy for ourselves.
-        int numPages = m_document->GetPageCount();
-        for (int np=0; np<numPages; np++)
+        //  make a thread for searching, and a worker that runs in the thread.
+        m_searchThread = new QThread;
+        m_searchWorker = new SearchWorker(this, text);
+        m_searchWorker->moveToThread(m_searchThread);
+
+        //  connect worker and thread signals
+        connect(m_searchThread, SIGNAL(started()),  m_searchWorker, SLOT(process()));
+        connect(m_searchWorker, SIGNAL(finished()), m_searchThread, SLOT(quit()));
+        connect(m_searchWorker, SIGNAL(finished()), m_searchWorker, SLOT(deleteLater()));
+        connect(m_searchThread, SIGNAL(finished()), m_searchThread, SLOT(deleteLater()));
+
+        //  connect worker signals to slots in this class
+        connect(m_searchWorker, SIGNAL(finished()),        this, SLOT(searchFinished()));
+        connect(m_searchWorker, SIGNAL(pageFinished(int, std::vector<SearchItem> *)), this, SLOT(searchPageFinished(int, std::vector<SearchItem> *)));
+
+        //  start the thread
+        m_searchThread->start();
+    }
+
+}
+
+void Window::searchFinished()
+{
+
+}
+
+void Window::searchPageFinished(int np, std::vector<SearchItem> *items)
+{
+    if (items != NULL)
+    {
+        m_pages->setSearchText (np, items);
+        m_searchHits += items->size();
+
+        if (items->size()>0)
         {
-            std::vector<SearchItem> *items =
-                    m_document->SearchText (np, (char*)text.toStdString().c_str());
-
-            if (items != NULL)
+            for (int i=0;i<(int)items->size();i++)
             {
-                m_pages->setSearchText (np, items);
-                m_searchHits += items->size();
-
-                if (items->size()>0)
-                {
-                    for (int i=0;i<(int)items->size();i++)
-                    {
-                        m_searchItems.push_back(items->at(i));
-                    }
-                }
+                m_searchItems.push_back(items->at(i));
             }
         }
-    }
 
-    if (m_searchHits>0)
-    {
-        hilightCurrentSearchText();
+        updateSearchReport();
     }
-    else
-        m_searchLabel->clear();
 }
 
-void Window::hilightCurrentSearchText()
+void Window::updateSearchReport()
 {
-    m_searchLabel->setText(QString::number(m_searchCounter+1)+tr("/")+QString::number(m_searchHits));
-    m_pages->hilightSearchText(&(m_searchItems.at(m_searchCounter)));
+    if (m_searchHits > 0)
+        m_searchLabel->setText(QString::number(m_searchCounter+1)+tr("/")+QString::number(m_searchHits));
+    else
+        m_searchLabel->setText(QString::number(0)+tr("/")+QString::number(0));
 }
+
+void Window::goToSearchItem(int n)
+{
+    if (m_searchHits > 0)
+        m_pages->hilightSearchText(&(m_searchItems.at(n)));
+}
+
+void Window::onFindDialog()
+{
+    //  as user for a string
+    bool ok;
+    QString text = QInputDialog::getText(this, NULL, tr("Text to find:"), QLineEdit::Normal, NULL, &ok);
+
+    if (ok && !text.isEmpty())
+    {
+        //  setting the search field will trigger onFind(), so don't call it here.
+        m_search->setText(text);
+    }
+}
+
 QString Window::password() const
 {
     return m_password;
@@ -1211,7 +1221,8 @@ void Window::findNext()
     if (m_searchCounter+1 < m_searchHits)
     {
         m_searchCounter++;
-        hilightCurrentSearchText();
+        updateSearchReport();
+        goToSearchItem(m_searchCounter);
     }
 }
 
@@ -1220,7 +1231,8 @@ void Window::findPrevious()
     if (m_searchCounter > 0)
     {
         m_searchCounter--;
-        hilightCurrentSearchText();
+        updateSearchReport();
+        goToSearchItem(m_searchCounter);
     }
 }
 
@@ -1442,5 +1454,37 @@ void Window::resizeEvent(QResizeEvent *event)
         if (m_resizetimer!=NULL)
             m_resizetimer->start(500);
     }
+}
 
+SearchWorker::SearchWorker(Window *window, QString text)
+{
+    m_window = window;
+    m_searchText = text;
+}
+
+SearchWorker::~SearchWorker()
+{
+}
+
+void SearchWorker::process()
+{
+    int nPages = m_window->document()->GetPageCount();
+
+    for (int i = 0; i < nPages; ++i)
+    {
+        //  killed?
+        if (m_killed)
+            break;
+
+        //  do the searching
+        std::vector<SearchItem> *items = m_window->document()->SearchText (
+                    i, (char*)m_searchText.toStdString().c_str());
+
+        if (!m_killed)
+            emit pageFinished (i, items);
+    }
+
+    //  done!
+    if (!m_killed)
+        emit finished();
 }

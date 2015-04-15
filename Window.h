@@ -27,6 +27,27 @@ QT_END_NAMESPACE
 class FileSave;
 class MessagesDialog;
 
+class SearchWorker : public QObject {
+    Q_OBJECT
+
+public:
+    SearchWorker(Window *window, QString text);
+    ~SearchWorker();
+    void kill() {m_killed=true;}
+
+public slots:
+    void process();
+
+signals:
+    void pageFinished(int pageNumber, std::vector<SearchItem> *items);
+    void finished();
+
+private:
+    Window *m_window;
+    bool m_killed = false;
+    QString m_searchText;
+};
+
 class Window : public QMainWindow
 {
 	Q_OBJECT
@@ -93,7 +114,6 @@ private slots:
     void ghostscriptMessages();
     void onFind();
     void onFindDialog();
-    void onFindTimer();
     void findNext();
     void findPrevious();
     void extractPages();
@@ -104,6 +124,8 @@ private slots:
     void forward();
     void onResizeTimer();
     void openRecent();
+    void searchFinished();
+    void searchPageFinished(int np, std::vector<SearchItem> *items);
 
 public slots:
     void saveSelection();
@@ -122,7 +144,8 @@ private:
 
     void zoom(double scale, bool resizing);
 
-    void hilightCurrentSearchText();
+    void updateSearchReport();
+    void goToSearchItem(int n);
 
     //  pages
     double m_scalePage = 1.0;
@@ -173,6 +196,8 @@ private:
     int m_searchCounter = 0;
     QLabel *m_searchLabel = NULL;
     std::vector<SearchItem> m_searchItems;
+    SearchWorker *m_searchWorker = NULL;
+    QThread *m_searchThread = NULL;
 
     ExtractPagesDialog *m_extractDlg=NULL;
 

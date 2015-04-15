@@ -380,19 +380,22 @@ int muctx::GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec)
 	int hit_count = 0;
 	int k;
 
+    fz_context *ctx_clone = NULL;
+    ctx_clone = fz_clone_context(mu_ctx);
+
 	fz_var(page);
 	fz_var(sheet);
 	fz_var(dev);
-	fz_try(mu_ctx)
+    fz_try(ctx_clone)
 	{
-        page = fz_load_page(mu_ctx, mu_doc, page_num);
-		sheet = fz_new_text_sheet(mu_ctx);
-		text = fz_new_text_page(mu_ctx);
-		dev = fz_new_text_device(mu_ctx, sheet, text);
-        fz_run_page(mu_ctx, page, dev, &fz_identity, NULL);
-        fz_drop_device(mu_ctx, dev);  /* Why does this need to be done here?  Seems odd */
+        page = fz_load_page(ctx_clone, mu_doc, page_num);
+        sheet = fz_new_text_sheet(ctx_clone);
+        text = fz_new_text_page(ctx_clone);
+        dev = fz_new_text_device(ctx_clone, sheet, text);
+        fz_run_page(ctx_clone, page, dev, &fz_identity, NULL);
+        fz_drop_device(ctx_clone, dev);  /* Why does this need to be done here?  Seems odd */
 		dev = NULL;
-		hit_count = fz_search_text_page(mu_ctx, text, needle, mu_hit_bbox, nelem(mu_hit_bbox));
+        hit_count = fz_search_text_page(ctx_clone, text, needle, mu_hit_bbox, nelem(mu_hit_bbox));
 
 		for (k = 0; k < hit_count; k++)
 		{
@@ -404,17 +407,19 @@ int muctx::GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec)
 			texts_vec->push_back(text_search);
 		}
 	}
-	fz_always(mu_ctx)
+    fz_always(ctx_clone)
 	{
-        fz_drop_page(mu_ctx, page);
-        fz_drop_device(mu_ctx, dev);
-        fz_drop_text_sheet(mu_ctx, sheet);
-        fz_drop_text_page(mu_ctx, text);
+        fz_drop_page(ctx_clone, page);
+        fz_drop_device(ctx_clone, dev);
+        fz_drop_text_sheet(ctx_clone, sheet);
+        fz_drop_text_page(ctx_clone, text);
 	}
-	fz_catch(mu_ctx)
+    fz_catch(ctx_clone)
 	{
+        fz_drop_context(ctx_clone);
         return E_FAILURE;
 	}
+    fz_drop_context(ctx_clone);
 	return hit_count;
 }
 
