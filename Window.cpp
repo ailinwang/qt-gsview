@@ -123,6 +123,8 @@ Window::Window(QWidget *parent) :
     connect(m_resizetimer, SIGNAL(timeout()), this, SLOT(onResizeTimer()));
 
     setupRecentActions();
+
+    connect(&m_startSearchTimer, SIGNAL(timeout()), this, SLOT(onFind2()));
 }
 
 void Window::setupRecentActions()
@@ -493,6 +495,11 @@ bool Window::OpenFile (QString path)
         m_fileExtension = "PDF";
         m_fileType = tr("Portable Document Format");
     }
+    if (fileInfo.suffix().toLower() == QString("epub") )
+    {
+        m_fileExtension = "EPUB";
+        m_fileType = tr("Electronic Publishing");
+    }
     else if (fileInfo.suffix().toLower() == QString("ps") )
     {
         m_fileExtension = "PS";
@@ -717,7 +724,7 @@ void Window::open()
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setOption(QFileDialog::DontUseNativeDialog, !USE_NATIVE_FILE_DIALOGS);
     dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz *.ps *.eps)"));
+    dialog.setNameFilter(tr("Viewable Files (*.pdf *.xps *.cbz *.ps *.eps *.epub)"));
 
     //  get current window count
     int windowCount = numWindows();
@@ -1117,8 +1124,14 @@ void Window::onFind()
     //  terminate previous search
     stopSearch();
 
-    //  the thread just terminated will shut down normally, but will no longer
-    //  deliver new resuts to this thread.
+    //  pick this up in a bit to allow for rapid typing
+    m_startSearchTimer.stop();
+    m_startSearchTimer.start(750);
+}
+
+void Window::onFind2()
+{
+    m_startSearchTimer.stop();
 
     //  start fresh
     m_searchLabel->setText(tr(""));
@@ -1367,7 +1380,13 @@ bool Window::eventFilter(QObject *object, QEvent *e)
 void Window::stopSearch()
 {
     if (NULL != m_searchThread)
+    {
         m_searchWorker->kill();
+
+        //  the thread just terminated will shut down normally, but will no longer
+        //  deliver new resuts to this thread.
+    }
+
     m_searchLabel->setText(tr(""));
 }
 
@@ -1494,6 +1513,9 @@ SearchWorker::~SearchWorker()
 
 void SearchWorker::process()
 {
+    if (m_killed)
+        return;
+
     int nPages = m_window->document()->GetPageCount();
 
     for (int i = 0; i < nPages; ++i)

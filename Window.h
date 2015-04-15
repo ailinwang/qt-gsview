@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QLineEdit>
 #include <QPrinter>
+#include <QTimer>
 
 namespace Ui {
 class Window;
@@ -113,6 +114,7 @@ private slots:
     void setAA();
     void ghostscriptMessages();
     void onFind();
+    void onFind2();
     void onFindDialog();
     void findNext();
     void findPrevious();
@@ -200,6 +202,7 @@ private:
     SearchWorker *m_searchWorker = NULL;
     QThread *m_searchThread = NULL;
     void stopSearch();
+    QTimer m_startSearchTimer;
 
     ExtractPagesDialog *m_extractDlg=NULL;
 
