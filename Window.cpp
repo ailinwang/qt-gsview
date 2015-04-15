@@ -1156,7 +1156,8 @@ void Window::onFind()
 
 void Window::searchFinished()
 {
-
+    m_searchThread = NULL;
+    updateSearchReport();
 }
 
 void Window::searchPageFinished(int np, std::vector<SearchItem> *items)
@@ -1180,10 +1181,17 @@ void Window::searchPageFinished(int np, std::vector<SearchItem> *items)
 
 void Window::updateSearchReport()
 {
+    QString text;
+
     if (m_searchHits > 0)
-        m_searchLabel->setText(QString::number(m_searchCounter+1)+tr("/")+QString::number(m_searchHits));
+        text = QString::number(m_searchCounter+1)+tr("/")+QString::number(m_searchHits);
     else
-        m_searchLabel->setText(QString::number(0)+tr("/")+QString::number(0));
+        text = QString::number(0)+tr("/")+QString::number(0);
+
+    if (m_searchThread && !m_searchThread->isFinished())
+        text += " ...";
+
+    m_searchLabel->setText(text);
 }
 
 void Window::goToSearchItem(int n)
