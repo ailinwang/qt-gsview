@@ -126,6 +126,7 @@ private slots:
     void openRecent();
     void searchFinished();
     void searchPageFinished(int np, std::vector<SearchItem> *items);
+    void stopFind();
 
 public slots:
     void saveSelection();
@@ -198,6 +199,7 @@ private:
     std::vector<SearchItem> m_searchItems;
     SearchWorker *m_searchWorker = NULL;
     QThread *m_searchThread = NULL;
+    void stopSearch();
 
     ExtractPagesDialog *m_extractDlg=NULL;
 

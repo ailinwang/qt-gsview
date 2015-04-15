@@ -64,6 +64,7 @@ Window::Window(QWidget *parent) :
     connect(ui->actionDeselect_Text, SIGNAL(triggered()), this, SLOT(deselectText()));
     connect(ui->actionSelect_All_Text, SIGNAL(triggered()), this, SLOT(selectAllText()));
     connect(ui->actionFindDialog, SIGNAL(triggered()), this, SLOT(onFindDialog()));
+    connect(ui->actionStop_Finding, SIGNAL(triggered()), this, SLOT(stopFind()));
     connect(ui->actionCopy_Page, SIGNAL(triggered()), this, SLOT(copyPage()));
 
     //  view menu
@@ -1113,9 +1114,8 @@ void Window::ghostscriptMessages()
 
 void Window::onFind()
 {
-    //  terminate previous thread
-    if (NULL != m_searchWorker)
-        m_searchWorker->kill();
+    //  terminate previous search
+    stopSearch();
 
     //  the thread just terminated will shut down normally, but will no longer
     //  deliver new resuts to this thread.
@@ -1156,6 +1156,14 @@ void Window::onFind()
 
 void Window::searchFinished()
 {
+    m_searchThread = NULL;
+    updateSearchReport();
+}
+
+void Window::stopFind()
+{
+    if (NULL != m_searchThread)
+        m_searchWorker->kill();
     m_searchThread = NULL;
     updateSearchReport();
 }
@@ -1356,6 +1364,13 @@ bool Window::eventFilter(QObject *object, QEvent *e)
     return m_pages->onEvent(e);
 }
 
+void Window::stopSearch()
+{
+    if (NULL != m_searchThread)
+        m_searchWorker->kill();
+    m_searchLabel->setText(tr(""));
+}
+
 void Window::closeEvent(QCloseEvent *event)
 {
     UNUSED(event);
@@ -1364,6 +1379,9 @@ void Window::closeEvent(QCloseEvent *event)
     if (!m_isOpen)
         return;
     m_isOpen = false;
+
+    //  terminate previous search thread
+    stopSearch();
 
     //  delete things that were allocated
     if (NULL!=m_copiedImage)
