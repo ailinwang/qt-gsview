@@ -1388,6 +1388,7 @@ void Window::stopSearch()
     }
 
     m_searchLabel->setText(tr(""));
+    qApp->processEvents();
 }
 
 void Window::closeEvent(QCloseEvent *event)
