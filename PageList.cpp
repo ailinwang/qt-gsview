@@ -5,8 +5,8 @@
 #include <QProcess>
 #include <QtDebug>
 #include <FileSave.h>
-#include <QScrollBar.h>
-#include <QTimer.h>
+#include <QScrollBar>
+#include <QTimer>
 
 #include "PageList.h"
 #include "QtUtil.h"
