@@ -235,7 +235,7 @@ void PageList::onMouseRelease(QEvent *e)
         m_selectingArea = false;
         if (NULL!=widget)
             widget->setSelectingArea(false);
-        QApplication::restoreOverrideCursor();  //  default arrow cursor
+        QApplication::setOverrideCursor(Qt::ArrowCursor);
         qApp->processEvents();
 
         return;
@@ -282,16 +282,29 @@ void PageList::manageCursor(QEvent *e)
             }
         }
 
-        if (bInside)
+        if (!widget->isInLink())
         {
-            qApp->setOverrideCursor(Qt::IBeamCursor);
-            qApp->processEvents();
+            if (bInside)
+            {
+                qApp->setOverrideCursor(Qt::IBeamCursor);
+                qApp->processEvents();
+            }
+            else
+            {
+                qApp->setOverrideCursor(Qt::ArrowCursor);
+                qApp->processEvents();
+            }
         }
         else
         {
-            QApplication::restoreOverrideCursor();  //  default arrow cursor
+            qApp->setOverrideCursor(Qt::PointingHandCursor);
             qApp->processEvents();
         }
+    }
+    else
+    {
+        qApp->setOverrideCursor(Qt::ArrowCursor);
+        qApp->processEvents();
     }
 
 }
@@ -499,7 +512,7 @@ bool PageList::onEvent(QEvent *e)
         if (ke->key() == Qt::Key_Control)
         {
             m_controlKeyIsDown = false;
-            QApplication::restoreOverrideCursor();  //  default arrow cursor
+            QApplication::setOverrideCursor(Qt::ArrowCursor);
             qApp->processEvents();
         }
     }
@@ -726,6 +739,8 @@ void PageList::onMouseLeave()
         //  start auto scrolling
         autoScroll();
     }
+    qApp->setOverrideCursor(Qt::ArrowCursor);
+    qApp->processEvents();
 }
 
 enum {AUTOSCROLL_DELTA = 25, AUTOSCROLL_REPEAT = 50, AUTOSCROLL_MARGIN = 10};

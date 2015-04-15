@@ -173,21 +173,23 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
             }
         }
 
+        m_inLink = (linkIAmIn!=NULL);
+
         //  if the link we're in has changed, show/hide the hand cursor
         if (m_mouseInLink != linkIAmIn)
         {
-            if (linkIAmIn)
-            {
-                //  in a link, so show the pointing hand
-                this->setCursor(Qt::PointingHandCursor);
-                qApp->processEvents();
-            }
-            else
-            {
-                //  not in a link, so restore normal cursor.
-                this->setCursor(Qt::ArrowCursor);
-                qApp->processEvents();
-            }
+//            if (linkIAmIn)
+//            {
+//                //  in a link, so show the pointing hand
+//                this->setCursor(Qt::PointingHandCursor);
+//                qApp->processEvents();
+//            }
+//            else
+//            {
+//                //  not in a link, so restore normal cursor.
+//                this->setCursor(Qt::ArrowCursor);
+//                qApp->processEvents();
+//            }
 
             //  remember new value
             m_mouseInLink = linkIAmIn;

@@ -74,6 +74,8 @@ public:
 
     void setSelectingArea(bool val) {m_selectingArea=val;};
 
+    bool isInLink() {return m_inLink;}
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -103,6 +105,8 @@ private:
     QPixmap *m_pixmap = NULL;
 
     bool m_selectingArea = false;
+
+    bool m_inLink = false;
 };
 
 #endif // IMAGEWIDGET_H
