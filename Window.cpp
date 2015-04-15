@@ -1135,6 +1135,7 @@ void Window::onFind2()
 
     //  start fresh
     m_searchLabel->setText(tr(""));
+    m_searchLabel->repaint();
     m_pages->clearSearchText();
     m_searchLabel->clear();
     m_searchItems.clear();
@@ -1213,6 +1214,7 @@ void Window::updateSearchReport()
         text += " ...";
 
     m_searchLabel->setText(text);
+    m_searchLabel->repaint();
 }
 
 void Window::goToSearchItem(int n)
@@ -1388,7 +1390,7 @@ void Window::stopSearch()
     }
 
     m_searchLabel->setText(tr(""));
-    qApp->processEvents();
+    m_searchLabel->repaint();
 }
 
 void Window::closeEvent(QCloseEvent *event)
