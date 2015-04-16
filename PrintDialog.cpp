@@ -435,9 +435,29 @@ void PrintDialog::onNewPrinter()
     QTextStream(stdout) << "\n" << "onNewPrinter 4";
 
     //  get the new paper sizes
+    QList<QPageSize> sizes = printerInfo.supportedPageSizes();
+    m_paperSizes.clear();
+    int i;
+    for (i=0; i<sizes.size() ;i++)
+    {
+        QPageSize theSize = sizes.at(i);
+        QPair<QString,QSizeF> qp(theSize.name(),theSize.size(QPageSize::Millimeter));
+        m_paperSizes.append(qp);
+    }
+
+    QTextStream(stdout) << "\n" << "onNewPrinter 4a";
+
+    if (m_paperSizes.size()<=0)
+    {
+        QTextStream(stdout) << "\n" << "onNewPrinter no sizes - added US Letter";
+        //  no sizes, so add one default
+        m_paperSizes.append(QPair<QString,QSizeF>("US Letter",QSizeF(8.5*25.4, 11*25.4)));
+    }
+
+    QTextStream(stdout) << "\n" << "onNewPrinter 4a";
+
     ui->paperSizeComboBox->blockSignals(true);
     ui->paperSizeComboBox->clear();
-    m_paperSizes = printerInfo.supportedSizesWithNames();
     int matching = -1;
     for (int i=0; i<m_paperSizes.size() ;i++)
     {
