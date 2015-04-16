@@ -25,6 +25,7 @@ FileType fileTypes[] = {
     {"HTML",            "html", "", false },
     {"XML",             "xml" , "", false },
     {"PostScript",      "ps"  , "", false },
+    {"Encapsulated PostScript",      "eps"  , "", false },
     {"",                ""    , "", false },
     {"PDF/A-1 RGB",     "pdf" , "", true  },
     {"PDF/A-1 CMYK",    "pdf" , "", true  },
@@ -33,7 +34,7 @@ FileType fileTypes[] = {
     {"PDF/X-3 Gray",    "pdf" , "", true  },
     {"PDF/X-3 CMYK",    "pdf" , "", true  },
 };
-int numTypes = 16;
+int numTypes = 17;
 
 enum {
     TYPE_PDF = 0,
@@ -45,6 +46,7 @@ enum {
     TYPE_HTML,
     TYPE_XML,
     TYPE_PS,
+    TYPE_EPS,
     TYPE_BLANK,
     TYPE_PDF_A1_RGB,
     TYPE_PDF_A1_CMYK,
@@ -271,6 +273,11 @@ void FileSave::run()
         else if (index==TYPE_PS)
         {
             QString options("-sDEVICE=ps2write -dNOPAUSE -dBATCH -P- -dSAFER");
+            saveWithProgress (options, original, dst, password);
+        }
+        else if (index==TYPE_EPS)
+        {
+            QString options("-sDEVICE=eps2write -dNOPAUSE -dBATCH -P- -dSAFER");
             saveWithProgress (options, original, dst, password);
         }
 
