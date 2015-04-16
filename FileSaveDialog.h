@@ -2,6 +2,7 @@
 #define FILESAVEDIALOG_H
 
 #include <QFileDialog>
+#include "ui_filedialogextension.h"
 
 class FileSaveDialog : public QFileDialog
 {
@@ -26,6 +27,9 @@ public slots:
 private:
     QString m_separator;
     QString m_fallback;
+
+    //  for getting the options UI from a form
+    Ui::Form *ui;
 };
 
 #endif // FILESAVEDIALOG_H

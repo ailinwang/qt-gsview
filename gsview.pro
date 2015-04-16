@@ -36,7 +36,7 @@ win32: DEFINES += _QT_WIN
 
 #  debugging can be easier if we don't use native file dialogs
 
-DEFINES += USE_NATIVE_FILE_DIALOGS=true
+DEFINES += USE_NATIVE_FILE_DIALOGS=false
 
 #  Qt configuration
 
@@ -107,7 +107,8 @@ FORMS += \
     ExtractPagesDialog.ui \
     ICCDialog.ui \
     ICCDialog2.ui \
-    PrintDialog.ui
+    PrintDialog.ui \
+    filedialogextension.ui
 
 RESOURCES += \
     resources.qrc

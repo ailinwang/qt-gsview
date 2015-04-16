@@ -7,6 +7,7 @@
 #include <QApplication>
 
 #include "FileSaveDialog.h"
+#include "ui_filedialogextension.h"
 
 FileSaveDialog::FileSaveDialog (QWidget *parent,
                             const QString &caption,
@@ -15,6 +16,10 @@ FileSaveDialog::FileSaveDialog (QWidget *parent,
 {
     //  connect to signal when user changes filter
     connect (this, SIGNAL(filterSelected(const QString &)), this, SLOT(onFilterSelected(const QString &)));
+
+    //  bring in the options form
+    ui = new Ui::Form();
+    ui->setupUi(this);
 }
 
 void FileSaveDialog::onFilterSelected(const QString &filter)
@@ -28,11 +33,26 @@ void FileSaveDialog::onFilterSelected(const QString &filter)
         this->selectNameFilter(m_fallback);
         connect (this, SIGNAL(filterSelected(const QString &)), this, SLOT(onFilterSelected(const QString &)));
     }
+
+//    if (filter.contains("*.ps"))
+//    {
+//        ui->verticalLayoutWidget->setVisible(true);
+//    }
+//    else
+//    {
+//        ui->verticalLayoutWidget->setVisible(false);
+//    }
+
+
 }
 
 void FileSaveDialog::show()
 {
     //  customize the dialog
+    this->layout()->addWidget(ui->verticalLayoutWidget);
+    ui->verticalLayoutWidget->setVisible(false);
+
+    //  show it
     QFileDialog::show();
 }
 
