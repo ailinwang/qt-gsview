@@ -456,6 +456,11 @@ void Document::SavePage(char *filename, int pagenum, int resolution, int type, b
         mu_ctx->SavePage(filename, pagenum, resolution, type, append);
 }
 
+void Document::AbortTextSearch()
+{
+    mu_ctx->AbortTextSearch();
+}
+
 std::vector<SearchItem> *Document::SearchText (int page_num, char *textToFind)
 {
     if (mu_ctx != NULL)

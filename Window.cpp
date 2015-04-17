@@ -1125,8 +1125,9 @@ void Window::onFind()
     stopSearch();
 
     //  pick this up in a bit to allow for rapid typing
-    m_startSearchTimer.stop();
-    m_startSearchTimer.start(750);
+//    m_startSearchTimer.stop();
+//    m_startSearchTimer.start(750);
+    onFind2();
 }
 
 void Window::onFind2()
@@ -1513,6 +1514,13 @@ SearchWorker::SearchWorker(Window *window, QString text)
 SearchWorker::~SearchWorker()
 {
 }
+
+void SearchWorker::kill()
+{
+    m_window->document()->AbortTextSearch();
+    m_killed=true;
+}
+
 
 void SearchWorker::process()
 {

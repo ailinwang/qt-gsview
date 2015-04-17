@@ -104,6 +104,8 @@ private:
     Cache *annot_cache;
     Cache *text_cache;
 
+    fz_cookie *m_search_cookie;
+
 public:
 	muctx(void);
 	~muctx(void);
@@ -130,6 +132,7 @@ public:
 	unsigned int GetLinks(int page_num, sh_vector_link links_vec);
 	void SetAA(int level);
 	int GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec);
+    void AbortTextSearch();
 	int GetContents(sh_vector_content contents_vec);
 	std::string GetText(int page_num, int type);
 	void ReleaseText(void *text);

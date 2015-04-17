@@ -185,6 +185,7 @@ public:
         bool append);
 
     std::vector<SearchItem> *SearchText(int page_num, char *textToFind);
+    void AbortTextSearch();
 
 private:
 

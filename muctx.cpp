@@ -237,6 +237,8 @@ muctx::muctx(void)
 	page_cache = new Cache();
     annot_cache = new Cache();
     text_cache = new Cache();
+
+    m_search_cookie = new fz_cookie;
 }
 
 /* Destructor */
@@ -268,8 +270,8 @@ int muctx::GetPageCount()
 {
 	if (this->mu_doc == NULL)
 		return -1;
-	else
-        return this->mu_doc->count_pages(mu_ctx, this->mu_doc);
+
+    return fz_count_pages(mu_ctx, mu_doc);
 }
 
 /* Get page size */
@@ -371,6 +373,11 @@ int muctx::GetContents(sh_vector_content contents_vec)
 	return has_content;
 }
 
+void muctx::AbortTextSearch()
+{
+    m_search_cookie->abort = true;
+}
+
 int muctx::GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec)
 {
 	fz_page *page = NULL;
@@ -383,6 +390,8 @@ int muctx::GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec)
     fz_context *ctx_clone = NULL;
     ctx_clone = fz_clone_context(mu_ctx);
 
+    m_search_cookie->abort = false;
+
 	fz_var(page);
 	fz_var(sheet);
 	fz_var(dev);
@@ -392,7 +401,7 @@ int muctx::GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec)
         sheet = fz_new_text_sheet(ctx_clone);
         text = fz_new_text_page(ctx_clone);
         dev = fz_new_text_device(ctx_clone, sheet, text);
-        fz_run_page(ctx_clone, page, dev, &fz_identity, NULL);
+        fz_run_page(ctx_clone, page, dev, &fz_identity, m_search_cookie);
         fz_drop_device(ctx_clone, dev);  /* Why does this need to be done here?  Seems odd */
 		dev = NULL;
         hit_count = fz_search_text_page(ctx_clone, text, needle, mu_hit_bbox, nelem(mu_hit_bbox));

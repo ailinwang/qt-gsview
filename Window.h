@@ -34,7 +34,7 @@ class SearchWorker : public QObject {
 public:
     SearchWorker(Window *window, QString text);
     ~SearchWorker();
-    void kill() {m_killed=true;}
+    void kill();
 
 public slots:
     void process();
