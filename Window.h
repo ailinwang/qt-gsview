@@ -75,6 +75,9 @@ public:
     void changeEvent(QEvent *);
     void resizeEvent(QResizeEvent *event);
 
+    void wheelZoomIn();
+    void wheelZoomOut();
+
 protected:
     void keyPressEvent(QKeyEvent* event);
     void customEvent(QEvent *event);
@@ -235,8 +238,9 @@ private:
     void setupRecentActions();
     void updateRecentActions();
 
-    //  pinch zooming
-    bool m_pinchZooming = false;
+    //  pinch/wheel zooming
+    bool m_liveZooming = false;
+    void liveZoom(int direction);
 };
 
 #endif  //  WINDOW_H

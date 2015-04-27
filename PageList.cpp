@@ -798,3 +798,13 @@ void PageList::onScrollChange()
     }
 }
 
+void PageList::wheelZoomIn()
+{
+    m_window->wheelZoomIn();
+}
+
+void PageList::wheelZoomOut()
+{
+    m_window->wheelZoomOut();
+}
+

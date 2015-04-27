@@ -32,6 +32,9 @@ public:
     virtual void onMouseEnter();
     virtual void onMouseLeave();
 
+    virtual void wheelZoomIn();
+    virtual void wheelZoomOut();
+
 public slots:
 
     virtual void onScrollingTimer();

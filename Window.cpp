@@ -1379,39 +1379,25 @@ bool Window::eventFilter(QObject *object, QEvent *e)
     UNUSED(object);
 
     QNativeGestureEvent *gesture = dynamic_cast<QNativeGestureEvent*>(e);
-    if (gesture !=NULL)
+    if (gesture != NULL)
     {
-        if (gesture->gestureType()==Qt::BeginNativeGesture)
-        {
-            m_isResizing = true;
-        }
+//        if (gesture->gestureType()==Qt::BeginNativeGesture)
+//        {
+//            m_isResizing = true;
+//        }
 
-        if (gesture->gestureType()==Qt::EndNativeGesture)
-        {
-            m_isResizing = false;
-            zoom(m_scalePage,m_isResizing);
-        }
+//        if (gesture->gestureType()==Qt::EndNativeGesture)
+//        {
+//            m_isResizing = false;
+//            zoom(m_scalePage,m_isResizing);
+//        }
 
         if (gesture->gestureType()==Qt::ZoomNativeGesture)
         {
-            ui->actionZoom_Normal->setChecked(true);
-            ui->actionFit_Page->setChecked(false);
-            ui->actionFit_Width->setChecked(false);
-
-            if (!m_pinchZooming)
-            {
-                m_pinchZooming = true;
-
-                double delta = 0.05;
-                if (m_scalePage<1)
-                    delta = 0.025;
-                if (gesture->value()<0)
-                    delta = -delta;
-
-                zoom(m_scalePage+delta, m_isResizing);
-
-                m_pinchZooming = false;
-            }
+            if (gesture->value()>0)
+                liveZoom(-1);
+            else
+                liveZoom(1);
         }
     }
 
@@ -1543,6 +1529,51 @@ void Window::resizeEvent(QResizeEvent *event)
     }
 }
 
+
+void Window::wheelZoomIn()
+{
+    liveZoom(1);
+}
+
+void Window::wheelZoomOut()
+{
+    liveZoom(-1);
+}
+
+void Window::liveZoom (int direction)  //  direction: 1=zoom in, -1=zoom out
+{
+    //  since we initiated a live zoom, we set the user back to normal zoom mode.
+    ui->actionZoom_Normal->setChecked(true);
+    ui->actionFit_Page->setChecked(false);
+    ui->actionFit_Width->setChecked(false);
+
+    //  kill previous timer
+    if (m_resizetimer!=NULL && m_resizetimer->isActive())
+        m_resizetimer->stop();
+
+    if (!m_liveZooming)
+    {
+        m_liveZooming = true;
+        m_isResizing = true;
+
+        double delta = -0.05;
+        if (m_scalePage<1)
+            delta = -0.025;
+        if (direction<0)
+            delta = -delta;
+
+        zoom (m_scalePage+delta, m_isResizing);
+
+        m_liveZooming = false;
+        m_isResizing = false;
+    }
+
+    //  start timer.  When this fires we'll be sure to re-render at full resolution.
+    if (m_resizetimer!=NULL)
+        m_resizetimer->start(500);
+}
+
+
 SearchWorker::SearchWorker(Window *window, QString text)
 {
     m_window = window;
@@ -1558,7 +1589,6 @@ void SearchWorker::kill()
     m_window->document()->AbortTextSearch();
     m_killed=true;
 }
-
 
 void SearchWorker::process()
 {

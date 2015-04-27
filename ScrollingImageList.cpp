@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QScrollBar>
 #include <QDebug>
+#include <QWheelEvent>
 
 static bool inGoToPage = false;
 
@@ -363,6 +364,25 @@ void ScrollingImageList::goToPage (int nPage, bool evenIfVisible)
 
 bool ScrollingImageList::eventFilter(QObject *target, QEvent *event)
 {
+    //  wheel event?
+    if (event->type() == QEvent::Wheel)
+    {
+        QWheelEvent *we = dynamic_cast<QWheelEvent *>(event);
+        if (NULL != we)
+        {
+            if(we->modifiers() & Qt::ControlModifier)
+            {
+                if (we->delta()>0)
+                    this->wheelZoomIn();
+                else
+                    this->wheelZoomOut();
+
+                //  we're consuming this event.
+                return true;
+            }
+        }
+    }
+
     //  process the event
     bool result = QObject::eventFilter(target, event);
 

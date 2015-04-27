@@ -54,6 +54,9 @@ public:
 
     bool isSliderDown();
 
+    virtual void wheelZoomIn() {}
+    virtual void wheelZoomOut() {}
+
 protected:
     ImageWidget *images() {return m_images;}
     Document *m_document = NULL;
