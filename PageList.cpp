@@ -23,7 +23,13 @@ PageList::PageList(Window *parent)
     m_scrollingTimer = new QTimer(this);
     m_scrollingTimer->stop();
     connect(m_scrollingTimer, SIGNAL(timeout()), this, SLOT(onScrollingTimer()));
+}
 
+void PageList::setBackgroundColor()
+{
+    //  scrolling area background color
+    QWidget* contentWidget = this->scrollArea()->widget();
+    contentWidget->setStyleSheet("background-color:#999999;");
 }
 
 void PageList::onMousePress(QEvent *e)

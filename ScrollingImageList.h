@@ -57,6 +57,8 @@ public:
     virtual void wheelZoomIn() {}
     virtual void wheelZoomOut() {}
 
+    virtual void setBackgroundColor() {}
+
 protected:
     ImageWidget *images() {return m_images;}
     Document *m_document = NULL;

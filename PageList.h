@@ -35,6 +35,8 @@ public:
     virtual void wheelZoomIn();
     virtual void wheelZoomOut();
 
+    virtual void setBackgroundColor();
+
 public slots:
 
     virtual void onScrollingTimer();

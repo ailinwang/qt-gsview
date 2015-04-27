@@ -69,6 +69,8 @@ void ScrollingImageList::buildImages()
         contentWidget->setLayout(new QVBoxLayout(contentWidget));
         contentWidget->layout()->setContentsMargins(0,0,0,0);
 
+        setBackgroundColor();
+
         //  set the initial scale value
         double theScale = getScale();
         setScale(theScale);
