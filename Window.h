@@ -234,6 +234,9 @@ private:
     QList<QAction*> m_recentFileActionList;
     void setupRecentActions();
     void updateRecentActions();
+
+    //  pinch zooming
+    bool m_pinchZooming = false;
 };
 
 #endif  //  WINDOW_H

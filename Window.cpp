@@ -3,6 +3,7 @@
 #include <QAbstractScrollArea>
 #include <QAction>
 #include <QTemporaryDir>
+#include <QNativeGestureEvent>
 
 #include "Window.h"
 #include "Printer.h"
@@ -843,7 +844,7 @@ void Window::zoom (double newScale, bool resizing)
         m_scalePage = m_minScale;
 
     m_pages->zoom (m_scalePage*m_superScale, resizing);
-    m_percentage->setText(QString::number((int)(100*m_scalePage)));
+    m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
 }
 
 void Window::pageUp()
@@ -1376,6 +1377,43 @@ void Window::enterFullScreen()
 bool Window::eventFilter(QObject *object, QEvent *e)
 {
     UNUSED(object);
+
+    QNativeGestureEvent *gesture = dynamic_cast<QNativeGestureEvent*>(e);
+    if (gesture !=NULL)
+    {
+        if (gesture->gestureType()==Qt::BeginNativeGesture)
+        {
+            m_isResizing = true;
+        }
+
+        if (gesture->gestureType()==Qt::EndNativeGesture)
+        {
+            m_isResizing = false;
+            zoom(m_scalePage,m_isResizing);
+        }
+
+        if (gesture->gestureType()==Qt::ZoomNativeGesture)
+        {
+            ui->actionZoom_Normal->setChecked(true);
+            ui->actionFit_Page->setChecked(false);
+            ui->actionFit_Width->setChecked(false);
+
+            if (!m_pinchZooming)
+            {
+                m_pinchZooming = true;
+
+                double delta = 0.05;
+                if (m_scalePage<1)
+                    delta = 0.025;
+                if (gesture->value()<0)
+                    delta = -delta;
+
+                zoom(m_scalePage+delta, m_isResizing);
+
+                m_pinchZooming = false;
+            }
+        }
+    }
 
     return m_pages->onEvent(e);
 }

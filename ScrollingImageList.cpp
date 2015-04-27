@@ -199,8 +199,8 @@ void ScrollingImageList::zoom (double theScale, bool resizing)
             }
         }
 
-        //  now show the scroll area again and render
-        qApp->processEvents();
+        //  now show the scroll area again a`nd render
+//        qApp->processEvents();
         if (!resizing)
         {
             m_scrollArea->widget()->show();
@@ -213,7 +213,8 @@ void ScrollingImageList::zoom (double theScale, bool resizing)
         QAbstractSlider *hslider = (QAbstractSlider *) m_scrollArea->horizontalScrollBar();
         hslider->setValue((maxW-hslider->size().width())/2);
 
-        emit imagesReady();
+        if (!resizing)
+            emit imagesReady();
     }
 }
 
