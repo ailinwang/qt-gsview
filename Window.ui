@@ -477,7 +477,7 @@
      <normaloff>:/new/prefix1/resources/save.png</normaloff>:/new/prefix1/resources/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save...</string>
+    <string>Save As...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>

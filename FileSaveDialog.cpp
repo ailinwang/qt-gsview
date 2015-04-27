@@ -17,9 +17,9 @@ FileSaveDialog::FileSaveDialog (QWidget *parent,
     //  connect to signal when user changes filter
     connect (this, SIGNAL(filterSelected(const QString &)), this, SLOT(onFilterSelected(const QString &)));
 
-    //  bring in the options form
-    ui = new Ui::Form();
-    ui->setupUi(this);
+//    //  bring in the options form
+//    ui = new Ui::Form();
+//    ui->setupUi(this);
 }
 
 void FileSaveDialog::onFilterSelected(const QString &filter)
@@ -48,9 +48,9 @@ void FileSaveDialog::onFilterSelected(const QString &filter)
 
 void FileSaveDialog::show()
 {
-    //  customize the dialog
-    this->layout()->addWidget(ui->verticalLayoutWidget);
-    ui->verticalLayoutWidget->setVisible(false);
+//    //  customize the dialog
+//    this->layout()->addWidget(ui->verticalLayoutWidget);
+//    ui->verticalLayoutWidget->setVisible(false);
 
     //  show it
     QFileDialog::show();
