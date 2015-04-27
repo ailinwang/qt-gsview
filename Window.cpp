@@ -1186,6 +1186,8 @@ void Window::stopFind()
 
 void Window::searchPageFinished(int np, std::vector<SearchItem> *items)
 {
+    int nBefore = m_searchItems.size();
+
     if (items != NULL)
     {
         m_pages->setSearchText (np, items);
@@ -1200,6 +1202,10 @@ void Window::searchPageFinished(int np, std::vector<SearchItem> *items)
         }
 
         updateSearchReport();
+
+        //  skip to the first one
+        if (nBefore<=0)
+            findNext();
     }
 }
 
