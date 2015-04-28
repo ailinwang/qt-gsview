@@ -145,6 +145,46 @@ void ScrollingImageList::cleanup()
     }
 }
 
+void ScrollingImageList::zoomLive (double scale)
+{
+    double zoomRatio = scale/m_scale;
+
+    m_scale = scale;
+
+    m_scrollArea->setUpdatesEnabled(false);
+
+    //  estimate where the vertical slider should go
+    QAbstractSlider *vslider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
+    int oldVal = vslider->value();
+    int newVal = oldVal * zoomRatio;
+
+    int maxW = 0;
+    int nPages = m_document->GetPageCount();
+    for (int i=0; i<nPages; i++)
+    {
+        point_t pageSize;
+        m_document->GetPageSize(i, m_scale, &pageSize);
+
+        if (pageSize.X>maxW)
+            maxW = pageSize.X;
+
+        m_images[i].setFixedWidth(pageSize.X);
+        m_images[i].setFixedHeight(pageSize.Y);
+        m_images[i].setScale(m_scale);
+        m_images[i].setPageSize(pageSize);
+        m_images[i].setScaledContents(true);
+    }
+
+    qApp->processEvents();
+
+    //  set the sliders
+    vslider->setValue(newVal);
+    QAbstractSlider *hslider = (QAbstractSlider *) m_scrollArea->horizontalScrollBar();
+    hslider->setValue((maxW-hslider->size().width())/2);
+
+    m_scrollArea->setUpdatesEnabled(true);
+}
+
 void ScrollingImageList::zoom (double theScale, bool resizing)
 {
     if (theScale != m_scale)
@@ -158,8 +198,8 @@ void ScrollingImageList::zoom (double theScale, bool resizing)
         int newVal = oldVal * zoomRatio;
 
         //  hide the scroll area widget while we do the rest to avoid flickering
-        if (!resizing)
-            m_scrollArea->widget()->hide();
+//        if (!resizing)
+//            m_scrollArea->widget()->hide();
 
         vslider->setValue(newVal);
 
@@ -176,6 +216,7 @@ void ScrollingImageList::zoom (double theScale, bool resizing)
             if (pageSize.X>maxW)
                 maxW = pageSize.X;
 
+            m_images[i].setScaledContents(false);
             m_images[i].setFixedWidth(pageSize.X);
             m_images[i].setFixedHeight(pageSize.Y);
             m_images[i].setScale(m_scale);

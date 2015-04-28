@@ -148,7 +148,7 @@ private:
     void exitFullScreen();
     bool handlePassword();
 
-    void zoom(double scale, bool resizing);
+    void zoom (double scale, bool resizing);
 
     void updateSearchReport();
     void goToSearchItem(int n);

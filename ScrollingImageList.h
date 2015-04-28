@@ -59,6 +59,8 @@ public:
 
     virtual void setBackgroundColor() {}
 
+    void zoomLive (double scale);
+
 protected:
     ImageWidget *images() {return m_images;}
     Document *m_document = NULL;

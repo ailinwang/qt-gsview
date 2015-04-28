@@ -1387,16 +1387,16 @@ bool Window::eventFilter(QObject *object, QEvent *e)
     QNativeGestureEvent *gesture = dynamic_cast<QNativeGestureEvent*>(e);
     if (gesture != NULL)
     {
-//        if (gesture->gestureType()==Qt::BeginNativeGesture)
-//        {
-//            m_isResizing = true;
-//        }
+        if (gesture->gestureType()==Qt::BeginNativeGesture)
+        {
+            m_isResizing = true;
+        }
 
-//        if (gesture->gestureType()==Qt::EndNativeGesture)
-//        {
-//            m_isResizing = false;
-//            zoom(m_scalePage,m_isResizing);
-//        }
+        if (gesture->gestureType()==Qt::EndNativeGesture)
+        {
+            m_isResizing = false;
+            zoom(m_scalePage,m_isResizing);
+        }
 
         if (gesture->gestureType()==Qt::ZoomNativeGesture)
         {
@@ -1503,6 +1503,7 @@ void Window::changeEvent(QEvent *e)
 void Window::onResizeTimer()
 {
     m_isResizing = false;
+    m_resizetimer->stop();
 
     //  do the hi-res thing
     zoom(m_scalePage, false);
@@ -1568,7 +1569,16 @@ void Window::liveZoom (int direction)  //  direction: 1=zoom in, -1=zoom out
         if (direction<0)
             delta = -delta;
 
-        zoom (m_scalePage+delta, m_isResizing);
+        m_scalePage = m_scalePage+delta;
+
+        if (m_scalePage > m_maxScale)
+            m_scalePage = m_maxScale;
+
+        if (m_scalePage < m_minScale)
+            m_scalePage = m_minScale;
+
+        m_pages->zoomLive(m_scalePage);
+        m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
 
         m_liveZooming = false;
         m_isResizing = false;
