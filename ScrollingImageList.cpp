@@ -162,23 +162,26 @@ void ScrollingImageList::zoomLive (double scale)
     int nPages = m_document->GetPageCount();
     for (int i=0; i<nPages; i++)
     {
-        point_t pageSize;
-        m_document->GetPageSize(i, m_scale, &pageSize);
+        if (isImageVisible(i))
+        {
+            point_t pageSize;
+            m_document->GetPageSize(i, m_scale, &pageSize);
 
-        if (pageSize.X>maxW)
-            maxW = pageSize.X;
+            if (pageSize.X>maxW)
+                maxW = pageSize.X;
 
-        m_images[i].setFixedWidth(pageSize.X);
-        m_images[i].setFixedHeight(pageSize.Y);
-        m_images[i].setScale(m_scale);
-        m_images[i].setPageSize(pageSize);
-        m_images[i].setScaledContents(true);
+            m_images[i].setFixedWidth(pageSize.X);
+            m_images[i].setFixedHeight(pageSize.Y);
+            m_images[i].setScale(m_scale);
+            m_images[i].setPageSize(pageSize);
+            m_images[i].setScaledContents(true);
+        }
     }
 
     qApp->processEvents();
 
     //  set the sliders
-    vslider->setValue(newVal);
+    //vslider->setValue(newVal);
     QAbstractSlider *hslider = (QAbstractSlider *) m_scrollArea->horizontalScrollBar();
     hslider->setValue((maxW-hslider->size().width())/2);
 
@@ -198,8 +201,8 @@ void ScrollingImageList::zoom (double theScale, bool resizing)
         int newVal = oldVal * zoomRatio;
 
         //  hide the scroll area widget while we do the rest to avoid flickering
-//        if (!resizing)
-//            m_scrollArea->widget()->hide();
+        if (!resizing)
+            m_scrollArea->widget()->hide();
 
         vslider->setValue(newVal);
 
@@ -243,8 +246,8 @@ void ScrollingImageList::zoom (double theScale, bool resizing)
             }
         }
 
-        //  now show the scroll area again a`nd render
-//        qApp->processEvents();
+        //  now show the scroll area again and render
+        qApp->processEvents();
         if (!resizing)
         {
             m_scrollArea->widget()->show();
