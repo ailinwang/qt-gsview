@@ -1617,7 +1617,6 @@ void Window::doLiveZoom(double delta)
     {
         m_inDoLiveZoom = true;
 
-        //zoom(m_scalePage);
         m_pages->zoomLive(m_scalePage*m_superScale);
         m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
 
