@@ -145,20 +145,21 @@ void ScrollingImageList::cleanup()
     }
 }
 
-void ScrollingImageList::zoomLive (double scale)
+double start_scale;
+
+void ScrollingImageList::startLiveZoom()
 {
-    double zoomRatio = scale/m_scale;
+    start_scale = m_scale;
+}
 
-    m_scale = scale;
-
+void ScrollingImageList::zoomLive (double theScale)
+{
     m_scrollArea->setUpdatesEnabled(false);
 
-    //  estimate where the vertical slider should go
-    QAbstractSlider *vslider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
-    int oldVal = vslider->value();
-    int newVal = oldVal * zoomRatio;
+    //  set the new scale value
+    m_scale = theScale;
 
-    int maxW = 0;
+    //  resize all the images and mark them as not rendered
     int nPages = m_document->GetPageCount();
     for (int i=0; i<nPages; i++)
     {
@@ -167,58 +168,6 @@ void ScrollingImageList::zoomLive (double scale)
             point_t pageSize;
             m_document->GetPageSize(i, m_scale, &pageSize);
 
-            if (pageSize.X>maxW)
-                maxW = pageSize.X;
-
-            m_images[i].setFixedWidth(pageSize.X);
-            m_images[i].setFixedHeight(pageSize.Y);
-            m_images[i].setScale(m_scale);
-            m_images[i].setPageSize(pageSize);
-            m_images[i].setScaledContents(true);
-        }
-    }
-
-    qApp->processEvents();
-
-    //  set the sliders
-    //vslider->setValue(newVal);
-    QAbstractSlider *hslider = (QAbstractSlider *) m_scrollArea->horizontalScrollBar();
-    hslider->setValue((maxW-hslider->size().width())/2);
-
-    m_scrollArea->setUpdatesEnabled(true);
-}
-
-void ScrollingImageList::zoom (double theScale, bool resizing)
-{
-    if (theScale != m_scale)
-    {
-        double zoomRatio = theScale/m_scale;
-        int nPages = m_document->GetPageCount();
-
-        //  estimate where the vertical slider should go and send it there.
-        QAbstractSlider *vslider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
-        int oldVal = vslider->value();
-        int newVal = oldVal * zoomRatio;
-
-        //  hide the scroll area widget while we do the rest to avoid flickering
-        if (!resizing)
-            m_scrollArea->widget()->hide();
-
-        vslider->setValue(newVal);
-
-        //  set the new scale value
-        m_scale = theScale;
-
-        //  resize all the images and mark them as not rendered
-        int maxW = 0;
-        for (int i=0; i<nPages; i++)
-        {
-            point_t pageSize;
-            m_document->GetPageSize(i, m_scale, &pageSize);
-
-            if (pageSize.X>maxW)
-                maxW = pageSize.X;
-
             m_images[i].setScaledContents(false);
             m_images[i].setFixedWidth(pageSize.X);
             m_images[i].setFixedHeight(pageSize.Y);
@@ -226,43 +175,80 @@ void ScrollingImageList::zoom (double theScale, bool resizing)
             m_images[i].setPageSize(pageSize);
             m_images[i].setRendered(false);
             m_images[i].setBackgroundRole(QPalette::Dark);
-
-            if (resizing)
-                m_images[i].update();
-
-            //  first just substitute a scaled version of the old pixmap.
-            //  then later, when the rendering takes place, it will be replaced
-            //  with a better version.  But in the meantime, the zooming
-            //  will appear instantaneously.
-
-            if (!resizing)
-            {
-                const QPixmap *pm = m_images[i].pixmap();
-                if (pm)
-                {
-                    QPixmap scaledPixmap = pm->scaled(m_images[i].size(), Qt::KeepAspectRatio);
-                    m_images[i].setPixmap(scaledPixmap);
-                }
-            }
+            m_images[i].setScaledContents(true);
         }
-
-        //  now show the scroll area again and render
-        qApp->processEvents();
-        if (!resizing)
-        {
-            m_scrollArea->widget()->show();
-            qApp->processEvents();
-            renderVisibleImages();
-            qApp->processEvents();
-        }
-
-        //  center the slider
-        QAbstractSlider *hslider = (QAbstractSlider *) m_scrollArea->horizontalScrollBar();
-        hslider->setValue((maxW-hslider->size().width())/2);
-
-        if (!resizing)
-            emit imagesReady();
     }
+
+    m_scrollArea->setUpdatesEnabled(true);
+}
+
+void ScrollingImageList::zoom (double theScale)
+{
+    m_scrollArea->setUpdatesEnabled(false);
+    m_scrollArea->widget()->setUpdatesEnabled(false);
+
+    double zoomRatio = theScale/m_scale;
+    int nPages = m_document->GetPageCount();
+
+    //  estimate where the vertical slider should go and send it there.
+    QAbstractSlider *vslider = (QAbstractSlider *) m_scrollArea->verticalScrollBar();
+    int oldVal = vslider->value();
+    int newVal = oldVal * zoomRatio;
+
+    //  hide the scroll area widget while we do the rest to avoid flickering
+    m_scrollArea->widget()->hide();
+
+    vslider->setValue(newVal);
+
+    //  set the new scale value
+    m_scale = theScale;
+
+    //  resize all the images and mark them as not rendered
+    int maxW = 0;
+    for (int i=0; i<nPages; i++)
+    {
+        point_t pageSize;
+        m_document->GetPageSize(i, m_scale, &pageSize);
+
+        if (pageSize.X>maxW)
+            maxW = pageSize.X;
+
+        m_images[i].setScaledContents(false);
+        m_images[i].setFixedWidth(pageSize.X);
+        m_images[i].setFixedHeight(pageSize.Y);
+        m_images[i].setScale(m_scale);
+        m_images[i].setPageSize(pageSize);
+        m_images[i].setRendered(false);
+        m_images[i].setBackgroundRole(QPalette::Dark);
+
+        //  first just substitute a scaled version of the old pixmap.
+        //  then later, when the rendering takes place, it will be replaced
+        //  with a better version.  But in the meantime, the zooming
+        //  will appear instantaneously.
+
+        const QPixmap *pm = m_images[i].pixmap();
+        if (pm)
+        {
+            QPixmap scaledPixmap = pm->scaled(m_images[i].size(), Qt::KeepAspectRatio);
+            m_images[i].setPixmap(scaledPixmap);
+        }
+    }
+
+    //  now show the scroll area again and render
+    qApp->processEvents();
+    m_scrollArea->widget()->show();
+    qApp->processEvents();
+    renderVisibleImages();
+    qApp->processEvents();
+
+    //  center the horizontal slider
+    QAbstractSlider *hslider = (QAbstractSlider *) m_scrollArea->horizontalScrollBar();
+    hslider->setValue((maxW-hslider->size().width())/2);
+
+    m_scrollArea->setUpdatesEnabled(true);
+    m_scrollArea->widget()->setUpdatesEnabled(true);
+
+    emit imagesReady();
 }
 
 void ScrollingImageList::onImagesReady()

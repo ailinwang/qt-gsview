@@ -28,7 +28,7 @@ public:
     void hilightImage(int nImage);
     void goToPage (int nPage, bool evenIfVisible=false);
 
-    virtual void zoom (double scale, bool resizing);
+    virtual void zoom (double scale);
     void annot (bool showAnnotations);
     void links (bool showLinks);
 
@@ -60,6 +60,7 @@ public:
     virtual void setBackgroundColor() {}
 
     void zoomLive (double scale);
+    void startLiveZoom();
 
 protected:
     ImageWidget *images() {return m_images;}

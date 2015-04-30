@@ -187,9 +187,9 @@ void PageList::saveSelection(FileSave *fileSave)
     fileSave->extractSelection (transX, transY, w, h, m_rubberbandpage, 300);
 }
 
-void PageList::zoom (double scale, bool resizing)
+void PageList::zoom (double scale)
 {
-    ScrollingImageList::zoom (scale, resizing);
+    ScrollingImageList::zoom (scale);
 
     //  adjust the size of the selection rectangle
     if (m_rubberBand!=NULL)

@@ -118,11 +118,6 @@ Window::Window(QWidget *parent) :
     resize(QDesktopWidget().availableGeometry(this).size() * 0.85);
     setInitialSizeAndPosition();
 
-    //  create a timer for resizing
-    m_resizetimer = new QTimer(this);
-    m_resizetimer->stop();
-    connect(m_resizetimer, SIGNAL(timeout()), this, SLOT(onResizeTimer()));
-
     setupRecentActions();
 
     connect(&m_startSearchTimer, SIGNAL(timeout()), this, SLOT(onFind2()));
@@ -409,7 +404,7 @@ void Window::percentageEditReturnPressed()
             if ( f>=m_minScale && f<=m_maxScale )
             {
                 m_scalePage = f;
-                m_pages->zoom (m_scalePage, false);
+                m_pages->zoom (m_scalePage);
                 return;
             }
         }
@@ -812,7 +807,7 @@ void Window::zoomIn()
     ui->actionFit_Page->setChecked(false);
     ui->actionFit_Width->setChecked(false);
 
-    zoom(m_scalePage+m_zoomInc, false);
+    zoom(m_scalePage+m_zoomInc);
 }
 
 void Window::zoomOut()
@@ -821,7 +816,7 @@ void Window::zoomOut()
     ui->actionFit_Page->setChecked(false);
     ui->actionFit_Width->setChecked(false);
 
-    zoom(m_scalePage-m_zoomInc, false);
+    zoom(m_scalePage-m_zoomInc);
 }
 
 void Window::normalSize()
@@ -830,10 +825,10 @@ void Window::normalSize()
     ui->actionFit_Page->setChecked(false);
     ui->actionFit_Width->setChecked(false);
 
-    zoom (1.0, false);
+    zoom (1.0);
 }
 
-void Window::zoom (double newScale, bool resizing)
+void Window::zoom (double newScale)
 {
     m_scalePage = newScale;
 
@@ -843,7 +838,7 @@ void Window::zoom (double newScale, bool resizing)
     if (m_scalePage < m_minScale)
         m_scalePage = m_minScale;
 
-    m_pages->zoom (m_scalePage*m_superScale, resizing);
+    m_pages->zoom (m_scalePage*m_superScale);
     m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
 }
 
@@ -978,6 +973,14 @@ void Window::fitPage()
     ui->actionFit_Page->setChecked(true);
     ui->actionFit_Width->setChecked(false);
 
+    double scale = getFitPageScale();
+
+    //  zoom it
+    zoom (scale);
+}
+
+double Window::getFitPageScale()
+{
     //  get viewport size
     double height = m_pages->height();
     double width  = m_pages->width();
@@ -994,8 +997,7 @@ void Window::fitPage()
     double width_scale  = double(width)  / page_width;
     double scale = std::min(height_scale, width_scale);
 
-    //  zoom it
-    zoom (scale, m_isResizing);
+    return scale;
 }
 
 void Window::fitWidth()
@@ -1004,6 +1006,13 @@ void Window::fitWidth()
     ui->actionFit_Page->setChecked(false);
     ui->actionFit_Width->setChecked(true);
 
+    double scale = getFitWidthScale();
+
+    zoom (scale);
+}
+
+double Window::getFitWidthScale()
+{
     //  calculate an initial superScale based on the window width.
     //  get native size of current page
     point_t pageSize;
@@ -1013,8 +1022,7 @@ void Window::fitWidth()
     double scale = double(pw)  / pageSize.X;
     scale /= m_superScale;
 
-    zoom(scale, m_isResizing);
-
+    return scale;
 }
 
 static QString makeRow(QString label, QString value)
@@ -1387,24 +1395,33 @@ bool Window::eventFilter(QObject *object, QEvent *e)
     QNativeGestureEvent *gesture = dynamic_cast<QNativeGestureEvent*>(e);
     if (gesture != NULL)
     {
+        //  pinch-zooming should put us in normal zoom mode
+        ui->actionZoom_Normal->setChecked(true);
+        ui->actionFit_Page->setChecked(false);
+        ui->actionFit_Width->setChecked(false);
+
         if (gesture->gestureType()==Qt::BeginNativeGesture)
         {
-            m_isResizing = true;
+            startLiveZoom();
         }
 
         if (gesture->gestureType()==Qt::EndNativeGesture)
         {
-            m_isResizing = false;
-            zoom(m_scalePage,m_isResizing);
+            endLiveZoom();
         }
 
         if (gesture->gestureType()==Qt::ZoomNativeGesture)
         {
-            if (gesture->value()>0)
-                liveZoom(-1);
-            else
-                liveZoom(1);
+            double delta = 0.05;
+            if (m_scalePage<1)
+                delta = 0.025;
+            if (gesture->value()<0)
+                delta = -delta;
+
+            doLiveZoom(delta);
         }
+
+        return true;  //  we're consuming these
     }
 
     return m_pages->onEvent(e);
@@ -1500,93 +1517,132 @@ void Window::changeEvent(QEvent *e)
 
 }
 
-void Window::onResizeTimer()
-{
-    m_isResizing = false;
-    m_resizetimer->stop();
-
-    //  do the hi-res thing
-    zoom(m_scalePage, false);
-}
-
 void Window::resizeEvent(QResizeEvent *event)
 {
-    QMainWindow::resizeEvent(event);
-
     if (!m_isOpen)
         return;
 
-    if (ui->actionFit_Page->isChecked() || ui->actionFit_Width->isChecked())
+    if (ui->actionFit_Page->isChecked())
     {
-        m_isResizing = true;
-
-        //  kill previous timer
-        if (m_resizetimer!=NULL && m_resizetimer->isActive())
-            m_resizetimer->stop();
-
-        if (ui->actionFit_Page->isChecked())
-            fitPage();
-
-        if (ui->actionFit_Width->isChecked())
-            fitWidth();
-
-        //  start timer
-        if (m_resizetimer!=NULL)
-            m_resizetimer->start(500);
+        double delta = getFitPageScale() - m_scalePage;
+        doLiveZoom(delta);
     }
-}
+    else if (ui->actionFit_Width->isChecked())
+    {
+        double delta = getFitWidthScale() - m_scalePage;
+        doLiveZoom(delta);
+    }
 
+    QMainWindow::resizeEvent(event);
+}
 
 void Window::wheelZoomIn()
 {
-    liveZoom(1);
-}
-
-void Window::wheelZoomOut()
-{
-    liveZoom(-1);
-}
-
-void Window::liveZoom (int direction)  //  direction: 1=zoom in, -1=zoom out
-{
-    //  since we initiated a live zoom, we set the user back to normal zoom mode.
+    //  wheel-zooming should put us in normal zoom mode
     ui->actionZoom_Normal->setChecked(true);
     ui->actionFit_Page->setChecked(false);
     ui->actionFit_Width->setChecked(false);
 
-    //  kill previous timer
-    if (m_resizetimer!=NULL && m_resizetimer->isActive())
-        m_resizetimer->stop();
+    double delta = 0.05;
+    if (m_scalePage<1)
+        delta = 0.025;
 
-    if (!m_liveZooming)
+    doLiveZoom(delta);
+}
+
+void Window::wheelZoomOut()
+{
+    //  wheel-zooming should put us in normal zoom mode
+    ui->actionZoom_Normal->setChecked(true);
+    ui->actionFit_Page->setChecked(false);
+    ui->actionFit_Width->setChecked(false);
+
+    double delta = -0.05;
+    if (m_scalePage<1)
+        delta = -0.025;
+
+    doLiveZoom(delta);
+}
+
+void Window::onLiveZoomTimer()
+{
+    qDebug() << "onLiveZoomTimer";
+
+    m_zoomTimer->stop();
+
+    endLiveZoom();
+}
+
+void Window::startLiveZoom()
+{
+    qDebug() << "start live zoom";
+
+    m_isLiveZooming = true;
+
+    //  create the timer
+    if (m_zoomTimer == NULL)
     {
-        m_liveZooming = true;
-        m_isResizing = true;
-
-        double delta = -0.05;
-        if (m_scalePage<1)
-            delta = -0.025;
-        if (direction<0)
-            delta = -delta;
-
-        m_scalePage = m_scalePage+delta;
-
-        if (m_scalePage > m_maxScale)
-            m_scalePage = m_maxScale;
-
-        if (m_scalePage < m_minScale)
-            m_scalePage = m_minScale;
-
-        m_pages->zoomLive(m_scalePage);
-        m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
-
-        m_liveZooming = false;
-        m_isResizing = false;
+        m_zoomTimer = new QTimer(this);
+        m_zoomTimer->stop();
+        connect(m_zoomTimer, SIGNAL(timeout()), this, SLOT(onLiveZoomTimer()));
     }
 
-    //  start timer.  When this fires we'll be sure to re-render at full resolution.
-    if (m_resizetimer!=NULL)
-        m_resizetimer->start(500);
+    m_pages->startLiveZoom();
+
+    //  start the timer
+    m_zoomTimer->stop();
+    m_zoomTimer->start(m_zoomTimerVal);
+}
+
+void Window::doLiveZoom(double delta)
+{
+    //  call start the first time (resize, wheel)
+    if (!m_isLiveZooming)
+        startLiveZoom();
+
+    //  move the timer into the future
+    m_zoomTimer->stop();
+    m_zoomTimer->start(m_zoomTimerVal);
+
+    qDebug() << "do live zoom";
+
+    //  now do it
+    m_scalePage = m_scalePage+delta;
+    if (m_scalePage > m_maxScale)
+        m_scalePage = m_maxScale;
+    if (m_scalePage < m_minScale)
+        m_scalePage = m_minScale;
+
+    if (!m_inDoLiveZoom)
+    {
+        m_inDoLiveZoom = true;
+
+        //zoom(m_scalePage);
+        m_pages->zoomLive(m_scalePage*m_superScale);
+        m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
+
+        m_inDoLiveZoom = false;
+    }
+}
+
+void Window::endLiveZoom()
+{
+    m_isLiveZooming = false;
+
+    qDebug() << "end live zoom";
+
+    if (ui->actionFit_Page->isChecked())
+    {
+        fitPage();
+    }
+    else if (ui->actionFit_Width->isChecked())
+    {
+        fitWidth();
+    }
+    else
+    {
+        zoom(m_scalePage);
+    }
 }
 
 

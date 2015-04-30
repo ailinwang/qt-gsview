@@ -127,11 +127,11 @@ private slots:
     void printOutput();
     void back();
     void forward();
-    void onResizeTimer();
     void openRecent();
     void searchFinished();
     void searchPageFinished(int np, std::vector<SearchItem> *items);
     void stopFind();
+    void onLiveZoomTimer();
 
 public slots:
     void saveSelection();
@@ -148,10 +148,13 @@ private:
     void exitFullScreen();
     bool handlePassword();
 
-    void zoom (double scale, bool resizing);
+    void zoom (double scale);
 
     void updateSearchReport();
     void goToSearchItem(int n);
+
+    double getFitPageScale();
+    double getFitWidthScale();
 
     //  pages
     double m_scalePage = 1.0;
@@ -230,17 +233,19 @@ private:
     void updatePageHistory(int nPage);
     bool m_historyUpdateAllowed = true;
 
-    QTimer *m_resizetimer= NULL;
-    bool m_isResizing = false;
-
     //  recent file stuff
     QList<QAction*> m_recentFileActionList;
     void setupRecentActions();
     void updateRecentActions();
 
-    //  pinch/wheel zooming
-    bool m_liveZooming = false;
-    void liveZoom(int direction);
+    //  live zooming
+    bool m_isLiveZooming = false;
+    bool m_inDoLiveZoom = false;
+    int m_zoomTimerVal = 500;
+    void startLiveZoom();
+    void doLiveZoom(double delta);
+    void endLiveZoom();
+    QTimer *m_zoomTimer= NULL;
 };
 
 #endif  //  WINDOW_H
