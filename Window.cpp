@@ -1522,6 +1522,8 @@ void Window::resizeEvent(QResizeEvent *event)
     if (!m_isOpen)
         return;
 
+    QMainWindow::resizeEvent(event);
+
     if (ui->actionFit_Page->isChecked())
     {
         double delta = getFitPageScale() - m_scalePage;
@@ -1532,8 +1534,6 @@ void Window::resizeEvent(QResizeEvent *event)
         double delta = getFitWidthScale() - m_scalePage;
         doLiveZoom(delta);
     }
-
-    QMainWindow::resizeEvent(event);
 }
 
 void Window::wheelZoomIn()

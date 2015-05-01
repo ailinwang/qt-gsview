@@ -175,8 +175,13 @@ void ScrollingImageList::startLiveZoom(int page)
 
 void ScrollingImageList::endLiveZoom()
 {
-    if (!isImageVisible(start_page))
-        m_scrollArea->ensureWidgetVisible(&(m_images[start_page]));
+    int nPages = m_document->GetPageCount();
+    if (start_page>=0 && start_page<nPages)
+    {
+        if (!isImageVisible(start_page))
+            m_scrollArea->ensureWidgetVisible(&(m_images[start_page]));
+    }
+
     liveScrolling = false;
 }
 
@@ -210,8 +215,11 @@ void ScrollingImageList::zoomLive (double theScale)
     }
 
     //  ensure the current page is still visible
-    if (!isImageVisible(start_page))
-        m_scrollArea->ensureWidgetVisible(&(m_images[start_page]));
+    if (start_page>=0 && start_page<nPages)
+    {
+        if (!isImageVisible(start_page))
+            m_scrollArea->ensureWidgetVisible(&(m_images[start_page]));
+    }
 
     //  resume updates
     m_scrollArea->setUpdatesEnabled(true);
@@ -394,6 +402,12 @@ void ScrollingImageList::hilightImage(int nImage)
 
 bool ScrollingImageList::isImageVisible(int nPage)
 {
+    if (nPage<0)
+        return false;
+    int nPages = m_document->GetPageCount();
+    if (nPage >= nPages)
+        return false;
+
     QRegion visibleRegion = m_images[nPage].visibleRegion();
 
     if (visibleRegion.isEmpty())
