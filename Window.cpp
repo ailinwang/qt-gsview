@@ -1566,7 +1566,7 @@ void Window::wheelZoomOut()
 
 void Window::onLiveZoomTimer()
 {
-    qDebug() << "onLiveZoomTimer";
+//    qDebug() << "onLiveZoomTimer";
 
     m_zoomTimer->stop();
 
@@ -1575,7 +1575,7 @@ void Window::onLiveZoomTimer()
 
 void Window::startLiveZoom()
 {
-    qDebug() << "start live zoom";
+//    qDebug() << "start live zoom";
 
     m_isLiveZooming = true;
 
@@ -1587,7 +1587,9 @@ void Window::startLiveZoom()
         connect(m_zoomTimer, SIGNAL(timeout()), this, SLOT(onLiveZoomTimer()));
     }
 
-    m_pages->startLiveZoom();
+    m_pages->startLiveZoom(currentPage());
+
+    m_lastLiveZoomTime = QDateTime::currentMSecsSinceEpoch();
 
     //  start the timer
     m_zoomTimer->stop();
@@ -1604,7 +1606,7 @@ void Window::doLiveZoom(double delta)
     m_zoomTimer->stop();
     m_zoomTimer->start(m_zoomTimerVal);
 
-    qDebug() << "do live zoom";
+//    qDebug() << "do live zoom";
 
     //  now do it
     m_scalePage = m_scalePage+delta;
@@ -1613,22 +1615,29 @@ void Window::doLiveZoom(double delta)
     if (m_scalePage < m_minScale)
         m_scalePage = m_minScale;
 
-    if (!m_inDoLiveZoom)
+    qint64 now  = QDateTime::currentMSecsSinceEpoch();
+    qint64 diff = now - m_lastLiveZoomTime;
+    //if (diff >= 25)
     {
-        m_inDoLiveZoom = true;
+        if (!m_inDoLiveZoom)
+        {
+            m_inDoLiveZoom = true;
 
-        m_pages->zoomLive(m_scalePage*m_superScale);
-        m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
+            m_pages->zoomLive(m_scalePage*m_superScale);
+            m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
 
-        m_inDoLiveZoom = false;
+            m_inDoLiveZoom = false;
+        }
+        m_lastLiveZoomTime = now;
     }
+
 }
 
 void Window::endLiveZoom()
 {
     m_isLiveZooming = false;
 
-    qDebug() << "end live zoom";
+//    qDebug() << "end live zoom";
 
     if (ui->actionFit_Page->isChecked())
     {
@@ -1641,6 +1650,7 @@ void Window::endLiveZoom()
     else
     {
         zoom(m_scalePage);
+        m_pages->endLiveZoom();
     }
 }
 

@@ -246,6 +246,9 @@ private:
     void doLiveZoom(double delta);
     void endLiveZoom();
     QTimer *m_zoomTimer= NULL;
+
+    qint64 m_lastLiveZoomTime;
+
 };
 
 #endif  //  WINDOW_H

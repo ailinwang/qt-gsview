@@ -60,7 +60,8 @@ public:
     virtual void setBackgroundColor() {}
 
     void zoomLive (double scale);
-    void startLiveZoom();
+    void startLiveZoom(int page);
+    void endLiveZoom();
 
 protected:
     ImageWidget *images() {return m_images;}
@@ -89,6 +90,10 @@ private:
     bool m_showAnnotations = true;
     bool m_showLinks = false;
     QTimer *m_rendertimer = NULL;
+
+    double start_scale;
+    int start_page;
+    bool liveScrolling = false;
 };
 
 #endif  //  SCROLLINGIMAGELIST_H
