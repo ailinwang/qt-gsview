@@ -1522,8 +1522,6 @@ void Window::resizeEvent(QResizeEvent *event)
     if (!m_isOpen)
         return;
 
-    QMainWindow::resizeEvent(event);
-
     if (ui->actionFit_Page->isChecked())
     {
         double delta = getFitPageScale() - m_scalePage;
@@ -1534,6 +1532,8 @@ void Window::resizeEvent(QResizeEvent *event)
         double delta = getFitWidthScale() - m_scalePage;
         doLiveZoom(delta);
     }
+
+    QMainWindow::resizeEvent(event);
 }
 
 void Window::wheelZoomIn()
@@ -1569,13 +1569,12 @@ void Window::onLiveZoomTimer()
 //    qDebug() << "onLiveZoomTimer";
 
     m_zoomTimer->stop();
-
     endLiveZoom();
 }
 
 void Window::startLiveZoom()
 {
-//    qDebug() << "start live zoom";
+    qDebug() << "start live zoom";
 
     m_isLiveZooming = true;
 
@@ -1613,21 +1612,22 @@ void Window::doLiveZoom(double delta)
     m_zoomTimer->stop();
     m_zoomTimer->start(m_zoomTimerVal);
 
-//    qDebug() << "do live zoom";
+    qDebug() << "do live zoom";
 
-    //  now do it
-    m_scalePage = m_scalePage+delta;
-    if (m_scalePage > m_maxScale)
-        m_scalePage = m_maxScale;
-    if (m_scalePage < m_minScale)
-        m_scalePage = m_minScale;
-
+    //  throttle
     qint64 now  = QDateTime::currentMSecsSinceEpoch();
     qint64 diff = now - m_lastLiveZoomTime;
     if (diff >= 50)
     {
         if (!m_inDoLiveZoom)
-        {
+        {            
+            //  now do it
+            m_scalePage = m_scalePage+delta;
+            if (m_scalePage > m_maxScale)
+                m_scalePage = m_maxScale;
+            if (m_scalePage < m_minScale)
+                m_scalePage = m_minScale;
+
             m_inDoLiveZoom = true;
 
             m_pages->zoomLive(m_scalePage*m_superScale);
@@ -1645,7 +1645,7 @@ void Window::endLiveZoom()
 {
     m_isLiveZooming = false;
 
-//    qDebug() << "end live zoom";
+    qDebug() << "end live zoom";
 
     if (ui->actionFit_Page->isChecked())
     {
