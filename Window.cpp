@@ -1587,7 +1587,14 @@ void Window::startLiveZoom()
         connect(m_zoomTimer, SIGNAL(timeout()), this, SLOT(onLiveZoomTimer()));
     }
 
-    m_pages->startLiveZoom(currentPage());
+    int startPage = -1;
+    if (ui->actionFit_Page->isChecked())
+    {
+        startPage = currentPage();
+        goToPage(startPage);
+    }
+
+    m_pages->startLiveZoom(startPage);
 
     m_lastLiveZoomTime = QDateTime::currentMSecsSinceEpoch();
 
@@ -1617,7 +1624,7 @@ void Window::doLiveZoom(double delta)
 
     qint64 now  = QDateTime::currentMSecsSinceEpoch();
     qint64 diff = now - m_lastLiveZoomTime;
-    //if (diff >= 25)
+    if (diff >= 50)
     {
         if (!m_inDoLiveZoom)
         {
@@ -1627,8 +1634,9 @@ void Window::doLiveZoom(double delta)
             m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
 
             m_inDoLiveZoom = false;
+
+            m_lastLiveZoomTime = now;
         }
-        m_lastLiveZoomTime = now;
     }
 
 }
@@ -1642,6 +1650,7 @@ void Window::endLiveZoom()
     if (ui->actionFit_Page->isChecked())
     {
         fitPage();
+        goToPage(currentPage());
     }
     else if (ui->actionFit_Width->isChecked())
     {

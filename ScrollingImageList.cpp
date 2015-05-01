@@ -147,21 +147,27 @@ void ScrollingImageList::cleanup()
 
 void ScrollingImageList::startLiveZoom(int page)
 {
-    //  what page is in the middle?
-    int first = -1;
-    int last = -1;
-    int nPages = m_document->GetPageCount();
-    for (int i=0; i<nPages; i++)
+    if (page != -1)
     {
-        if (isImageVisible(i))
-        {
-            if (first == -1)
-                first = i;
-            last = i;
-        }
+        start_page = page;
     }
-    start_page = (first+last)/2;
-//    start_page = page;
+    else
+    {
+        //  what page is in the middle?
+        int first = -1;
+        int last = -1;
+        int nPages = m_document->GetPageCount();
+        for (int i=0; i<nPages; i++)
+        {
+            if (isImageVisible(i))
+            {
+                if (first == -1)
+                    first = i;
+                last = i;
+            }
+        }
+        start_page = (first+last)/2;
+    }
 
     start_scale = m_scale;
     liveScrolling = true;
