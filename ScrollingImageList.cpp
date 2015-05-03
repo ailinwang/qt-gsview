@@ -198,8 +198,8 @@ void ScrollingImageList::endLiveZoom()
 void ScrollingImageList::zoomLive (double theScale)
 {
     //  suspend updates
-    m_scrollArea->setUpdatesEnabled(false);
-    m_scrollArea->widget()->setUpdatesEnabled(false);
+//    m_scrollArea->setUpdatesEnabled(false);
+//    m_scrollArea->widget()->setUpdatesEnabled(false);
 
     //  set the new scale value
     m_scale = theScale;
@@ -213,18 +213,11 @@ void ScrollingImageList::zoomLive (double theScale)
         {
             point_t pageSize;
             m_document->GetPageSize(i, m_scale, &pageSize);
-
-            m_images[i].setScaledContents(true);
             m_images[i].setFixedWidth(pageSize.X);
             m_images[i].setFixedHeight(pageSize.Y);
-            m_images[i].setScale(m_scale);
-            m_images[i].setPageSize(pageSize);
-            m_images[i].setRendered(false);
-            m_images[i].setBackgroundRole(QPalette::Dark);
-
+            m_images[i].setScaledContents(true);
             m_images[i].update();
         }
-
     }
 
     //  ensure the current page is still visible
@@ -239,8 +232,8 @@ void ScrollingImageList::zoomLive (double theScale)
     }
 
     //  resume updates
-    m_scrollArea->setUpdatesEnabled(true);
-    m_scrollArea->widget()->setUpdatesEnabled(true);
+//    m_scrollArea->setUpdatesEnabled(true);
+//    m_scrollArea->widget()->setUpdatesEnabled(true);
 }
 
 void ScrollingImageList::zoom (double theScale)
