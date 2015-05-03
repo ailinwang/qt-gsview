@@ -154,19 +154,25 @@ void ScrollingImageList::startLiveZoom(int page)
     else
     {
         //  what page is in the middle?
-        int first = -1;
-        int last = -1;
+        int area = 0;
+        int ilargest = -1;
         int nPages = m_document->GetPageCount();
         for (int i=0; i<nPages; i++)
         {
-            if (isImageVisible(i))
+            QRegion visibleRegion = m_images[i].visibleRegion();
+            if (!visibleRegion.isEmpty())
             {
-                if (first == -1)
-                    first = i;
-                last = i;
+                QRect r = visibleRegion.boundingRect();
+                int w = r.width();
+                int h = r.height();
+                if (w*h > area)
+                {
+                    area = w*h;
+                    ilargest = i;
+                }
             }
         }
-        start_page = (first+last)/2;
+        start_page = ilargest;
     }
 
     start_scale = m_scale;
@@ -179,7 +185,11 @@ void ScrollingImageList::endLiveZoom()
     if (start_page>=0 && start_page<nPages)
     {
         if (!isImageVisible(start_page))
+        {
+            inGoToPage = true;
             m_scrollArea->ensureWidgetVisible(&(m_images[start_page]));
+            inGoToPage = false;
+        }
     }
 
     liveScrolling = false;
@@ -211,14 +221,21 @@ void ScrollingImageList::zoomLive (double theScale)
             m_images[i].setPageSize(pageSize);
             m_images[i].setRendered(false);
             m_images[i].setBackgroundRole(QPalette::Dark);
+
+            m_images[i].update();
         }
+
     }
 
     //  ensure the current page is still visible
     if (start_page>=0 && start_page<nPages)
     {
         if (!isImageVisible(start_page))
+        {
+            inGoToPage = true;
             m_scrollArea->ensureWidgetVisible(&(m_images[start_page]));
+            inGoToPage = false;
+        }
     }
 
     //  resume updates
