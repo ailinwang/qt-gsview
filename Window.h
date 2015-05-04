@@ -132,6 +132,7 @@ private slots:
     void searchPageFinished(int np, std::vector<SearchItem> *items);
     void stopFind();
     void onLiveZoomTimer();
+    void doWorkInIdle();
 
 public slots:
     void saveSelection();
@@ -249,6 +250,19 @@ private:
 
     qint64 m_lastLiveZoomTime;
 
+};
+
+//  custom event for live zooming
+class LiveZoomEvent : public QEvent
+{
+public:
+    LiveZoomEvent (int command, double delta): QEvent(LIVE_ZOOM_EVENT), m_command(command), m_delta(delta) {}
+    static const QEvent::Type LIVE_ZOOM_EVENT = static_cast<QEvent::Type>(QEvent::User + 2);
+    int getCommand(){return m_command;}
+    double getDelta(){return m_delta;}
+private:
+    int m_command;
+    double m_delta;
 };
 
 #endif  //  WINDOW_H

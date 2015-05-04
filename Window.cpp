@@ -886,6 +886,21 @@ void Window::customEvent (QEvent *event)
         return;
     }
 
+    if (event->type() == LiveZoomEvent::LIVE_ZOOM_EVENT)
+    {
+        int command  = static_cast<LiveZoomEvent *>(event)->getCommand();
+        double delta = static_cast<LiveZoomEvent *>(event)->getDelta();
+
+        if (command == 1)
+            startLiveZoom();
+        else if (command == 2)
+            doLiveZoom(delta);
+        else if (command == 3)
+            endLiveZoom();
+
+        return;
+    }
+
     QMainWindow::customEvent(event);
 }
 
@@ -1402,12 +1417,12 @@ bool Window::eventFilter(QObject *object, QEvent *e)
 
         if (gesture->gestureType()==Qt::BeginNativeGesture)
         {
-            startLiveZoom();
+            QApplication::postEvent(this, new LiveZoomEvent(1,0));
         }
 
         if (gesture->gestureType()==Qt::EndNativeGesture)
         {
-            endLiveZoom();
+            QApplication::postEvent(this, new LiveZoomEvent(3,0));
         }
 
         if (gesture->gestureType()==Qt::ZoomNativeGesture)
@@ -1418,7 +1433,7 @@ bool Window::eventFilter(QObject *object, QEvent *e)
             if (gesture->value()<0)
                 delta = -delta;
 
-            doLiveZoom(delta);
+            QApplication::postEvent(this, new LiveZoomEvent(2,delta));
         }
 
         return true;  //  we're consuming these
@@ -1525,12 +1540,12 @@ void Window::resizeEvent(QResizeEvent *event)
     if (ui->actionFit_Page->isChecked())
     {
         double delta = getFitPageScale() - m_scalePage;
-        doLiveZoom(delta);
+        QApplication::postEvent(this, new LiveZoomEvent(2,delta));
     }
     else if (ui->actionFit_Width->isChecked())
     {
         double delta = getFitWidthScale() - m_scalePage;
-        doLiveZoom(delta);
+        QApplication::postEvent(this, new LiveZoomEvent(2,delta));
     }
 
     QMainWindow::resizeEvent(event);
@@ -1547,7 +1562,7 @@ void Window::wheelZoomIn()
     if (m_scalePage<1)
         delta = 0.025;
 
-    doLiveZoom(delta);
+    QApplication::postEvent(this, new LiveZoomEvent(2,delta));
 }
 
 void Window::wheelZoomOut()
@@ -1561,21 +1576,17 @@ void Window::wheelZoomOut()
     if (m_scalePage<1)
         delta = -0.025;
 
-    doLiveZoom(delta);
+    QApplication::postEvent(this, new LiveZoomEvent(2,delta));
 }
 
 void Window::onLiveZoomTimer()
 {
-//    qDebug() << "onLiveZoomTimer";
-
     m_zoomTimer->stop();
     endLiveZoom();
 }
 
 void Window::startLiveZoom()
 {
-    qDebug() << "start live zoom";
-
     m_isLiveZooming = true;
 
     //  create the timer
@@ -1612,40 +1623,20 @@ void Window::doLiveZoom(double delta)
     m_zoomTimer->stop();
     m_zoomTimer->start(m_zoomTimerVal);
 
-    qDebug() << "do live zoom";
+    //  now do it
+    m_scalePage = m_scalePage+delta;
+    if (m_scalePage > m_maxScale)
+        m_scalePage = m_maxScale;
+    if (m_scalePage < m_minScale)
+        m_scalePage = m_minScale;
 
-    //  throttle
-    qint64 now  = QDateTime::currentMSecsSinceEpoch();
-    qint64 diff = now - m_lastLiveZoomTime;
-    if (diff >= 50)
-    {
-        if (!m_inDoLiveZoom)
-        {            
-            //  now do it
-            m_scalePage = m_scalePage+delta;
-            if (m_scalePage > m_maxScale)
-                m_scalePage = m_maxScale;
-            if (m_scalePage < m_minScale)
-                m_scalePage = m_minScale;
-
-            m_inDoLiveZoom = true;
-
-            m_pages->zoomLive(m_scalePage*m_superScale);
-            m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
-
-            m_inDoLiveZoom = false;
-
-            m_lastLiveZoomTime = now;
-        }
-    }
-
+    m_pages->zoomLive(m_scalePage*m_superScale);
+    m_percentage->setText(QString::number((int)(100*(m_scalePage+.001))));  //  add a little bit for rounding
 }
 
 void Window::endLiveZoom()
 {
     m_isLiveZooming = false;
-
-    qDebug() << "end live zoom";
 
     if (ui->actionFit_Page->isChecked())
     {
@@ -1663,6 +1654,9 @@ void Window::endLiveZoom()
     }
 }
 
+void Window::doWorkInIdle()
+{
+}
 
 SearchWorker::SearchWorker(Window *window, QString text)
 {
