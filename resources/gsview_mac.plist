@@ -42,13 +42,13 @@
 	<key>CFBundleExecutable</key>
         <string>GSView</string>
 	<key>CFBundleGetInfoString</key>
-        <string>gsview by Artifex</string>
+        <string>GSView by Artifex</string>
 	<key>CFBundleIconFile</key>
         <string>gsview_app.icns</string>
 	<key>CFBundleIdentifier</key>
         <string>com.artifex.gsview</string>
 	<key>CFBundleName</key>
-	<string>gsview</string>
+	<string>GSView</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

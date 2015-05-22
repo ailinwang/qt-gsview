@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#  This script builds a DMG file for distributing gsview.
+#  This script builds a DMG file for distributing GSView.
 #  based on:
 #  http://asmaloney.com/2013/07/howto/packaging-a-mac-os-x-application-using-a-dmg/
 
@@ -41,7 +41,7 @@ rm -rf "${STAGING_DIR}" "${DMG_TMP}" "${DMG_FINAL}"
 
 #  make staging dir and copy in necessary files.
 mkdir -p "${STAGING_DIR}"
-cp -rfp ${PROJECT}/build/release/gsview.app "${STAGING_DIR}"
+cp -Rfp ./GSView.app "${STAGING_DIR}"
 cp -rfp ./license.txt "${STAGING_DIR}"
 
  
@@ -80,7 +80,7 @@ echo '
            set arrangement of viewOptions to not arranged
            set icon size of viewOptions to 72
 	   set background picture of viewOptions to file ".background:'${DMG_BACKGROUND_IMG}'"
-           set position of item "gsview.app" of container window to {160, 190}
+           set position of item "GSView.app" of container window to {160, 190}
            set position of item "Applications" of container window to {360, 190}
            set position of item "license.txt" of container window to {260, 300}
            close
