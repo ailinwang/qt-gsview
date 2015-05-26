@@ -12,6 +12,7 @@
 QTBIN=$HOME/Qt5.4.1/5.4/clang_64/bin
 
 #  project is one level up
+HOME="`dirname "${0}"`"
 PROJECT="`dirname "${0}"`/.."
 
 #  remove any old release build.
@@ -32,5 +33,11 @@ make
 #  run Qt's deployment tool which will, among other things,
 #  puts Qt's frameworks inside the app.
 $QTBIN/macdeployqt ./gsview.app
+
+#  put a copy in the folder that contains this script
+cd $HOME
+rm -rf ./GSView.app
+cp -R ../build/release/GSView.app ./GSView.app
+
 
 #  done.
