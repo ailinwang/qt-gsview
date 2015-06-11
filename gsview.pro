@@ -143,10 +143,13 @@ macx {
     QMAKE_POST_LINK += $$quote(cp $$PWD/resources/gsview_mac.plist $$OUT_PWD/gsview.app/Contents/Info.plist $$escape_expand(\n\t))
 }
 
-#  mac:  documentation
+#  documentation
 
 macx {
     QMAKE_POST_LINK += $$quote(cp $$PWD/UserGuide.pdf $$OUT_PWD/gsview.app/Contents/Resources/UserGuide.pdf $$escape_expand(\n\t))
+}
+unix:!macx {
+    QMAKE_POST_LINK += $$quote(cp $$PWD/UserGuide.pdf $$OUT_PWD/UserGuide.pdf $$escape_expand(\n\t))
 }
 
 #  post-link step to get some shared files for the release build

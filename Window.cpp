@@ -871,8 +871,11 @@ void Window::helpAbout()
 void Window::help()
 {
     //  open a file
-
-    QString path = QtUtil::getRealAppDirPath() + QString("../Resources/UserGuide.pdf");
+#ifdef _QT_MAC
+       QString path = QtUtil::getRealAppDirPath() + QString("../Resources/UserGuide.pdf");
+#else
+       QString path = QtUtil::getRealAppDirPath() + QString("UserGuide.pdf");
+#endif
 
     //  we were, try and load it
     Window *newWindow = new Window();
