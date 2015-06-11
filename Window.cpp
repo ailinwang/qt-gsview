@@ -109,7 +109,8 @@ Window::Window(QWidget *parent) :
 
     //  help menu
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(helpAbout()));
-    connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
+//    connect(ui->actionGSView_Help, SIGNAL(triggered()), this, SLOT(help()));
+    connect(ui->actionUser_Guide, SIGNAL(triggered()), this, SLOT(help()));
 
     //  account for this window
     countWindow(1);
@@ -869,8 +870,29 @@ void Window::helpAbout()
 
 void Window::help()
 {
-    //  TODO
-    QMessageBox::about(this, tr("How to use muPDF"), tr("Help is not yet available."));
+    //  open a file
+
+    QString path = QtUtil::getRealAppDirPath() + QString("../Resources/UserGuide.pdf");
+
+    //  we were, try and load it
+    Window *newWindow = new Window();
+    newWindow->show();
+
+    if (newWindow->OpenFile(path))
+    {
+        //  success
+        return;
+    }
+
+    //  error
+    newWindow->hide();
+    delete newWindow;
+
+    //  remove from the recent list.
+    QtUtil::removeRecentFile(path);
+
+    QMessageBox::information(NULL, tr(""), tr("Error opening %1").arg(path));
+
 }
 
 void Window::updateActions()

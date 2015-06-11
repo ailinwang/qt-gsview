@@ -8,7 +8,7 @@
 #include <QEvent>
 
 
-QString getRealAppDirPath()
+QString QtUtil::getRealAppDirPath()
 {
     QString path = qApp->applicationDirPath();
     if (!path.endsWith( QDir::separator()))

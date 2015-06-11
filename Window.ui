@@ -240,6 +240,7 @@
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionGSView_Help"/>
+    <addaction name="actionUser_Guide"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -724,6 +725,11 @@
    </property>
    <property name="shortcut">
     <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionUser_Guide">
+   <property name="text">
+    <string>GSView User Guide...</string>
    </property>
   </action>
  </widget>

@@ -10,6 +10,7 @@
 class QtUtil
 {
 public:
+    static QString getRealAppDirPath();
     static QString getTempFolderPath();
     static QString getGsPath();
     static QString getGxpsPath();
