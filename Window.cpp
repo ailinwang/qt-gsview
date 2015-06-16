@@ -593,7 +593,11 @@ bool Window::OpenFile2 (QString path)
     m_document->SetAA(8);
 
     //  set the window title
-    this->setWindowTitle(path);
+    QFile f(path);
+    QFileInfo fileInfo(f.fileName());
+    QString filename(fileInfo.fileName());
+    this->setWindowTitle(filename);
+
     m_path = path;
 
     //  ask for password if required
