@@ -5,6 +5,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+
         <key>CFBundleDocumentTypes</key>
             <array>
             <dict>
