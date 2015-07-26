@@ -97,6 +97,10 @@ void PageList::onMousePress(QEvent *e)
     //  remember current mouse location
     //  in content-relative coordinates
     m_origin = mapToContent(getScrollArea(), ((QMouseEvent *)e)->pos());
+
+//    int dpr = m_window->devicePixelRatio();
+//    m_origin.setX(m_origin.x()/dpr);
+//    m_origin.setY(m_origin.y()/dpr);
 }
 
 QPoint PageList::mapToContent(QWidget *w, QPoint p)
@@ -394,8 +398,8 @@ void PageList::updateSelection(QPoint point)
                 TextLine *line = (block->line_list->at(jj));
 
                 //  global rect of the current line
-                QRect lineRect ( widget->scale()*line->X, widget->scale()*line->Y,
-                                 widget->scale()*line->Width, widget->scale()*line->Height);
+                QRect lineRect ( widget->scale2()*line->X, widget->scale2()*line->Y,
+                                 widget->scale2()*line->Width, widget->scale2()*line->Height);
 
                 lineRect.setTopLeft    (mapToContent(widget, lineRect.topLeft()));
                 lineRect.setBottomRight(mapToContent(widget, lineRect.bottomRight()));

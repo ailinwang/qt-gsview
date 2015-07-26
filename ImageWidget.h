@@ -34,7 +34,9 @@ public:
 
     bool rendered() const {return m_rendered;}
 
-    double scale() const {return m_scale;}
+    //  use devicePixelRatio() for Retina support
+    double scale2() const {return m_scale;}
+    double scale() const {return m_scale * devicePixelRatio();}
     void setScale(double scale) {m_scale = scale;}
 
     point_t pageSize() const {return m_pageSize;}

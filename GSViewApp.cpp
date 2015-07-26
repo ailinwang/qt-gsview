@@ -15,6 +15,8 @@ GSViewApp::GSViewApp ( int &argc, char **argv ) : QApplication(argc, argv)
 
     QGuiApplication::setApplicationDisplayName(tr("gsview"));
 
+    qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
+
     //  on Linux, we may be asked to open a file on the command line
     if (argc>1)
         m_fileToOpen = argv[1];

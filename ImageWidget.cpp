@@ -25,7 +25,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
 
     QPainter painter(this);
 
-    //  draw 'selected" appearance
+    //  draw 'selected" thumbnail appearance.
     if (selected())
     {
         QRect rect(0,0,this->width(),this->height());
@@ -38,6 +38,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
         painter.drawRect(rect);
     }
 
+    //  hilight links
     if (showLinks() && !thumbnail())
     {
         int n = m_document->ComputeLinks(m_pageNumber);
@@ -65,7 +66,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
             if (line->selBegin==-1 && line->selEnd==-1)
             {
                 //  this is a whole line->
-                double scale = this->scale();
+                double scale = this->m_scale;
                 QRect lrect ( QPoint(scale*line->X,scale*line->Y),
                               QPoint(scale*(line->X+line->Width),scale*(line->Y+line->Height)));
                 painter.fillRect(lrect, QBrush(QColor(SELECTED_TEXT_COLOR)));
@@ -79,7 +80,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
                     if (ii>=line->selBegin && ii<=line->selEnd)
                     {
                         TextCharacter *theChar = (line->char_list->at(ii));
-                        double scale = this->scale();
+                        double scale = this->m_scale;
                         QRect crect ( QPoint(scale*theChar->X,scale*theChar->Y),
                                       QPoint(scale*(theChar->X+theChar->Width),scale*(theChar->Y+theChar->Height)));
                         painter.fillRect(crect, QBrush(QColor(SELECTED_TEXT_COLOR)));
@@ -111,7 +112,7 @@ void ImageWidget::paintEvent(QPaintEvent *event)
 
 //    //  TESTTESTTEST:  hilight blocks.
 //    if (!thumbnail())
-//        HilightBlocks (&painter, m_scale, m_pageNumber, false, true, true);  // blocks, lines, chars
+//        HilightBlocks (&painter, scale(), m_pageNumber, false, true, true);  // blocks, lines, chars
 }
 
 void ImageWidget::setSelected(bool isSelected)
@@ -178,19 +179,6 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
         //  if the link we're in has changed, show/hide the hand cursor
         if (m_mouseInLink != linkIAmIn)
         {
-//            if (linkIAmIn)
-//            {
-//                //  in a link, so show the pointing hand
-//                this->setCursor(Qt::PointingHandCursor);
-//                qApp->processEvents();
-//            }
-//            else
-//            {
-//                //  not in a link, so restore normal cursor.
-//                this->setCursor(Qt::ArrowCursor);
-//                qApp->processEvents();
-//            }
-
             //  remember new value
             m_mouseInLink = linkIAmIn;
 
@@ -215,7 +203,6 @@ void ImageWidget::mouseMoveEvent( QMouseEvent * event )
                 QToolTip::hideText();
             }
             qApp->processEvents();
-
         }
     }
 
@@ -445,11 +432,16 @@ void ImageWidget::render (bool showAnnotations, bool showLinks, bool lowRes)
     {
         deleteImageData();
 
-        //  smaller page
+        //  use devicePixelRatio() for Retina support
         point_t thePageSize = pageSize();
-        thePageSize.X /=5;
-        thePageSize.Y /=5;
-        double scale2 = scale()/5;
+        thePageSize.X *= devicePixelRatio();
+        thePageSize.Y *= devicePixelRatio();
+
+        //  smaller page
+        double divideBy = 5 * devicePixelRatio();
+        thePageSize.X /=divideBy;
+        thePageSize.Y /=divideBy;
+        double scale2 = scale()/divideBy;
 
         //  render
         int numBytes = (int)thePageSize.X * (int)thePageSize.Y * 4;
@@ -462,9 +454,6 @@ void ImageWidget::render (bool showAnnotations, bool showLinks, bool lowRes)
         QPixmap pix2 = pix.scaled(pageSize().X, pageSize().Y, Qt::KeepAspectRatio);
         setPixmap(pix2);
 
-        //  tell image to show or hide the links.
-//        setShowLinks(showLinks);
-//        setRendered(true);
         update();
 
     }
@@ -472,7 +461,10 @@ void ImageWidget::render (bool showAnnotations, bool showLinks, bool lowRes)
     {
         deleteImageData();
 
+        //  use devicePixelRatio() for Retina support
         point_t thePageSize = pageSize();
+        thePageSize.X *= devicePixelRatio();
+        thePageSize.Y *= devicePixelRatio();
 
         //  render
         int numBytes = (int)thePageSize.X * (int)thePageSize.Y * 4;
@@ -484,6 +476,10 @@ void ImageWidget::render (bool showAnnotations, bool showLinks, bool lowRes)
         //  copy to widget
         m_image = new QImage(m_bitmap, (int)thePageSize.X, (int)thePageSize.Y, QImage::Format_ARGB32);
         QPixmap pix = QPixmap::fromImage(*m_image);
+
+        //  Retina
+        pix.setDevicePixelRatio(devicePixelRatio());
+
         setPixmap(pix);
 
         //  tell image to show or hide the links.
