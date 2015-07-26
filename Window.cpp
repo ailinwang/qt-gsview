@@ -239,6 +239,8 @@ void Window::setupToolbar()
     //  we do this in code, rather than relying on Qt designer, because
     //  we need to insert non-actions (widgets)
 
+    int fieldWidth;
+
     ui->toolBar->addAction(ui->actionOpen);
     ui->toolBar->addAction(ui->actionSave);
     ui->toolBar->addAction(ui->actionPrint);
@@ -249,11 +251,14 @@ void Window::setupToolbar()
     ui->toolBar->addAction(ui->actionPage_Up);
     ui->toolBar->addAction(ui->actionPage_Down);
     ui->toolBar->addAction(ui->actionEnd);
+
     m_pageNumber = new QLineEdit();
-    m_pageNumber->setMaximumWidth(40);
-    m_pageNumber->setMinimumWidth(40);
+    fieldWidth = m_pageNumber->fontMetrics().charWidth("5",0)*5+10;
+    m_pageNumber->setMaximumWidth(fieldWidth);
+    m_pageNumber->setMinimumWidth(fieldWidth);
     m_pageNumber->setAlignment(Qt::AlignRight);
     connect ( m_pageNumber, SIGNAL(returnPressed()), SLOT(pageEditReturnPressed()));
+
     m_totalPages = new QLabel();
     QLabel *slash = new QLabel();  slash->setText(tr("/"));
     ui->toolBar->insertWidget(NULL, m_pageNumber);
@@ -266,8 +271,9 @@ void Window::setupToolbar()
     ui->toolBar->addAction(ui->actionZoom_Out);
 
     m_percentage = new QLineEdit();
-    m_percentage->setMaximumWidth(30);
-    m_percentage->setMinimumWidth(30);
+    fieldWidth = m_percentage->fontMetrics().charWidth("5",0)*4+10;
+    m_percentage->setMaximumWidth(fieldWidth);
+    m_percentage->setMinimumWidth(fieldWidth);
     connect ( m_percentage, SIGNAL(returnPressed()), SLOT(percentageEditReturnPressed()));
     QLabel *pct = new QLabel();  pct->setText(tr("%"));
     ui->toolBar->insertWidget(NULL, m_percentage);
@@ -290,8 +296,9 @@ void Window::setupToolbar()
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->actionFindDialog);
     m_search = new QLineEdit();
-    m_search->setMaximumWidth(120);
-    m_search->setMinimumWidth(120);
+    fieldWidth = m_search->fontMetrics().averageCharWidth()*20;
+    m_search->setMaximumWidth(fieldWidth);
+    m_search->setMinimumWidth(fieldWidth);
     ui->toolBar->insertWidget(NULL, m_search);
 
     ui->toolBar->addAction(ui->actionFind_Previous);
