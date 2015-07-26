@@ -97,10 +97,6 @@ void PageList::onMousePress(QEvent *e)
     //  remember current mouse location
     //  in content-relative coordinates
     m_origin = mapToContent(getScrollArea(), ((QMouseEvent *)e)->pos());
-
-//    int dpr = m_window->devicePixelRatio();
-//    m_origin.setX(m_origin.x()/dpr);
-//    m_origin.setY(m_origin.y()/dpr);
 }
 
 QPoint PageList::mapToContent(QWidget *w, QPoint p)
