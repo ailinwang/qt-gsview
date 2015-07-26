@@ -116,7 +116,7 @@ Window::Window(QWidget *parent) :
     countWindow(1);
 
     //  set initial size and placement
-    resize(QDesktopWidget().availableGeometry(this).size() * 0.85);
+    resize(QDesktopWidget().availableGeometry(this).size() * 0.90);
     setInitialSizeAndPosition();
 
     setupRecentActions();
@@ -645,21 +645,29 @@ bool Window::OpenFile2 (QString path)
     m_pages->buildImages();
 
     //  calculate an initial superScale
-    QScreen *screen = QApplication::screens().at(0);
-    qreal dpi = (qreal)screen->physicalDotsPerInchX();
-    m_superScale = dpi / 72;  //  72 determined empirically
 
-    //  adjust if we're too big
     point_t pageSize;
-    m_document->GetPageSize(m_currentPage, m_superScale, &pageSize);
-    if (pageSize.X > (m_pages->width()-m_scrollbarAllowance))
-        m_superScale = m_superScale * (m_pages->width()-m_scrollbarAllowance) / pageSize.X;
+    m_document->GetPageSize(m_currentPage, 1.0, &pageSize);
+    QDesktopWidget desktop;
+    int swidth  = desktop.screen()->width() *0.90 ;
+    double ratiow = swidth / pageSize.X;
+    m_superScale = ratiow * 0.90;
 
-    //  'cause I feel like it
-    m_superScale *= 0.90;
+//    if (ratioh<m_superScale)
+//        m_superScale = ratioh;
+
+//    QScreen *screen = QApplication::screens().at(0);
+//    qreal dpi = (qreal)screen->physicalDotsPerInchX();
+//    m_superScale = dpi / 72;  //  72 determined empirically
+
+//    //  adjust if we're too big
+//    point_t pageSize;
+//    m_document->GetPageSize(m_currentPage, m_superScale, &pageSize);
+//    if (pageSize.X > (m_pages->width()-m_scrollbarAllowance))
+//        m_superScale = m_superScale * (m_pages->width()-m_scrollbarAllowance) / pageSize.X;
 
     //  TODO:  why does this engage the centering properly?
-//    m_superScale = 1.001;
+    //    m_superScale = 1.001;
 
     normalSize();
 
@@ -675,8 +683,8 @@ void Window::setInitialSizeAndPosition()
     QDesktopWidget desktop;
     int screenWidth  = desktop.screen()->width();
     int screenHeight = desktop.screen()->height();
-    int width = screenWidth*4/5;
-    int height = screenHeight*4/5;
+    int width = screenWidth*0.90;
+    int height = screenHeight*0.90;
     int top  = screenHeight/10;
     int left = screenWidth/10;
 
