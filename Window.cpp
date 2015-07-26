@@ -644,20 +644,22 @@ bool Window::OpenFile2 (QString path)
     m_pages->setScale(m_scalePage);
     m_pages->buildImages();
 
-//    //  calculate an initial superScale such that the
-//    //  pages are shown actual size.
-//    QScreen *screen = QApplication::screens().at(0);
-//    qreal dpi = (qreal)screen->physicalDotsPerInchX();
-//    m_superScale = dpi / 72;  //  72 determined empirically
+    //  calculate an initial superScale
+    QScreen *screen = QApplication::screens().at(0);
+    qreal dpi = (qreal)screen->physicalDotsPerInchX();
+    m_superScale = dpi / 72;  //  72 determined empirically
 
-//    //  adjust if we're too big
-//    point_t pageSize;
-//    m_document->GetPageSize(m_currentPage, m_superScale, &pageSize);
-//    if (pageSize.X > (m_pages->width()-m_scrollbarAllowance))
-//        m_superScale = m_superScale * (m_pages->width()-m_scrollbarAllowance) / pageSize.X;
+    //  adjust if we're too big
+    point_t pageSize;
+    m_document->GetPageSize(m_currentPage, m_superScale, &pageSize);
+    if (pageSize.X > (m_pages->width()-m_scrollbarAllowance))
+        m_superScale = m_superScale * (m_pages->width()-m_scrollbarAllowance) / pageSize.X;
+
+    //  'cause I feel like it
+    m_superScale *= 0.90;
 
     //  TODO:  why does this engage the centering properly?
-    m_superScale = 1.001;
+//    m_superScale = 1.001;
 
     normalSize();
 
