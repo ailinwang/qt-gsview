@@ -275,7 +275,9 @@ void PageList::manageCursor(QEvent *e)
         QPoint posPage = widget->mapFromGlobal(posGlobal);
         int num_blocks = document()->blockList()[pageNumber].size();
         bool bInside = false;
-        double scale = widget->scale();
+        //double scale = widget->scale();
+        double scale = widget->scale2();
+
         for (int kk = 0; kk < num_blocks; kk++)
         {
             TextBlock *block = (document()->blockList()[pageNumber].at(kk));
@@ -329,9 +331,11 @@ int PageList::charIndex(TextLine *line, ImageWidget *widget, QPoint pos)
     int num_chars = line->char_list->size();
     for (int ii = 0; ii < num_chars; ii++)
     {
+        //double scale = widget->scale();
+        double scale = widget->scale2();
         TextCharacter *theChar = (line->char_list->at(ii));
-        QRect cRect ( widget->scale()*theChar->X, widget->scale()*theChar->Y,
-                      widget->scale()*theChar->Width, widget->scale()*theChar->Height);
+        QRect cRect ( scale*theChar->X, scale*theChar->Y,
+                      scale*theChar->Width, scale*theChar->Height);
 
         cRect.setTopLeft    (mapToContent(widget, cRect.topLeft()));
         cRect.setBottomRight(mapToContent(widget, cRect.bottomRight()));
@@ -346,8 +350,8 @@ int PageList::charIndex(TextLine *line, ImageWidget *widget, QPoint pos)
             if (isBetween(pos.x(), cRect.left(), cRect.right()))
                 return ii;
             TextCharacter *theChar2 = (line->char_list->at(ii-1));
-            QRect cRect2 ( widget->scale()*theChar2->X, widget->scale()*theChar2->Y,
-                           widget->scale()*theChar2->Width, widget->scale()*theChar2->Height);
+            QRect cRect2 ( scale*theChar2->X, scale*theChar2->Y,
+                           scale*theChar2->Width, scale*theChar2->Height);
 
             cRect2.setTopLeft    (mapToContent(widget, cRect2.topLeft()));
             cRect2.setBottomRight(mapToContent(widget, cRect2.bottomRight()));
@@ -379,6 +383,9 @@ void PageList::updateSelection(QPoint point)
     ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
     if (widget != NULL)
     {
+        //double scale = widget->scale();
+        double scale = widget->scale2();
+
         //  get blocks/lines/chars for this page (widget)
         int pageNumber = widget->pageNumber();
         document()->ComputeTextBlocks(pageNumber);
@@ -394,8 +401,8 @@ void PageList::updateSelection(QPoint point)
                 TextLine *line = (block->line_list->at(jj));
 
                 //  global rect of the current line
-                QRect lineRect ( widget->scale2()*line->X, widget->scale2()*line->Y,
-                                 widget->scale2()*line->Width, widget->scale2()*line->Height);
+                QRect lineRect ( scale*line->X, scale*line->Y,
+                                 scale*line->Width, scale*line->Height);
 
                 lineRect.setTopLeft    (mapToContent(widget, lineRect.topLeft()));
                 lineRect.setBottomRight(mapToContent(widget, lineRect.bottomRight()));
