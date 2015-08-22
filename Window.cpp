@@ -564,8 +564,6 @@ bool Window::OpenFile (QString path)
         m_gsProcess->waitForFinished();
         disconnect (m_gsProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(printOutput()));
 
-        MessagesDialog::addMessage(command+"\n");
-
         //  now open the temp file.
         return OpenFile2(newPath);
     }
