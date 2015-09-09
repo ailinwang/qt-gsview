@@ -120,6 +120,14 @@ bool Document::OpenFile(const std::string fileName)
     return true;
 }
 
+bool Document::MakeProof(const std::string infile, const std::string outfile, int resolution)
+{
+    status_t result = mu_ctx->MakeProof((char *)infile.c_str(), (char *)outfile.c_str(), resolution);
+    if (result != S_ISOK)
+        return false;
+    return true;
+}
+
 bool Document::GetPageSize (int page_num, double scale, point_t *render_size)
 {
     int result = mu_ctx->MeasurePage(page_num, render_size);
@@ -489,4 +497,33 @@ std::vector<SearchItem> *Document::SearchText (int page_num, char *textToFind)
     }
 
     return NULL;
+}
+
+int Document::getNumSepsOnPage(int page_num)
+{
+    return mu_ctx->getNumSepsOnPage(page_num);
+}
+
+Separation Document::getSep (int page_num, int nsep)
+{
+    separation_t sep;
+    status_t stat = mu_ctx->getSep(page_num, nsep, &sep);
+
+    Separation theSep;
+    theSep.name = sep.name;
+    theSep.rgba = sep.rgba;
+    theSep.cmyk = sep.cmyk;
+
+    return theSep;
+}
+
+bool Document::controlSep (int page_num, int nsep, bool disable)
+{
+    status_t result = mu_ctx->controlSep(page_num, nsep, disable);
+    return (result==S_ISOK);
+}
+
+bool Document::sepDisabled(int page_num, int nsep)
+{
+    return mu_ctx->sepDisabled(page_num, nsep);
 }

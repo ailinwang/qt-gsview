@@ -471,6 +471,10 @@ void ImageWidget::render (bool showAnnotations, bool showLinks, bool lowRes)
         m_bitmap = new Byte[numBytes];
         m_document->RenderPage (m_pageNumber, scale(), m_bitmap, thePageSize.X, thePageSize.Y, showAnnotations);
 
+        //  get separation data
+        int n = m_document->getNumSepsOnPage(m_pageNumber);
+
+
         m_document->ComputeTextBlocks(m_pageNumber);
 
         //  copy to widget

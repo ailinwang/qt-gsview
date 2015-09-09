@@ -130,7 +130,12 @@ void ScrollingImageList::reRender()
         m_images[i].setRendered(false);
 
     renderVisibleImages();
+}
 
+void ScrollingImageList::reRender(int nPage)
+{
+    m_images[nPage].setRendered(false);
+    renderVisibleImages();
 }
 
 void ScrollingImageList::cleanup()
@@ -381,10 +386,16 @@ void ScrollingImageList::renderVisibleImages(bool lowRes /* =false*/)
 {
     int nPages = m_document->GetPageCount();
 
+    int nVisible = 0;
+
     for (int i=0; i<nPages; i++)
     {
         if (isImageVisible(i))
         {
+            nVisible++;
+            if (nVisible==1)
+                emit startRender();
+
             if (!m_images[i].rendered())
             {
                 renderImage(i, lowRes);
@@ -395,6 +406,9 @@ void ScrollingImageList::renderVisibleImages(bool lowRes /* =false*/)
             }
         }
     }
+
+    if (nVisible>0)
+        emit finishRender();
 }
 
 void ScrollingImageList::hilightImage(int nImage)

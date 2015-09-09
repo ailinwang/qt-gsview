@@ -15,6 +15,7 @@ struct cache_entry_s
 	int width;
 	int height;
 	fz_display_list *dlist;
+    fz_page *page;
 	cache_entry_t *next;
 	cache_entry_t *prev;
 	int index;
@@ -33,6 +34,7 @@ public:
 	~Cache(void);
 	void GetSize(int *width, int *height);
 	fz_display_list* Use(int value, int *width, int *height, fz_context *mu_ctx);
-    void Add(int value, int width, int height, fz_display_list *dlist, fz_context *mu_ctx);
+    void Add(int value, int width, int height, fz_display_list *dlist, fz_context *mu_ctx, fz_page *page);
 	void Empty(fz_context *mu_ctx);
+    fz_page *FindPage(int page_num);
 };

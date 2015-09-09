@@ -71,7 +71,8 @@ HEADERS       = \
     ICCDialog.h \
     ICCDialog2.h \
     SelectionFrame.h \
-    PrintDialog.h
+    PrintDialog.h \
+    ColorsDialog.h
 
 SOURCES       = \
     main.cpp \
@@ -97,7 +98,8 @@ SOURCES       = \
     ICCDialog.cpp \
     ICCDialog2.cpp \
     SelectionFrame.cpp \
-    PrintDialog.cpp
+    PrintDialog.cpp \
+    ColorsDialog.cpp
 
 FORMS += \
     Window.ui \
@@ -108,7 +110,8 @@ FORMS += \
     ICCDialog.ui \
     ICCDialog2.ui \
     PrintDialog.ui \
-    filedialogextension.ui
+    filedialogextension.ui \
+    ColorsDialog.ui
 
 RESOURCES += \
     resources.qrc
@@ -122,18 +125,21 @@ unix:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
 #unix:  LIBS += -lcups
 unix:  LIBS += -lssl -lcrypto
 
+#unix: LIBS += $$PWD/ghostpdl/gs.a
+#unix: LIBS += $$PWD/ghostpdl/sobin/libgs.dylib
+
 #  copy executable files from ghostpdl
 
 unix:!macx {
     QMAKE_POST_LINK += $$quote(mkdir -p $$OUT_PWD/apps $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/gs/bin/gs $$OUT_PWD/apps/gs $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/xps/obj/gxps $$OUT_PWD/apps/gxps $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/bin/gs $$OUT_PWD/apps/gs $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/bin/gxps $$OUT_PWD/apps/gxps $$escape_expand(\n\t))
 }
 
 macx {
     QMAKE_POST_LINK += $$quote(mkdir -p $$OUT_PWD/gsview.app/Contents/MacOS/apps $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/gs/bin/gs $$OUT_PWD/gsview.app/Contents/MacOS/apps/gs $$escape_expand(\n\t))
-    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/xps/obj/gxps $$OUT_PWD/gsview.app/Contents/MacOS/apps/gxps $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/bin/gs $$OUT_PWD/gsview.app/Contents/MacOS/apps/gs $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/ghostpdl/bin/gxps $$OUT_PWD/gsview.app/Contents/MacOS/apps/gxps $$escape_expand(\n\t))
 }
 
 #  mac: icon and plist file

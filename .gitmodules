@@ -3,4 +3,4 @@
 	url = git://git.ghostscript.com/ghostpdl.git
 [submodule "mupdf"]
 	path = mupdf
-	url = git://git.ghostscript.com/mupdf.git
+	url = fred@ghostscript.com:repos/mupdf.git

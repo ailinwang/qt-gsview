@@ -124,6 +124,8 @@ status_t muctx::InitializeStream(IRandomAccessStream^ readStream, char *ext)
 
 status_t muctx::OpenDocument(char *filename)
 {
+    fz_register_document_handlers(mu_ctx);
+
     fz_try(mu_ctx)
     {
         this->mu_doc = fz_open_document(mu_ctx, filename);
@@ -297,6 +299,22 @@ int muctx::MeasurePage(int page_num, point_t *size)
         return E_FAILURE;
 	}
 	return 0;
+}
+
+status_t muctx::MakeProof(char *infile, char *outfile, int resolution)
+{
+    fz_try(mu_ctx)
+    {
+        fz_write_gproof_file(mu_ctx, infile, mu_doc, outfile, resolution, "", "");
+    }
+    fz_always(mu_ctx)
+    {
+    }
+    fz_catch(mu_ctx)
+    {
+        return E_FAILURE;
+    }
+    return S_ISOK;
 }
 
 /* Get page size */
@@ -534,13 +552,13 @@ fz_display_list * muctx::CreateAnnotationList(int page_num)
 
             for (annot = fz_first_annot(mu_ctx, page); annot; annot = fz_next_annot(mu_ctx, page, annot))
                 fz_run_annot(mu_ctx, page, annot, dev, &fz_identity, NULL);
-			annot_cache->Add(page_num, 0, 0, dlist, mu_ctx);
+            annot_cache->Add(page_num, 0, 0, dlist, mu_ctx, page);
 		}
 	}
 	fz_always(mu_ctx)
 	{
         fz_drop_device(mu_ctx, dev);
-        fz_drop_page(mu_ctx, page);
+        //fz_drop_page(mu_ctx, page);
 	}
 	fz_catch(mu_ctx)
 	{
@@ -578,12 +596,12 @@ fz_display_list * muctx::CreateDisplayList(int page_num, int *width, int *height
 		*width = page_size.X;
 		*height = page_size.Y;
 		/* Add it to the cache and set that it is in use */
-		page_cache->Add(page_num, *width, *height, dlist, mu_ctx);
+        page_cache->Add(page_num, *width, *height, dlist, mu_ctx, page);
 	}
 	fz_always(mu_ctx)
 	{
         fz_drop_device(mu_ctx, dev);
-        fz_drop_page(mu_ctx, page);
+        //fz_drop_page(mu_ctx, page);
 	}
 	fz_catch(mu_ctx)
 	{
@@ -645,12 +663,12 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 		*width = page_size.X;
 		*height = page_size.Y;
 		/* Add it to the cache and set that it is in use */
-        text_cache->Add(page_num, *width, *height, dlist, mu_ctx);
+        text_cache->Add(page_num, *width, *height, dlist, mu_ctx, page);
 	}
 	fz_always(mu_ctx)
 	{
         fz_drop_device(mu_ctx, dev);
-        fz_drop_page(mu_ctx, page);
+//        fz_drop_page(mu_ctx, page);
         fz_drop_text_sheet(mu_ctx, sheet);
 //        fz_drop_display_list(mu_ctx, dlist);
 	}
@@ -1050,3 +1068,57 @@ void muctx::freeText(fz_text_page *text)
     fz_drop_text_page(mu_ctx, text);
 }
 
+int muctx::getNumSepsOnPage(int page_num)
+{
+    //  we assume that the page MUST be in the cache.
+    fz_page *page = page_cache->FindPage(page_num);
+    if (page==NULL)
+        return 0;
+
+    int numSeps = fz_count_separations_on_page(mu_ctx, page);
+    return numSeps;
+}
+
+status_t muctx::getSep(int page_num, int nsep, separation_t* separation)
+{
+    const char *name;
+    unsigned int rgba=0;
+    unsigned int cmyk=0;
+    unsigned char abgr[4];
+
+    //  we assume that the page MUST be in the cache.
+    fz_page *page = page_cache->FindPage(page_num);
+    if (page==NULL)
+        return E_FAILURE;
+
+    name = fz_get_separation_on_page(mu_ctx, page, nsep, (unsigned int *)(&abgr[0]), &cmyk);
+
+    separation->name = name;
+    separation->cmyk = cmyk;
+    separation->rgba = abgr[2] | abgr[1]<<8 | abgr[0]<<16 | abgr[3]<<24 ;
+
+    return S_ISOK;
+}
+
+status_t muctx::controlSep (int page_num, int nsep, bool disable)
+{
+    //  we assume that the page MUST be in the cache.
+    fz_page *page = page_cache->FindPage(page_num);
+    if (page==NULL)
+        return E_FAILURE;
+
+    fz_control_separation_on_page (mu_ctx, page, nsep, disable);
+
+    return S_ISOK;
+}
+
+bool muctx::sepDisabled(int page_num, int nsep)
+{
+    //  we assume that the page MUST be in the cache.
+    fz_page *page = page_cache->FindPage(page_num);
+    if (page==NULL)
+        return false;
+
+    int result = fz_separation_disabled_on_page (mu_ctx, page, nsep);
+    return (result != 0);
+}

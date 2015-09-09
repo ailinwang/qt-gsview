@@ -14,6 +14,7 @@
 #include "MessagesDialog.h"
 #include "ExtractPagesDialog.h"
 #include "ICCDialog2.h"
+#include "ColorsDialog.h"
 
 Window::Window(QWidget *parent) :
     QMainWindow(parent),
@@ -41,6 +42,8 @@ Window::Window(QWidget *parent) :
     m_pages = new PageList(this);
     m_pages->setScrollArea(ui->rightScrollArea);
     connect(m_pages, SIGNAL(imagesReady()), this, SLOT(pagesReady()));
+    connect(m_pages, SIGNAL(startRender()), this, SLOT(onStartPageRender()));
+    connect(m_pages, SIGNAL(finishRender()), this, SLOT(onFinishPageRender()));
 
     ui->rightScrollArea->installEventFilter(this);
 
@@ -74,6 +77,27 @@ Window::Window(QWidget *parent) :
     connect(ui->actionZoom_Normal, SIGNAL(triggered()), this, SLOT(normalSize()));
     connect(ui->actionFit_Page, SIGNAL(triggered()), this, SLOT(fitPage()));
     connect(ui->actionFit_Width, SIGNAL(triggered()), this, SLOT(fitWidth()));
+
+    //  proofing menu
+    QSignalMapper* signalMapper = new QSignalMapper (this) ;
+    connect (ui->action72,   SIGNAL(triggered()), signalMapper, SLOT(map())) ;
+    connect (ui->action96,   SIGNAL(triggered()), signalMapper, SLOT(map())) ;
+    connect (ui->action150,  SIGNAL(triggered()), signalMapper, SLOT(map())) ;
+    connect (ui->action300,  SIGNAL(triggered()), signalMapper, SLOT(map())) ;
+    connect (ui->action600,  SIGNAL(triggered()), signalMapper, SLOT(map())) ;
+    connect (ui->action1200, SIGNAL(triggered()), signalMapper, SLOT(map())) ;
+    connect (ui->action2400, SIGNAL(triggered()), signalMapper, SLOT(map())) ;
+    signalMapper->setMapping (ui->action72,   72) ;
+    signalMapper->setMapping (ui->action96,   96) ;
+    signalMapper->setMapping (ui->action150,  150) ;
+    signalMapper->setMapping (ui->action300,  300) ;
+    signalMapper->setMapping (ui->action600,  600) ;
+    signalMapper->setMapping (ui->action1200, 1200) ;
+    signalMapper->setMapping (ui->action2400, 72400) ;
+    connect (signalMapper, SIGNAL(mapped(int)), this, SLOT(doProof(int))) ;
+
+    //  colors menu item
+    connect(ui->actionColors, SIGNAL(triggered()), this, SLOT(doColors()));
 
     connect(ui->actionPage_Up, SIGNAL(triggered()), this, SLOT(pageUp()));
     connect(ui->actionPage_Down, SIGNAL(triggered()), this, SLOT(pageDown()));
@@ -672,6 +696,11 @@ bool Window::OpenFile2 (QString path)
     updatePageHistory(0);
 
     m_isOpen = true;
+
+    //  handle proofing menu items
+    ui->menuProof->menuAction()->setVisible(!getIsProof());
+    ui->actionColors->setVisible(getIsProof());
+
     return true;
 }
 
@@ -976,7 +1005,6 @@ void Window::setCurrentPage(int nPage, bool updateHistory /* =true */)
 
     if (updateHistory)
         updatePageHistory(m_currentPage);
-
 }
 
 void Window::toggleAnnotations()
@@ -1179,6 +1207,12 @@ void Window::setAA()
 
     m_document->SetAA(val);
     m_pages->reRender();
+}
+
+
+void Window::reRenderCurrentPage()
+{
+    m_pages->reRender(m_currentPage);
 }
 
 void Window::ghostscriptMessages()
@@ -1697,10 +1731,72 @@ void Window::endLiveZoom()
         m_pages->endLiveZoom();
     }
 }
+bool Window::getIsProof() const
+{
+    return m_isProof;
+}
+
+void Window::setIsProof(bool isProof)
+{
+    m_isProof = isProof;
+}
 
 void Window::doWorkInIdle()
 {
 }
+
+void Window::doProof(int resolution)
+{
+    //  paths
+    QString originalPath = getPath();
+    QFileInfo fileInfo (originalPath);
+    QString outPath = QtUtil::getTempFolderPath() + fileInfo.fileName() + ".gproof";
+
+    //  make the .gproof file
+    bool result = this->m_document->MakeProof(originalPath.toStdString(),
+                                              outPath.toStdString(),
+                                              resolution);
+    if (result)
+    {
+        Window *newWindow = new Window();
+        newWindow->setIsProof(true);
+        newWindow->show();
+        if (newWindow->OpenFile(outPath))
+        {
+            //  success
+            return;
+        }
+
+        //  error
+        newWindow->hide();
+        delete newWindow;
+    }
+
+    //  if we get here, there's been an error
+    QMessageBox::information(NULL, tr(""), tr("Error proofing %1").arg(originalPath));
+}
+
+void Window::doColors()
+{
+    ColorsDialog *dlg = new ColorsDialog(this, m_document, m_currentPage);
+    dlg->show();
+}
+
+void Window::onStartPageRender()
+{
+    //  page rendering is beginning
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    qApp->processEvents();
+}
+
+void Window::onFinishPageRender()
+{
+    //  page rendering has finished.
+    QApplication::restoreOverrideCursor();
+    qApp->processEvents();
+}
+
+//----------------------------------------------------------------------------
 
 SearchWorker::SearchWorker(Window *window, QString text)
 {

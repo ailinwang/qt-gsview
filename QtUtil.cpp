@@ -33,6 +33,14 @@ QString QtUtil::getGxpsPath()
     return getRealAppDirPath() + QString("apps/gxps");
 }
 
+QString QtUtil::getMutoolPath()
+{
+#ifdef  _QT_WIN
+    return getRealAppDirPath() + QString("apps/mutool/mutool.exe");
+#endif
+    return getRealAppDirPath() + QString("apps/mutool");
+}
+
 //  temp folder stuff
 static bool tempDone = false;
 static QString tempFolderPath("");

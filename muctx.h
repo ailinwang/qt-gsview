@@ -80,6 +80,14 @@ typedef struct win_stream_struct_s
 } win_stream_struct;
 #endif
 
+/* separations */
+typedef struct separation_s
+{
+    const char *name;
+    unsigned int cmyk;
+    unsigned int rgba;
+} separation_t;
+
 class muctx
 {
 private:
@@ -150,10 +158,16 @@ public:
 
     void freeText(fz_text_page *text);
 
+    status_t MakeProof(char *infile, char *outfile, int resolution);
+
 #ifdef _WINRT_DLL
 	status_t InitializeStream(IRandomAccessStream^ readStream, char *ext);
 #else
 	status_t OpenDocument(char *filename);
 #endif
 
+    int getNumSepsOnPage (int page_num);
+    status_t getSep (int page_num, int sep, separation_t*separation);
+    status_t controlSep (int page_num, int nsep, bool disable);
+    bool sepDisabled(int page_num, int nsep);
 };

@@ -78,6 +78,11 @@ public:
     void wheelZoomIn();
     void wheelZoomOut();
 
+    bool getIsProof() const;
+    void setIsProof(bool isProof);
+
+    void reRenderCurrentPage();
+
 protected:
     void keyPressEvent(QKeyEvent* event);
     void customEvent(QEvent *event);
@@ -133,6 +138,10 @@ private slots:
     void stopFind();
     void onLiveZoomTimer();
     void doWorkInIdle();
+    void doProof(int resolution);
+    void doColors();
+    void onStartPageRender();
+    void onFinishPageRender();
 
 public slots:
     void saveSelection();
@@ -249,6 +258,8 @@ private:
     QTimer *m_zoomTimer= NULL;
 
     qint64 m_lastLiveZoomTime;
+
+    bool m_isProof = false;
 
 };
 

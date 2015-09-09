@@ -42,6 +42,7 @@ public:
     bool eventFilter(QObject *target, QEvent *event);
 
     void reRender();
+    void reRender(int nPage);
 
     void cleanup();
 
@@ -76,6 +77,8 @@ public slots:
 
 signals:
     void imagesReady();
+    void startRender();
+    void finishRender();
 
 private:
     void renderVisibleImages(bool lowRes=false);

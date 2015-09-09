@@ -212,6 +212,18 @@
     <property name="title">
      <string>View</string>
     </property>
+    <widget class="QMenu" name="menuProof">
+     <property name="title">
+      <string>Proof</string>
+     </property>
+     <addaction name="action72"/>
+     <addaction name="action96"/>
+     <addaction name="action150"/>
+     <addaction name="action300"/>
+     <addaction name="action600"/>
+     <addaction name="action1200"/>
+     <addaction name="action2400"/>
+    </widget>
     <addaction name="actionPage_Down"/>
     <addaction name="actionPage_Up"/>
     <addaction name="actionHome"/>
@@ -232,6 +244,9 @@
     <addaction name="actionAnnotations"/>
     <addaction name="actionContents"/>
     <addaction name="actionLinks"/>
+    <addaction name="separator"/>
+    <addaction name="menuProof"/>
+    <addaction name="actionColors"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -730,6 +745,46 @@
   <action name="actionUser_Guide">
    <property name="text">
     <string>GSView User Guide...</string>
+   </property>
+  </action>
+  <action name="action72">
+   <property name="text">
+    <string>72</string>
+   </property>
+  </action>
+  <action name="action96">
+   <property name="text">
+    <string>96</string>
+   </property>
+  </action>
+  <action name="action150">
+   <property name="text">
+    <string>150</string>
+   </property>
+  </action>
+  <action name="action300">
+   <property name="text">
+    <string>300</string>
+   </property>
+  </action>
+  <action name="action600">
+   <property name="text">
+    <string>600</string>
+   </property>
+  </action>
+  <action name="action1200">
+   <property name="text">
+    <string>1200</string>
+   </property>
+  </action>
+  <action name="action2400">
+   <property name="text">
+    <string>2400</string>
+   </property>
+  </action>
+  <action name="actionColors">
+   <property name="text">
+    <string>Colors...</string>
    </property>
   </action>
  </widget>

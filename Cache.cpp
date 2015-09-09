@@ -25,7 +25,8 @@ void Cache::Empty(fz_context *mu_ctx)
 			cache_entry_t *old_entry = curr_entry;
 			curr_entry = old_entry->next;
             fz_drop_display_list(mu_ctx, old_entry->dlist);
-			delete old_entry;
+            fz_drop_page(mu_ctx, old_entry->page);
+            delete old_entry;
 		}
 		this->size = 0;
 		this->head = NULL;
@@ -34,7 +35,7 @@ void Cache::Empty(fz_context *mu_ctx)
 }
 
 void Cache::Add(int value, int width_in, int height_in, fz_display_list *dlist, 
-				fz_context *mu_ctx)
+                fz_context *mu_ctx, fz_page *page)
 {
 	std::lock_guard<std::mutex> lock(cache_lock);
 
@@ -60,10 +61,12 @@ void Cache::Add(int value, int width_in, int height_in, fz_display_list *dlist,
 	/* Make a new entry and stick at head */
 	cache_entry_t *new_entry = new cache_entry_t;
 
-	new_entry->dlist = dlist;
-	new_entry->index = value;
+    new_entry->dlist = dlist;
+    new_entry->page = page;
+    new_entry->index = value;
 	new_entry->width = width_in;
 	new_entry->height = height_in;
+
 	new_entry->prev = NULL;
 	if (head == NULL)
 	{
@@ -82,6 +85,24 @@ void Cache::Add(int value, int width_in, int height_in, fz_display_list *dlist,
     //  11/25/2014 - Fred and Michael think this unnecessarily increments
     //  the display list's reference counter
 //    fz_keep_display_list(mu_ctx, new_entry->dlist);
+}
+
+fz_page *Cache::FindPage(int page_num)
+{
+    std::lock_guard<std::mutex> lock(cache_lock);
+    cache_entry_t *curr_entry = this->head;
+
+    while (curr_entry != NULL)
+    {
+        if (curr_entry->index == page_num)
+            break;
+        curr_entry = curr_entry->next;
+    }
+
+    if (curr_entry != NULL)
+        return curr_entry->page;
+    else
+        return NULL;
 }
 
 fz_display_list* Cache::Use(int value, int *width_out, int *height_out, fz_context *mu_ctx)

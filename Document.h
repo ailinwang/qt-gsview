@@ -132,6 +132,14 @@ public:
     std::vector<Link *> links;
 };
 
+class Separation
+{
+public:
+    const char *name;
+    unsigned int rgba;
+    unsigned int cmyk;
+};
+
 class Document
 {
 public:
@@ -186,6 +194,13 @@ public:
 
     std::vector<SearchItem> *SearchText(int page_num, char *textToFind);
     void AbortTextSearch();
+
+    bool MakeProof(const std::string infile, const std::string outfile, int resolution);
+
+    int getNumSepsOnPage(int page_num);
+    Separation getSep (int page_num, int sep);
+    bool controlSep (int page_num, int nsep, bool disable);
+    bool sepDisabled(int page_num, int nsep);
 
 private:
 
