@@ -17,6 +17,18 @@ GSViewApp::GSViewApp ( int &argc, char **argv ) : QApplication(argc, argv)
 
     qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
 
+    //  Add our apps folder to the path,
+    //  so we can launch gs, gxps, and gswin32c.exe
+    char* pPath;
+    pPath = getenv ("PATH");
+    if (pPath!=NULL)
+    {
+        char newPath[2048];
+        QString ourPath = QtUtil::getAppsPath();
+        sprintf(newPath,"%s:%s",ourPath.toStdString().c_str(),pPath);
+        setenv("PATH",newPath,1);
+    }
+
     //  on Linux, we may be asked to open a file on the command line
     if (argc>1)
         m_fileToOpen = argv[1];

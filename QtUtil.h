@@ -10,11 +10,11 @@
 class QtUtil
 {
 public:
+    static QString getAppsPath();
     static QString getRealAppDirPath();
     static QString getTempFolderPath();
     static QString getGsPath();
     static QString getGxpsPath();
-    static QString getMutoolPath();
     static QString eventTypeName(QEvent *event);
     static QString extensionFromPath(QString path);
     static QString extensionFromFilter(QString filter);

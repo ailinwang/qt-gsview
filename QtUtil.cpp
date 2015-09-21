@@ -17,28 +17,31 @@ QString QtUtil::getRealAppDirPath()
     return path;
 }
 
+QString QtUtil::getAppsPath()
+{
+    return getRealAppDirPath() + QString("apps");
+}
+
 QString QtUtil::getGsPath()
 {
-#ifdef  _QT_WIN
-    return getRealAppDirPath() + QString("apps/gs/gswin32c.exe");
-#endif
-    return getRealAppDirPath() + QString("apps/gs");
+    return QString("gs");
+
+//  code below is no longer used because we modify PATH instead.
+//#ifdef  _QT_WIN
+//    return getRealAppDirPath() + QString("apps/gs/gswin32c.exe");
+//#endif
+//    return getRealAppDirPath() + QString("apps/gs");
 }
 
 QString QtUtil::getGxpsPath()
 {
-#ifdef  _QT_WIN
-    return getRealAppDirPath() + QString("apps/gxps/gxps.exe");
-#endif
-    return getRealAppDirPath() + QString("apps/gxps");
-}
+    return QString("gxps");
 
-QString QtUtil::getMutoolPath()
-{
-#ifdef  _QT_WIN
-    return getRealAppDirPath() + QString("apps/mutool/mutool.exe");
-#endif
-    return getRealAppDirPath() + QString("apps/mutool");
+//  code below is no longer used because we modify PATH instead.
+//#ifdef  _QT_WIN
+//    return getRealAppDirPath() + QString("apps/gxps/gxps.exe");
+//#endif
+//    return getRealAppDirPath() + QString("apps/gxps");
 }
 
 //  temp folder stuff

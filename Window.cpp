@@ -1749,6 +1749,28 @@ void Window::doProof(int resolution)
 {
     //  paths
     QString originalPath = getPath();
+
+    //  if the original is xps, convert to pdf first.
+    if (QtUtil::extensionFromPath(originalPath)==QString("xps"))
+    {
+        //  put the result into the temp folder
+        QFileInfo fileInfo (originalPath);
+        QString newPath = QtUtil::getTempFolderPath() + fileInfo.fileName() + ".pdf";
+
+        //  construct the command
+        QString command = "\"" + QtUtil::getGxpsPath() + "\"";
+        command += " -sDEVICE=pdfwrite ";
+        command += "-sOutputFile=\"" + newPath + "\"";
+        command += " -dNOPAUSE \"" + originalPath + "\"";
+
+        //  create a process to do it, and wait
+        QProcess *process = new QProcess(this);
+        process->start(command);
+        process->waitForFinished();
+
+        originalPath = newPath;
+    }
+
     QFileInfo fileInfo (originalPath);
     QString outPath = QtUtil::getTempFolderPath() + fileInfo.fileName() + ".gproof";
 

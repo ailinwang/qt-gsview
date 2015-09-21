@@ -203,7 +203,7 @@ void FileSave::run()
 
         QString password = m_window->password();
 
-        //  if the original is xps, convert tp pdf first.
+        //  if the original is xps, convert to pdf first.
         if (QtUtil::extensionFromPath(original)==QString("xps"))
         {
             //  put the result into the temp folder
