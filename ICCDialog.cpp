@@ -1,5 +1,7 @@
 #include <QtWidgets>
 
+#include "QtUtil.h"
+
 #include "ICCDialog.h"
 #include "ui_ICCDialog.h"
 
@@ -30,15 +32,7 @@ void ICCDialog::show()
 void ICCDialog::on_selectButton_clicked()
 {
     //  get the last-visited directory.  Default is desktop
-    QSettings settings;
-    const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
-    QString lastDir  = settings.value("LastOpenFileDir", desktopLocations.first()).toString();
-
-    //  if the location does not exist (maybe it was deleted/moved),
-    //  fall back to the desktop
-    QFile *f = new QFile(lastDir);
-    if (!f->exists())
-        lastDir = desktopLocations.first();
+    QString lastDir = QtUtil::getLastOpenFileDir();
 
     //  create a dialog for choosing a file
     QFileDialog dialog(NULL, tr("Choose a Color Profile"), lastDir);
@@ -55,7 +49,7 @@ void ICCDialog::on_selectButton_clicked()
     if (result == QDialog::Accepted)
     {
         //  remember the last-visited directory
-        settings.setValue("LastOpenFileDir", dialog.directory().absolutePath());
+        QtUtil::setLastOpenFileDir(dialog.directory().absolutePath());
 
         m_icc_path = dialog.selectedFiles().first();
         ui->selectedProfile->setText(m_icc_path);

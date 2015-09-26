@@ -72,7 +72,8 @@ HEADERS       = \
     ICCDialog2.h \
     SelectionFrame.h \
     PrintDialog.h \
-    ColorsDialog.h
+    ColorsDialog.h \
+    ProofSettingsDialog.h
 
 SOURCES       = \
     main.cpp \
@@ -99,7 +100,8 @@ SOURCES       = \
     ICCDialog2.cpp \
     SelectionFrame.cpp \
     PrintDialog.cpp \
-    ColorsDialog.cpp
+    ColorsDialog.cpp \
+    ProofSettingsDialog.cpp
 
 FORMS += \
     Window.ui \
@@ -111,7 +113,8 @@ FORMS += \
     ICCDialog2.ui \
     PrintDialog.ui \
     filedialogextension.ui \
-    ColorsDialog.ui
+    ColorsDialog.ui \
+    ProofSettingsDialog.ui
 
 RESOURCES += \
     resources.qrc

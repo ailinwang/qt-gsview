@@ -26,5 +26,6 @@
         <file>resources/search.png</file>
         <file>resources/next.png</file>
         <file>resources/previous.png</file>
+        <file>resources/seps.png</file>
     </qresource>
 </RCC>

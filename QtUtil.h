@@ -26,6 +26,8 @@ public:
     static void addRecentFile(QString path);
     static void removeRecentFile(QString path);
     static const int maxRecentFiles = 10;
+    static QString getLastOpenFileDir();
+    static void setLastOpenFileDir(QString val);
 };
 
 #endif // QTUTIL_H

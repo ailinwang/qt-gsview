@@ -212,18 +212,6 @@
     <property name="title">
      <string>View</string>
     </property>
-    <widget class="QMenu" name="menuProof">
-     <property name="title">
-      <string>Proof</string>
-     </property>
-     <addaction name="action72"/>
-     <addaction name="action96"/>
-     <addaction name="action150"/>
-     <addaction name="action300"/>
-     <addaction name="action600"/>
-     <addaction name="action1200"/>
-     <addaction name="action2400"/>
-    </widget>
     <addaction name="actionPage_Down"/>
     <addaction name="actionPage_Up"/>
     <addaction name="actionHome"/>
@@ -245,7 +233,7 @@
     <addaction name="actionContents"/>
     <addaction name="actionLinks"/>
     <addaction name="separator"/>
-    <addaction name="menuProof"/>
+    <addaction name="actionProof"/>
     <addaction name="actionColors"/>
     <addaction name="separator"/>
    </widget>
@@ -785,6 +773,15 @@
   <action name="actionColors">
    <property name="text">
     <string>Colors...</string>
+   </property>
+  </action>
+  <action name="actionProof">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/prefix1/resources/seps.png</normaloff>:/new/prefix1/resources/seps.png</iconset>
+   </property>
+   <property name="text">
+    <string>Proof...</string>
    </property>
   </action>
  </widget>

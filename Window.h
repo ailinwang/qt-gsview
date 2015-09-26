@@ -139,6 +139,7 @@ private slots:
     void onLiveZoomTimer();
     void doWorkInIdle();
     void doProof(int resolution);
+    void doProofDialog();
     void doColors();
     void onStartPageRender();
     void onFinishPageRender();

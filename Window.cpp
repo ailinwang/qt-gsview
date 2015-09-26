@@ -15,6 +15,7 @@
 #include "ExtractPagesDialog.h"
 #include "ICCDialog2.h"
 #include "ColorsDialog.h"
+#include "ProofSettingsDialog.h"
 
 Window::Window(QWidget *parent) :
     QMainWindow(parent),
@@ -78,23 +79,8 @@ Window::Window(QWidget *parent) :
     connect(ui->actionFit_Page, SIGNAL(triggered()), this, SLOT(fitPage()));
     connect(ui->actionFit_Width, SIGNAL(triggered()), this, SLOT(fitWidth()));
 
-    //  proofing menu
-    QSignalMapper* signalMapper = new QSignalMapper (this) ;
-    connect (ui->action72,   SIGNAL(triggered()), signalMapper, SLOT(map())) ;
-    connect (ui->action96,   SIGNAL(triggered()), signalMapper, SLOT(map())) ;
-    connect (ui->action150,  SIGNAL(triggered()), signalMapper, SLOT(map())) ;
-    connect (ui->action300,  SIGNAL(triggered()), signalMapper, SLOT(map())) ;
-    connect (ui->action600,  SIGNAL(triggered()), signalMapper, SLOT(map())) ;
-    connect (ui->action1200, SIGNAL(triggered()), signalMapper, SLOT(map())) ;
-    connect (ui->action2400, SIGNAL(triggered()), signalMapper, SLOT(map())) ;
-    signalMapper->setMapping (ui->action72,   72) ;
-    signalMapper->setMapping (ui->action96,   96) ;
-    signalMapper->setMapping (ui->action150,  150) ;
-    signalMapper->setMapping (ui->action300,  300) ;
-    signalMapper->setMapping (ui->action600,  600) ;
-    signalMapper->setMapping (ui->action1200, 1200) ;
-    signalMapper->setMapping (ui->action2400, 72400) ;
-    connect (signalMapper, SIGNAL(mapped(int)), this, SLOT(doProof(int))) ;
+    //  proofing dialog
+    connect (ui->actionProof, SIGNAL(triggered()), this, SLOT(doProofDialog()));
 
     //  colors menu item
     connect(ui->actionColors, SIGNAL(triggered()), this, SLOT(doColors()));
@@ -314,6 +300,7 @@ void Window::setupToolbar()
 //    ui->toolBar->addAction(ui->actionAnnotations);  //  hiding this unless we can find a better icon
     ui->toolBar->addAction(ui->actionContents);
     ui->toolBar->addAction(ui->actionLinks);
+    ui->toolBar->addAction(ui->actionProof);
 
     //  searching
 
@@ -698,7 +685,7 @@ bool Window::OpenFile2 (QString path)
     m_isOpen = true;
 
     //  handle proofing menu items
-    ui->menuProof->menuAction()->setVisible(!getIsProof());
+    ui->actionProof->setVisible(!getIsProof());
     ui->actionColors->setVisible(getIsProof());
 
     return true;
@@ -754,15 +741,7 @@ void Window::saveAction()
 void Window::open()
 {
     //  get the last-visited directory.  Default is desktop
-    QSettings settings;
-    const QStringList desktopLocations = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
-    QString lastDir  = settings.value("LastOpenFileDir", desktopLocations.first()).toString();
-
-    //  if the location does not exist (maybe it was deleted/moved),
-    //  fall back to the desktop
-    QFile *f = new QFile(lastDir);
-    if (!f->exists())
-        lastDir = desktopLocations.first();
+    QString lastDir = QtUtil::getLastOpenFileDir();
 
     //  create a dialog for choosing a file
     QFileDialog dialog(qApp->activeWindow(), tr("Open File"),lastDir);
@@ -791,7 +770,7 @@ void Window::open()
             break;
 
         //  remember the last-visited directory
-        settings.setValue("LastOpenFileDir", dialog.directory().absolutePath());
+        QtUtil::setLastOpenFileDir(dialog.directory().absolutePath());
 
         //  show the window
         newWindow->show();
@@ -1743,6 +1722,27 @@ void Window::setIsProof(bool isProof)
 
 void Window::doWorkInIdle()
 {
+}
+
+void Window::doProofDialog()
+{
+    ProofSettingsDialog *dlg = new ProofSettingsDialog(this);
+    dlg->show();
+    int result = dlg->exec();
+    if (result == QDialog::Accepted)
+    {
+        int res = dlg->getResolution();
+        if (res==0) {
+            QMessageBox::information(NULL, tr(""), tr("There was an internal error."));
+            return;
+        }
+
+        QString printProfile = dlg->getPrintProfile();
+        QString softProfile  = dlg->getSoftProfile();
+        //  TODO: do something with these
+
+        doProof(res);
+    }
 }
 
 void Window::doProof(int resolution)
