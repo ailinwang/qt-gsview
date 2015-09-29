@@ -1738,14 +1738,13 @@ void Window::doProofDialog()
         }
 
         QString printProfile = dlg->getPrintProfile();
-        QString softProfile  = dlg->getSoftProfile();
-        //  TODO: do something with these
+        QString displayProfile  = dlg->getDisplayProfile();
 
-        doProof(res);
+        doProof(res, displayProfile, printProfile);
     }
 }
 
-void Window::doProof(int resolution)
+void Window::doProof(int resolution, QString displayProfile, QString printProfile)
 {
     //  paths
     QString originalPath = getPath();
@@ -1777,7 +1776,10 @@ void Window::doProof(int resolution)
     //  make the .gproof file
     bool result = this->m_document->MakeProof(originalPath.toStdString(),
                                               outPath.toStdString(),
-                                              resolution);
+                                              resolution,
+                                              displayProfile.toStdString(),
+                                              printProfile.toStdString()
+                                              );
     if (result)
     {
         Window *newWindow = new Window();

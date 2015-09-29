@@ -301,11 +301,11 @@ int muctx::MeasurePage(int page_num, point_t *size)
 	return 0;
 }
 
-status_t muctx::MakeProof(char *infile, char *outfile, int resolution)
+status_t muctx::MakeProof(char *infile, char *outfile, int resolution, char *displayProfile, char *printProfile)
 {
     fz_try(mu_ctx)
     {
-        fz_write_gproof_file(mu_ctx, infile, mu_doc, outfile, resolution, "", "");
+        fz_write_gproof_file(mu_ctx, infile, mu_doc, outfile, resolution, printProfile, displayProfile);
     }
     fz_always(mu_ctx)
     {

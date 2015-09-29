@@ -138,7 +138,7 @@ private slots:
     void stopFind();
     void onLiveZoomTimer();
     void doWorkInIdle();
-    void doProof(int resolution);
+    void doProof(int resolution, QString displayProfile, QString printProfile);
     void doProofDialog();
     void doColors();
     void onStartPageRender();

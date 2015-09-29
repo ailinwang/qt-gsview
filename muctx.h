@@ -158,7 +158,7 @@ public:
 
     void freeText(fz_text_page *text);
 
-    status_t MakeProof(char *infile, char *outfile, int resolution);
+    status_t MakeProof(char *infile, char *outfile, int resolution, char *displayProfile, char *printProfile);
 
 #ifdef _WINRT_DLL
 	status_t InitializeStream(IRandomAccessStream^ readStream, char *ext);

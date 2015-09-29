@@ -10,6 +10,9 @@ ProofSettingsDialog::ProofSettingsDialog(QWidget *parent) :
     ui(new Ui::ProofSettingsDialog)
 {
     ui->setupUi(this);
+
+    //  set the window title
+    setWindowTitle(tr("Proof Settings"));
 }
 
 ProofSettingsDialog::~ProofSettingsDialog()
@@ -36,17 +39,17 @@ QString ProofSettingsDialog::getPrintProfile()
 {
     int index = ui->printProfileComboBox->currentIndex();
     if (index==0)
-        return ui->printProfileComboBox->currentText();
+        return QString("");
 
     QVariant qval = ui->printProfileComboBox->currentData();
     return qval.toString();
 }
 
-QString ProofSettingsDialog::getSoftProfile()
+QString ProofSettingsDialog::getDisplayProfile()
 {
     int index = ui->softProfileComboBox->currentIndex();
     if (index==0)
-        return ui->softProfileComboBox->currentText();
+        return QString("");
 
     QVariant qval = ui->softProfileComboBox->currentData();
     return qval.toString();

@@ -120,9 +120,11 @@ bool Document::OpenFile(const std::string fileName)
     return true;
 }
 
-bool Document::MakeProof(const std::string infile, const std::string outfile, int resolution)
+bool Document::MakeProof(const std::string infile, const std::string outfile, int resolution,
+                         const std::string displayProfile, const std::string printProfile)
 {
-    status_t result = mu_ctx->MakeProof((char *)infile.c_str(), (char *)outfile.c_str(), resolution);
+    status_t result = mu_ctx->MakeProof((char *)infile.c_str(), (char *)outfile.c_str(), resolution,
+                                        (char *)displayProfile.c_str(),(char *)printProfile.c_str());
     if (result != S_ISOK)
         return false;
     return true;

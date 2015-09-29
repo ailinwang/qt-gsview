@@ -195,7 +195,7 @@ public:
     std::vector<SearchItem> *SearchText(int page_num, char *textToFind);
     void AbortTextSearch();
 
-    bool MakeProof(const std::string infile, const std::string outfile, int resolution);
+    bool MakeProof(const std::string infile, const std::string outfile, int resolution, const std::string displayProfile, const std::string printProfile);
 
     int getNumSepsOnPage(int page_num);
     Separation getSep (int page_num, int sep);

@@ -16,7 +16,7 @@ public:
     ~ProofSettingsDialog();
     int getResolution();
     QString getPrintProfile();
-    QString getSoftProfile();
+    QString getDisplayProfile();
 
 private slots:
     void on_choosePrintProfileButton_clicked();
