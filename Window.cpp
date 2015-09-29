@@ -1748,6 +1748,7 @@ void Window::doProof(int resolution, QString displayProfile, QString printProfil
 {
     //  paths
     QString originalPath = getPath();
+    QString reallyOriginalPath = originalPath;
 
     //  if the original is xps, convert to pdf first.
     if (QtUtil::extensionFromPath(originalPath)==QString("xps"))
@@ -1784,10 +1785,31 @@ void Window::doProof(int resolution, QString displayProfile, QString printProfil
     {
         Window *newWindow = new Window();
         newWindow->setIsProof(true);
+
         newWindow->show();
         if (newWindow->OpenFile(outPath))
         {
+            //  TODO: how to detect profile error?
+
+//            // something went wrong if there are no pages
+//            if (m_document->GetPageCount()<=0)
+//            {
+//                newWindow->hide();
+//                delete newWindow;
+//                QMessageBox::information(NULL, tr(""), tr("Internal error proofing %1").arg(originalPath));
+//                return;
+//            }
+
             //  success
+
+            //  set up the window title
+            QString title = ("Proof of " + QFileInfo(reallyOriginalPath).fileName() + " at " + QString::number(resolution) + " PPI");
+            if(!displayProfile.isEmpty())
+                title += (" (soft profile: " + QFileInfo(displayProfile).fileName() + ")");
+            if(!printProfile.isEmpty())
+                title += (" (print profile: " + QFileInfo(printProfile).fileName() + ")");
+            newWindow->setWindowTitle(title);
+
             return;
         }
 
