@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+class QFileDialog;
+
 namespace Ui {
 class ProofSettingsDialog;
 }
@@ -24,6 +26,11 @@ private slots:
 
 private:
     Ui::ProofSettingsDialog *ui;
+
+    static QList<QString> m_softProfiles;
+    static QList<QString> m_printProfiles;
+
+    QFileDialog *makeICCDialog(QString title);
 };
 
 #endif // PROOFSETTINGSDIALOG_H
