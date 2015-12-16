@@ -133,7 +133,7 @@ public:
 							point_t bottom_right);
 	fz_display_list* CreateDisplayList(int page_num, int *width, int *height);
 	fz_display_list * CreateDisplayListText(int page_num, int *width,
-        int *height, fz_text_page **text, int *length);
+        int *height, fz_stext_page **text, int *length);
 	fz_display_list * CreateAnnotationList(int page_num);
 	int MeasurePage(int page_num, point_t *size);
 	point_t MeasurePage(fz_page *page);
@@ -156,7 +156,7 @@ public:
     int GetTextCharacter(void *page, int block_num, int line_num,
         int item_num, double *top_x, double *top_y, double *height, double *width);
 
-    void freeText(fz_text_page *text);
+    void freeText(fz_stext_page *text);
 
     status_t MakeProof(char *infile, char *outfile, int resolution, char *displayProfile, char *printProfile);
 

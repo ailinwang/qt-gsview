@@ -305,7 +305,7 @@ status_t muctx::MakeProof(char *infile, char *outfile, int resolution, char *dis
 {
     fz_try(mu_ctx)
     {
-        fz_write_gproof_file(mu_ctx, infile, mu_doc, outfile, resolution, printProfile, displayProfile);
+        fz_save_gproof(mu_ctx, infile, mu_doc, outfile, resolution, printProfile, displayProfile);
     }
     fz_always(mu_ctx)
     {
@@ -399,9 +399,9 @@ void muctx::AbortTextSearch()
 int muctx::GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec)
 {
 	fz_page *page = NULL;
-	fz_text_sheet *sheet = NULL;
+    fz_stext_sheet *sheet = NULL;
 	fz_device *dev = NULL;
-	fz_text_page *text = NULL;
+    fz_stext_page *text = NULL;
 	int hit_count = 0;
 	int k;
 
@@ -416,13 +416,13 @@ int muctx::GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec)
     fz_try(ctx_clone)
 	{
         page = fz_load_page(ctx_clone, mu_doc, page_num);
-        sheet = fz_new_text_sheet(ctx_clone);
-        text = fz_new_text_page(ctx_clone);
-        dev = fz_new_text_device(ctx_clone, sheet, text);
+        sheet = fz_new_stext_sheet(ctx_clone);
+        text = fz_new_stext_page(ctx_clone);
+        dev = fz_new_stext_device(ctx_clone, sheet, text);
         fz_run_page(ctx_clone, page, dev, &fz_identity, m_search_cookie);
         fz_drop_device(ctx_clone, dev);  /* Why does this need to be done here?  Seems odd */
 		dev = NULL;
-        hit_count = fz_search_text_page(ctx_clone, text, needle, mu_hit_bbox, nelem(mu_hit_bbox));
+        hit_count = fz_search_stext_page(ctx_clone, text, needle, mu_hit_bbox, nelem(mu_hit_bbox));
 
 		for (k = 0; k < hit_count; k++)
 		{
@@ -438,8 +438,8 @@ int muctx::GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec)
 	{
         fz_drop_page(ctx_clone, page);
         fz_drop_device(ctx_clone, dev);
-        fz_drop_text_sheet(ctx_clone, sheet);
-        fz_drop_text_page(ctx_clone, text);
+        fz_drop_stext_sheet(ctx_clone, sheet);
+        fz_drop_stext_page(ctx_clone, text);
 	}
     fz_catch(ctx_clone)
 	{
@@ -614,10 +614,10 @@ fz_display_list * muctx::CreateDisplayList(int page_num, int *width, int *height
 /* A special version which will create the display list AND get the information
    that we need for various text selection tasks */
 fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *height,
-    fz_text_page **text_out, int *length)
+    fz_stext_page **text_out, int *length)
 {
-	fz_text_sheet *sheet = NULL;
-	fz_text_page *text = NULL;
+    fz_stext_sheet *sheet = NULL;
+    fz_stext_page *text = NULL;
 	fz_device *dev = NULL;
 	fz_device *textdev = NULL;
 	fz_page *page = NULL;
@@ -642,15 +642,15 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 	fz_try(mu_ctx)
 	{
         page = fz_load_page(mu_ctx, mu_doc, page_num);
-		sheet = fz_new_text_sheet(mu_ctx);
-        text = fz_new_text_page(mu_ctx);
+        sheet = fz_new_stext_sheet(mu_ctx);
+        text = fz_new_stext_page(mu_ctx);
 
 		/* Create a new list */
         dlist = fz_new_display_list(mu_ctx);
 		dev = fz_new_list_device(mu_ctx, dlist);
 
 		/* Deal with text device */
-		textdev = fz_new_text_device(mu_ctx, sheet, text);
+        textdev = fz_new_stext_device(mu_ctx, sheet, text);
         fz_run_page(mu_ctx, page, textdev, &fz_identity, NULL);
 
 		*length = text->len;
@@ -669,7 +669,7 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
 	{
         fz_drop_device(mu_ctx, dev);
 //        fz_drop_page(mu_ctx, page);
-        fz_drop_text_sheet(mu_ctx, sheet);
+        fz_drop_stext_sheet(mu_ctx, sheet);
 //        fz_drop_display_list(mu_ctx, dlist);
 	}
 	fz_catch(mu_ctx)
@@ -820,8 +820,8 @@ std::string muctx::GetText(int page_num, int type)
 	fz_output *out = NULL;
 	fz_device *dev = NULL;
 	fz_page *page = NULL;
-	fz_text_sheet *sheet = NULL;
-	fz_text_page *text = NULL;
+    fz_stext_sheet *sheet = NULL;
+    fz_stext_page *text = NULL;
 	fz_buffer *buf = NULL;
 	std::string output;
 
@@ -833,9 +833,9 @@ std::string muctx::GetText(int page_num, int type)
 	fz_try(mu_ctx)
 	{
         page = fz_load_page(mu_ctx, mu_doc, page_num);
-		sheet = fz_new_text_sheet(mu_ctx);
-		text = fz_new_text_page(mu_ctx);
-		dev = fz_new_text_device(mu_ctx, sheet, text);
+        sheet = fz_new_stext_sheet(mu_ctx);
+        text = fz_new_stext_page(mu_ctx);
+        dev = fz_new_stext_device(mu_ctx, sheet, text);
         fz_run_page(mu_ctx, page, dev, &fz_identity, NULL);
         fz_drop_device(mu_ctx, dev);
 		dev = NULL;
@@ -844,15 +844,15 @@ std::string muctx::GetText(int page_num, int type)
 		out = fz_new_output_with_buffer(mu_ctx, buf);
 		if (type == HTML)
 		{
-			fz_print_text_page_html(mu_ctx, out, text);
+            fz_print_stext_page_html(mu_ctx, out, text);
 		}
 		else if (type == XML)
 		{
-			fz_print_text_page_xml(mu_ctx, out, text);
+            fz_print_stext_page_xml(mu_ctx, out, text);
 		}
 		else
 		{
-			fz_print_text_page(mu_ctx, out, text);
+            fz_print_stext_page(mu_ctx, out, text);
 		}
 		output = std::string(((char*)buf->data));
 	}
@@ -860,8 +860,8 @@ std::string muctx::GetText(int page_num, int type)
 	{
         fz_drop_device(mu_ctx, dev);
         fz_drop_page(mu_ctx, page);
-        fz_drop_text_sheet(mu_ctx, sheet);
-        fz_drop_text_page(mu_ctx, text);
+        fz_drop_stext_sheet(mu_ctx, sheet);
+        fz_drop_stext_page(mu_ctx, text);
         fz_drop_buffer(mu_ctx, buf);
 	}
 	fz_catch(mu_ctx)
@@ -873,8 +873,8 @@ std::string muctx::GetText(int page_num, int type)
 
 void muctx::ReleaseText(void *text)
 {
-	fz_text_page *text_page = (fz_text_page*) text;
-    fz_drop_text_page(mu_ctx, text_page);
+    fz_stext_page *text_page = (fz_stext_page*) text;
+    fz_drop_stext_page(mu_ctx, text_page);
 }
 
 /* To do: banding */
@@ -920,7 +920,7 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
 			file = fopen(filename, "wb");
 			if (file == NULL)
                 fz_throw(mu_ctx, FZ_ERROR_GENERIC, "cannot open file '%s'", filename);  //  TODO: localization
-            out = fz_new_output_with_file(mu_ctx, file, 0);
+            out = fz_new_output_with_file_ptr(mu_ctx, file, 0);
 
 			dev = fz_new_svg_device(mu_ctx, out, tbounds.x1 - tbounds.x0, tbounds.y1 - tbounds.y0);
 			if (dlist != NULL)
@@ -957,15 +957,15 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
 			switch (type)
 			{
 				case PNM_OUT:
-					fz_write_pnm(mu_ctx, pix, filename);
+                    fz_save_pixmap_as_pnm(mu_ctx, pix, filename);
 					break;
 				case PCL_OUT: /* This can do multi-page */
 					fz_pcl_options options;
 					fz_pcl_preset(mu_ctx, &options, "ljet4");
-					fz_write_pcl(mu_ctx, pix, filename, append, &options);
+                    fz_save_pixmap_as_pcl(mu_ctx, pix, filename, append, &options);
 					break;
 				case PWG_OUT: /* This can do multi-page */
-					fz_write_pwg(mu_ctx, pix, filename, append, NULL);
+                    fz_save_pixmap_as_pwg(mu_ctx, pix, filename, append, NULL);
 					break;
 			}
 		}
@@ -993,8 +993,8 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
 int muctx::GetTextBlock (void *page, int block_num,
     double *top_x, double *top_y, double *height, double *width)
 {
-    fz_text_page *text = (fz_text_page*) page;
-    fz_text_block *block;
+    fz_stext_page *text = (fz_stext_page*) page;
+    fz_stext_block *block;
 
     if (text->blocks[block_num].type != FZ_PAGE_BLOCK_TEXT)
         return 0;
@@ -1012,10 +1012,10 @@ int muctx::GetTextLine(void *page, int block_num, int line_num,
     double *top_x, double *top_y, double *height, double *width)
 {
     int len = 0;
-    fz_text_block *block;
-    fz_text_line line;
-    fz_text_span *span;
-    fz_text_page *text = (fz_text_page*)page;
+    fz_stext_block *block;
+    fz_stext_line line;
+    fz_stext_span *span;
+    fz_stext_page *text = (fz_stext_page*)page;
 
     block = text->blocks[block_num].u.text;
     line = block->lines[line_num];
@@ -1036,10 +1036,10 @@ int muctx::GetTextLine(void *page, int block_num, int line_num,
 int muctx::GetTextCharacter(void *page, int block_num, int line_num,
     int item_num, double *top_x, double *top_y, double *height, double *width)
 {
-    fz_text_block *block;
-    fz_text_line line;
-    fz_text_span *span;
-    fz_text_page *text = (fz_text_page*)page;
+    fz_stext_block *block;
+    fz_stext_line line;
+    fz_stext_span *span;
+    fz_stext_page *text = (fz_stext_page*)page;
     fz_char_and_box cab;
     int index = item_num;
 
@@ -1054,7 +1054,7 @@ int muctx::GetTextCharacter(void *page, int block_num, int line_num,
     }
 
     cab.c = span->text[index].c;
-    fz_text_char_bbox(mu_ctx, &(cab.bbox), span, index);
+    fz_stext_char_bbox(mu_ctx, &(cab.bbox), span, index);
     *top_x = cab.bbox.x0;
     *top_y = cab.bbox.y0;
     *height = cab.bbox.y1 - *top_y;
@@ -1063,9 +1063,9 @@ int muctx::GetTextCharacter(void *page, int block_num, int line_num,
     return cab.c;
 }
 
-void muctx::freeText(fz_text_page *text)
+void muctx::freeText(fz_stext_page *text)
 {
-    fz_drop_text_page(mu_ctx, text);
+    fz_drop_stext_page(mu_ctx, text);
 }
 
 int muctx::getNumSepsOnPage(int page_num)

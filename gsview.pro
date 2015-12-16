@@ -6,6 +6,8 @@
 
 #  C and C++ compiler configuration
 
+QMAKE_MAC_SDK = macosx10.11  #  for Xcode 7.2
+
 CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
 macx: QMAKE_CXXFLAGS += -stdlib=libstdc++
