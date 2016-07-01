@@ -547,11 +547,11 @@ fz_display_list * muctx::CreateAnnotationList(int page_num)
 		if (annot != NULL)
 		{
 			/* Create display list */
-			dlist = fz_new_display_list(mu_ctx);
+            dlist = fz_new_display_list(mu_ctx, NULL);
 			dev = fz_new_list_device(mu_ctx, dlist);
 
-            for (annot = fz_first_annot(mu_ctx, page); annot; annot = fz_next_annot(mu_ctx, page, annot))
-                fz_run_annot(mu_ctx, page, annot, dev, &fz_identity, NULL);
+            for (annot = fz_first_annot(mu_ctx, page); annot; annot = fz_next_annot(mu_ctx, annot))
+                fz_run_annot(mu_ctx, annot, dev, &fz_identity, NULL);
             annot_cache->Add(page_num, 0, 0, dlist, mu_ctx, page);
 		}
 	}
@@ -589,7 +589,7 @@ fz_display_list * muctx::CreateDisplayList(int page_num, int *width, int *height
         page = fz_load_page(mu_ctx, mu_doc, page_num);
 
 		/* Create a new list */
-		dlist = fz_new_display_list(mu_ctx);
+        dlist = fz_new_display_list(mu_ctx, NULL);
 		dev = fz_new_list_device(mu_ctx, dlist);
         fz_run_page_contents(mu_ctx, page, dev, &fz_identity, NULL);
 		page_size = MeasurePage(page);
@@ -646,7 +646,7 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
         text = fz_new_stext_page(mu_ctx);
 
 		/* Create a new list */
-        dlist = fz_new_display_list(mu_ctx);
+        dlist = fz_new_display_list(mu_ctx, NULL);
 		dev = fz_new_list_device(mu_ctx, dlist);
 
 		/* Deal with text device */
@@ -686,10 +686,6 @@ status_t muctx::RenderPageMT(void *dlist, void *a_dlist, int page_width, int pag
 							 float scale, bool flipy, bool tile, point_t top_left,
 							 point_t bottom_right)
 {
-    UNUSED(page_width);
-    UNUSED(tile);
-    UNUSED(bottom_right);
-
 	fz_device *dev = NULL;
 	fz_pixmap *pix = NULL;
 	fz_matrix ctm, *pctm = &ctm;
@@ -721,10 +717,12 @@ status_t muctx::RenderPageMT(void *dlist, void *a_dlist, int page_width, int pag
 		}
 		ctm.e -= top_left.X;
 
-		pix = fz_new_pixmap_with_data(ctx_clone, fz_device_bgr(ctx_clone),
-										bmp_width, bmp_height, bmp_data);
+        fz_colorspace *colorspace = fz_device_bgr(ctx_clone);
+        int stride = ((colorspace ? colorspace->n : 0) + 1) * bmp_width;
+        pix = fz_new_pixmap_with_data(ctx_clone, colorspace,
+                                        bmp_width, bmp_height, 1, stride, bmp_data);
 		fz_clear_pixmap_with_value(ctx_clone, pix, 255);
-		dev = fz_new_draw_device(ctx_clone, pix);
+        dev = fz_new_draw_device(ctx_clone, &fz_identity, pix);
         fz_run_display_list(ctx_clone, display_list, dev, pctm, NULL, NULL);
 		if (annot_displaylist != NULL)
             fz_run_display_list(ctx_clone, annot_displaylist, dev, pctm, NULL, NULL);
@@ -777,19 +775,23 @@ status_t muctx::RenderPage(int page_num, unsigned char *bmp_data, int bmp_width,
 			ctm.f = bmp_height;
 			ctm.d = -ctm.d;
 		}
+
+        fz_colorspace *colorspace = fz_device_bgr(mu_ctx);
+        int stride = ((colorspace ? colorspace->n : 0) + 1) * bmp_width;
+
 		pix = fz_new_pixmap_with_data(mu_ctx, fz_device_bgr(mu_ctx), bmp_width, 
-										bmp_height, bmp_data);
+                                        bmp_height, 1, stride, bmp_data);
 		fz_clear_pixmap_with_value(mu_ctx, pix, 255);
-		dev = fz_new_draw_device(mu_ctx, pix);
+        dev = fz_new_draw_device(mu_ctx, &fz_identity, pix);
 //		fz_run_page(mu_doc, page, dev, pctm, NULL);
         fz_run_page_contents(mu_ctx, page, dev, pctm, NULL);
 
         if (includeAnnotations)
         {
             fz_annot *annot;
-            for (annot = fz_first_annot(mu_ctx, page); annot; annot = fz_next_annot(mu_ctx, page, annot))
+            for (annot = fz_first_annot(mu_ctx, page); annot; annot = fz_next_annot(mu_ctx, annot))
 //                fz_run_annot(mu_doc, page, annot, dev, &fz_identity, NULL);
-                  fz_run_annot(mu_ctx, page, annot, dev, pctm, NULL);
+                  fz_run_annot(mu_ctx, annot, dev, pctm, NULL);
         }
 	}
 	fz_always(mu_ctx)
@@ -932,16 +934,16 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
 			else
 			{
 				fz_annot *annot;
-                for (annot = fz_first_annot(mu_ctx, page); annot; annot = fz_next_annot(mu_ctx, page, annot))
-                    fz_run_annot(mu_ctx, page, annot, dev, &fz_identity, NULL);
+                for (annot = fz_first_annot(mu_ctx, page); annot; annot = fz_next_annot(mu_ctx, annot))
+                    fz_run_annot(mu_ctx, annot, dev, &fz_identity, NULL);
 			}
 		}
 		else
 		{
-			pix = fz_new_pixmap_with_bbox(mu_ctx, fz_device_rgb(mu_ctx), &ibounds);
-			fz_pixmap_set_resolution(pix, resolution);
+            pix = fz_new_pixmap_with_bbox(mu_ctx, fz_device_rgb(mu_ctx), &ibounds, 1);
+            fz_set_pixmap_resolution(mu_ctx, pix, resolution, resolution);
 			fz_clear_pixmap_with_value(mu_ctx, pix, 255);
-			dev = fz_new_draw_device(mu_ctx, pix);
+            dev = fz_new_draw_device(mu_ctx, &fz_identity, pix);
 			if (dlist != NULL)
                 fz_run_display_list(mu_ctx, dlist, dev, &ctm, &tbounds, NULL);
 			else
@@ -951,8 +953,8 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
 			else
 			{
 				fz_annot *annot;
-                for (annot = fz_first_annot(mu_ctx, page); annot; annot = fz_next_annot(mu_ctx, page, annot))
-                    fz_run_annot(mu_ctx, page, annot, dev, &fz_identity, NULL);
+                for (annot = fz_first_annot(mu_ctx, page); annot; annot = fz_next_annot(mu_ctx, annot))
+                    fz_run_annot(mu_ctx, annot, dev, &fz_identity, NULL);
 			}
 			switch (type)
 			{

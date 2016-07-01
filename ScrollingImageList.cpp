@@ -333,8 +333,6 @@ bool ScrollingImageList::isSliderDown()
 
 void ScrollingImageList::valueChangedSlot(int val)
 {
-    UNUSED(val);
-
     if (!isSliderDown())
     {
         //  probably clicked in the trough

@@ -182,8 +182,6 @@ void PrintDialog::on_pageListEdit_textChanged()
 
 void PrintDialog::on_printerCombo_currentIndexChanged(int index)
 {
-    UNUSED(index);
-
     //  user changed selected printer
     onNewPrinter();
 }

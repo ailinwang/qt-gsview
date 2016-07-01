@@ -446,7 +446,6 @@ void Document::PDFExtract (const char *infile, const char *outfile,
 
     //  run the tool
     int result = pdfclean_main (argc, argv);
-    UNUSED(result);
 
     //  clean up
     delete(argv);

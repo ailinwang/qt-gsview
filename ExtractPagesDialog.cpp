@@ -469,8 +469,6 @@ void ExtractPagesDialog::onCanceled()
 
 void ExtractPagesDialog::onFinished(int exitCode)
 {
-    UNUSED(exitCode);
-
     //  are we canceled?
     if (m_progressDialog->wasCanceled())
     {

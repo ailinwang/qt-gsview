@@ -128,8 +128,6 @@ void ImageWidget::setSelected(bool isSelected)
 
 bool ImageWidget::eventFilter (QObject *obj, QEvent *event)
 {
-    UNUSED(obj);
-
     //  post event if it was a click
     if (event->type() == QEvent::MouseButtonRelease)
     {
@@ -383,8 +381,6 @@ void ImageWidget::setRendered (bool rendered)
 
 void ImageWidget::onMouseRelease(QEvent *event)
 {
-    UNUSED(event);
-
     //  clicked on a page.
     //  Handle it if we're not currently selecting text
     if (m_mouseInLink)

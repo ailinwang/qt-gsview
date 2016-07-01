@@ -124,8 +124,9 @@ RESOURCES += \
 #  Libraries to link to
 #  the order of the libraries here is very important.
 
-LIBS += -L$$PWD/mupdf/build/debug/
-unix:  LIBS += -lmupdf -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lmujs
+LIBS += -L$$PWD/mupdf/build/release
+unix:  LIBS += -lmupdf -lmupdfthird -lmutools
+
 #  not using CUPS
 #unix:  LIBS += -lcups
 unix:  LIBS += -lssl -lcrypto

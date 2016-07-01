@@ -107,8 +107,6 @@ fz_page *Cache::FindPage(int page_num)
 
 fz_display_list* Cache::Use(int value, int *width_out, int *height_out, fz_context *mu_ctx)
 {
-    UNUSED(mu_ctx);
-
 	std::lock_guard<std::mutex> lock(cache_lock);
 	cache_entry_t *curr_entry = this->head;
 

@@ -230,8 +230,6 @@ void PageList::copyText()
 
 void PageList::onMouseRelease(QEvent *e)
 {
-    UNUSED(e);
-
     ImageWidget *widget = dynamic_cast<ImageWidget*>(qApp->widgetAt(QCursor::pos()));
 
     if (m_rubberBand && m_selectingArea)
@@ -475,8 +473,6 @@ void PageList::updateSelection(QPoint point)
 
 void PageList::onMouseMove(QEvent *e)
 {
-    UNUSED(e);
-
     if (m_rubberBand && m_selectingArea)
     {
         ImageWidget *image = &(images()[m_rubberbandpage]);

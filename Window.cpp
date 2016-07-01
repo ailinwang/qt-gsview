@@ -1462,8 +1462,6 @@ void Window::enterFullScreen()
 
 bool Window::eventFilter(QObject *object, QEvent *e)
 {
-    UNUSED(object);
-
     QNativeGestureEvent *gesture = dynamic_cast<QNativeGestureEvent*>(e);
     if (gesture != NULL)
     {
@@ -1515,8 +1513,6 @@ void Window::stopSearch()
 
 void Window::closeEvent(QCloseEvent *event)
 {
-    UNUSED(event);
-
     //  don't do this twice
     if (!m_isOpen)
         return;

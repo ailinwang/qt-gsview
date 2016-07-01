@@ -618,8 +618,6 @@ void FileSave::onCanceled()
 
 void FileSave::onFinished(int exitCode)
 {
-    UNUSED(exitCode);
-
     //  are we canceled?
     if (m_progressDialog->wasCanceled())
     {
