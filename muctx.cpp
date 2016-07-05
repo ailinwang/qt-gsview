@@ -653,9 +653,9 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
         textdev = fz_new_stext_device(mu_ctx, sheet, text);
         fz_run_page(mu_ctx, page, textdev, &fz_identity, NULL);
 
-		*length = text->len;
         fz_drop_device(mu_ctx, textdev);
-		textdev = NULL;
+        *length = text->len;
+        textdev = NULL;
 		*text_out = text;
 
         fz_run_page_contents(mu_ctx, page, dev, &fz_identity, NULL);
