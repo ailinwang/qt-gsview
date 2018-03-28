@@ -6,7 +6,8 @@
 
 #  C and C++ compiler configuration
 
-QMAKE_MAC_SDK = macosx10.11  #  for Xcode 7.2
+#QMAKE_MAC_SDK = macosx10.13  #  for Xcode 7.2
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
 
 CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
@@ -129,7 +130,7 @@ unix:  LIBS += -lmupdf -lmupdfthird -lmutools
 
 #  not using CUPS
 #unix:  LIBS += -lcups
-unix:  LIBS += -lssl -lcrypto
+#unix:  LIBS += -lssl -lcrypto
 
 #unix: LIBS += $$PWD/ghostpdl/gs.a
 #unix: LIBS += $$PWD/ghostpdl/sobin/libgs.dylib
