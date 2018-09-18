@@ -26,11 +26,11 @@ _BACKGROUND_IMAGE_DPI_W=`sips -g dpiWidth ${DMG_BACKGROUND_IMG} | grep -Eo '[0-9
 if [ $(echo " $_BACKGROUND_IMAGE_DPI_H != 72.0 " | bc) -eq 1 -o $(echo " $_BACKGROUND_IMAGE_DPI_W != 72.0 " | bc) -eq 1 ]; then
    echo "WARNING: The background image's DPI is not 72.  This will result in distorted backgrounds on Mac OS X 10.7+."
    echo "         I will convert it to 72 DPI for you."
-   
+
    _DMG_BACKGROUND_TMP="${DMG_BACKGROUND_IMG%.*}"_dpifix."${DMG_BACKGROUND_IMG##*.}"
- 
+
    sips -s dpiWidth 72 -s dpiHeight 72 ${DMG_BACKGROUND_IMG} --out ${_DMG_BACKGROUND_TMP}
-   
+
    DMG_BACKGROUND_IMG="${_DMG_BACKGROUND_TMP}"
 fi
 
@@ -44,10 +44,12 @@ mkdir -p "${STAGING_DIR}"
 cp -Rfp ./GSView.app "${STAGING_DIR}"
 cp -rfp ./license.txt "${STAGING_DIR}"
 
- 
+
 #  create and mount the temporary DMG file
 hdiutil create -srcfolder "${STAGING_DIR}" -volname "${VOL_NAME}" -format UDSP "${DMG_TMP}"
+echo "created ${DMG_TMP}"
 DEVICE=$(hdiutil attach -readwrite -noverify "${DMG_TMP}" | egrep '^/dev/' | sed 1q | awk '{print $1}')
+echo "attached at ${DEVICE}"
 sleep 2
 
 
@@ -74,7 +76,7 @@ echo '
            set current view of container window to icon view
            set toolbar visible of container window to false
            set statusbar visible of container window to false
-           set the bounds of container window to {400, 100, 920, 490}
+           set the bounds of container window to {400, 100, 920, 550}
 	   delay 2
            set viewOptions to the icon view options of container window
            set arrangement of viewOptions to not arranged
@@ -88,29 +90,31 @@ echo '
            open
            update without registering applications
            delay 2
+           eject
      end tell
    end tell
 ' | osascript
- 
+
 sync
 sleep 2
 
 
 #  bless the folder so it opens automatically
 #  and then unmount
-bless /Volumes/${VOL_NAME} --openfolder /Volumes/${VOL_NAME}
-hdiutil detach "${DEVICE}"
+#bless /Volumes/${VOL_NAME} --openfolder /Volumes/${VOL_NAME}
+#echo "about to detach ${DEVICE}"
+#hdiutil detach -force "${DEVICE}"
 
 
 #  now make the final image using compression
 echo "Creating compressed image"
 hdiutil convert "${DMG_TMP}" -format UDZO -imagekey zlib-level=9 -o "${DMG_FINAL}"
- 
+
 
 # clean up
 rm -rf "${DMG_TMP}"
 rm -rf "${STAGING_DIR}"
- 
+
 
 echo 'Done.'
 exit
