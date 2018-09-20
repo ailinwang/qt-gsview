@@ -158,6 +158,7 @@ macx {
 macx {
     ICON = resources/gsview_app.icns
     QMAKE_POST_LINK += $$quote(cp $$PWD/resources/gsview_mac.plist $$OUT_PWD/gsview.app/Contents/Info.plist $$escape_expand(\n\t))
+    QMAKE_POST_LINK += $$quote(cp $$PWD/resources/gsview_app.icns $$OUT_PWD/gsview.app/Contents/Resources/gsview_app.icns $$escape_expand(\n\t))
 }
 
 #  documentation
