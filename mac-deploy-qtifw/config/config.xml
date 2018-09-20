@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Installer>
-     <Name>gsview</Name>
+     <Name>GSView 6.0</Name>
      <Version>6.0</Version>
      <Title>GSView 6.0 Installer</Title>
      <Publisher>Artifex Software</Publisher>
-     <StartMenuDir>gsview</StartMenuDir>
-     <TargetDir>Applications/GSView</TargetDir>
+     <StartMenuDir>GSView 6.0</StartMenuDir>
+     <TargetDir>/Applications/GSView 6.0</TargetDir>
 </Installer>

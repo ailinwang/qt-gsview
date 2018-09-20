@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-     <DisplayName>GSView</DisplayName>
-     <Description>Install GSView.</Description>
+     <DisplayName>GSView 6.0</DisplayName>
+     <Description>Install GSView 6.0</Description>
      <Version>6.0</Version>
      <ReleaseDate>2015-02-04</ReleaseDate>
      <Name>com.artifex.gsview</Name>
