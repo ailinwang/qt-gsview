@@ -1,5 +1,5 @@
 
-This End User License Agreement ("Agreement") is a legal agreement between ARTIFEX SOFTWARE INC., a California corporation with its principal place of business as 7 Mt. Lassen Drive, A-134, San Rafael, California 94903 ("Artifex") and you (either an individual or an entity, as identified in your invoice regarding the use of Artifex's software for which you have purchased a license, including any documentation that may be included in the software (together, the "Software").
+This End User License Agreement ("Agreement") is a legal agreement between ARTIFEX SOFTWARE INC., a California corporation with its principal place of business as 1305 Grant Avenue, Suite 200, Novato, CA 94945 ("Artifex") and you (either an individual or an entity, as identified in your invoice regarding the use of Artifex's software for which you have purchased a license, including any documentation that may be included in the software (together, the "Software").
 
 
 Grant of License.
