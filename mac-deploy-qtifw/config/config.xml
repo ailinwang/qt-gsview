@@ -6,4 +6,6 @@
      <Publisher>Artifex Software</Publisher>
      <StartMenuDir>GSView 6.0</StartMenuDir>
      <TargetDir>/Applications/GSView 6.0</TargetDir>
+     <MaintenanceToolName>Uninstaller</MaintenanceToolName>
+     <ControlScript>controlscript.qs</ControlScript>
 </Installer>
