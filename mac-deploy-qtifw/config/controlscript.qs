@@ -1,5 +1,0 @@
-
-function Controller()
-{
-    // default constructor
-}

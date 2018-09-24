@@ -5,9 +5,13 @@
      <Version>6.0</Version>
      <ReleaseDate>2015-02-04</ReleaseDate>
      <Name>com.artifex.gsview</Name>
-     <Default>true</Default>
+	 <Default>true</Default>
+	 <Required>true</Required>
      <Script>installscript.qs</Script>
      <Licenses>
           <License name="License Agreement" file="license.txt"/>
      </Licenses>
+	 <UserInterfaces>
+        <UserInterface>targetwidget.ui</UserInterface>
+    </UserInterfaces>
 </Package>
