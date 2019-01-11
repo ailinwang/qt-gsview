@@ -1,0 +1,786 @@
+diff --git a/PrintDialog.cpp b/PrintDialog.cpp
+index ffdc1a7..451ae58 100644
+--- a/PrintDialog.cpp
++++ b/PrintDialog.cpp
+@@ -2,6 +2,8 @@
+ #include "ui_PrintDialog.h"
+ #include "Printer.h"
+ 
++#include <cmath>
++
+ #include <QtPrintSupport/QPrinterInfo>
+ #include <QDebug>
+ #include <QPageSetupDialog>
+@@ -264,10 +266,10 @@ void PrintDialog::renderPreview()
+     int framew = ui->frame->width();
+ 
+     double scale = 1.0;
+-    scale = fmin(scale,double(framew)/(paperWidth*72.0));
+-    scale = fmin(scale,double(frameh)/(paperHeight*72.0));
+-    scale = fmin(scale,double(frameh)/(paperWidth*72.0));
+-    scale = fmin(scale,double(framew)/(paperHeight*72.0));
++    scale = std::min(scale,double(framew)/(paperWidth*72.0));
++    scale = std::min(scale,double(frameh)/(paperHeight*72.0));
++    scale = std::min(scale,double(frameh)/(paperWidth*72.0));
++    scale = std::min(scale,double(framew)/(paperHeight*72.0));
+ 
+     int pw = paperWidth*72.0*scale;
+     int ph = paperHeight*72.0*scale;
+@@ -313,7 +315,7 @@ void PrintDialog::renderPreview()
+         }
+         else
+         {
+-            m_autoFitScale = fmin(paperWidth/pageWidth,paperHeight/pageHeight);
++            m_autoFitScale = std::min(paperWidth/pageWidth,paperHeight/pageHeight);
+             if (pageAspect<1)
+                 ui->previewLabel->setAlignment(Qt::AlignVCenter);
+             else
+@@ -448,7 +450,7 @@ void PrintDialog::onNewPrinter()
+ QString formatDimension(double val)
+ {
+     QString str;
+-    if (fabs(val - round(val)) < 0.000001)
++    if (fabs(val - std::round(val)) < 0.000001)
+         str.sprintf("%d", (int)val);
+     else
+         str.sprintf("%.1f", val);
+diff --git a/gsview.pro b/gsview.pro
+index 99faf12..6217d5b 100644
+--- a/gsview.pro
++++ b/gsview.pro
+@@ -6,7 +6,7 @@
+ 
+ #  C and C++ compiler configuration
+ 
+-QMAKE_MAC_SDK = macosx10.11  #  for Xcode 7.2
++#QMAKE_MAC_SDK = macosx10.11  #  for Xcode 7.2
+ 
+ CONFIG += c++11
+ QMAKE_CXXFLAGS += -std=c++11
+@@ -125,11 +125,12 @@ RESOURCES += \
+ #  the order of the libraries here is very important.
+ 
+ LIBS += -L$$PWD/mupdf/build/release
+-unix:  LIBS += -lmupdf -lmupdfthird -lmutools
++unix:  LIBS += -lmupdf -lmupdfthird # -lmutools
+ 
+ #  not using CUPS
+ #unix:  LIBS += -lcups
+-unix:  LIBS += -lssl -lcrypto
++#unix:  LIBS += -lssl -lcrypto
++
+ 
+ #unix: LIBS += $$PWD/ghostpdl/gs.a
+ #unix: LIBS += $$PWD/ghostpdl/sobin/libgs.dylib
+diff --git a/muctx.cpp b/muctx.cpp
+index 7a29741..c5054a0 100644
+--- a/muctx.cpp
++++ b/muctx.cpp
+@@ -345,21 +345,43 @@ void muctx::FlattenOutline(fz_outline *outline, int level,
+ 
+ 	while (outline)
+ 	{
+-		if (outline->dest.kind == FZ_LINK_GOTO)
+-		{
+-			int page = outline->dest.ld.gotor.page;
+-			if (page >= 0 && outline->title)
+-			{
+-				/* Add to the contents std:vec */
+-				sh_content content_item(new content_t());
+-				content_item->page = page;
+-				content_item->string_orig = outline->title;
+-				str_indent = content_item->string_orig;
+-				str_indent.insert(0, indent_str);
+-				content_item->string_margin = str_indent;
+-				contents_vec->push_back(content_item);
+-			}
+-		}
++        if (outline->uri)
++        {
++            if (!fz_is_external_link(mu_ctx, outline->uri))
++            {
++                float x, y;
++                int page = fz_resolve_link(mu_ctx, mu_doc, outline->uri, &x, &y);
++                if (page >= 0 && outline->title)
++                {
++                    /* Add to the contents std:vec */
++                    sh_content content_item(new content_t());
++                    content_item->page = page;
++                    content_item->string_orig = outline->title;
++                    str_indent = content_item->string_orig;
++                    str_indent.insert(0, indent_str);
++                    content_item->string_margin = str_indent;
++                    contents_vec->push_back(content_item);
++                }
++            }
++        }
++
++
++
++//		if (outline->dest.kind == FZ_LINK_GOTO)
++//		{
++//			int page = outline->dest.ld.gotor.page;
++//			if (page >= 0 && outline->title)
++//			{
++//				/* Add to the contents std:vec */
++//				sh_content content_item(new content_t());
++//				content_item->page = page;
++//				content_item->string_orig = outline->title;
++//				str_indent = content_item->string_orig;
++//				str_indent.insert(0, indent_str);
++//				content_item->string_margin = str_indent;
++//				contents_vec->push_back(content_item);
++//			}
++//		}
+ 		FlattenOutline(outline->down, level + 1, contents_vec);
+ 		outline = outline->next;
+ 	}
+@@ -398,56 +420,86 @@ void muctx::AbortTextSearch()
+ 
+ int muctx::GetTextSearch(int page_num, char* needle, sh_vector_text texts_vec)
+ {
+-	fz_page *page = NULL;
+-    fz_stext_sheet *sheet = NULL;
+-	fz_device *dev = NULL;
+-    fz_stext_page *text = NULL;
+-	int hit_count = 0;
+-	int k;
++    fz_page *page = NULL;
++//    fz_stext_sheet *sheet = NULL;
++//	fz_device *dev = NULL;
++//    fz_stext_page *text = NULL;
++    int hit_count = 0;
++    int k;
+ 
+     fz_context *ctx_clone = NULL;
+     ctx_clone = fz_clone_context(mu_ctx);
+ 
+-    m_search_cookie->abort = false;
++    fz_rect hits[256];
+ 
+-	fz_var(page);
+-	fz_var(sheet);
+-	fz_var(dev);
+-    fz_try(ctx_clone)
+-	{
++    fz_try(mu_ctx)
++    {
+         page = fz_load_page(ctx_clone, mu_doc, page_num);
+-        sheet = fz_new_stext_sheet(ctx_clone);
+-        text = fz_new_stext_page(ctx_clone);
+-        dev = fz_new_stext_device(ctx_clone, sheet, text);
+-        fz_run_page(ctx_clone, page, dev, &fz_identity, m_search_cookie);
+-        fz_drop_device(ctx_clone, dev);  /* Why does this need to be done here?  Seems odd */
+-		dev = NULL;
+-        hit_count = fz_search_stext_page(ctx_clone, text, needle, mu_hit_bbox, nelem(mu_hit_bbox));
+-
+-		for (k = 0; k < hit_count; k++)
+-		{
+-			sh_text text_search(new text_search_t());
+-			text_search->upper_left.X = mu_hit_bbox[k].x0;
+-			text_search->upper_left.Y = mu_hit_bbox[k].y0;
+-			text_search->lower_right.X = mu_hit_bbox[k].x1;
+-			text_search->lower_right.Y = mu_hit_bbox[k].y1;
+-			texts_vec->push_back(text_search);
+-		}
+-	}
++        hit_count = fz_search_page(mu_ctx, page, needle, hits, nelem(hits));
++    }
+     fz_always(ctx_clone)
+-	{
++    {
+         fz_drop_page(ctx_clone, page);
+-        fz_drop_device(ctx_clone, dev);
+-        fz_drop_stext_sheet(ctx_clone, sheet);
+-        fz_drop_stext_page(ctx_clone, text);
+-	}
+-    fz_catch(ctx_clone)
+-	{
++    }
++    fz_catch(mu_ctx)
++    {
+         fz_drop_context(ctx_clone);
+         return E_FAILURE;
+-	}
++    }
++
++    for (k = 0; k < hit_count; k++)
++    {
++        sh_text text_search(new text_search_t());
++        text_search->upper_left.X = hits[k].x0;
++        text_search->upper_left.Y = hits[k].y0;
++        text_search->lower_right.X = hits[k].x1;
++        text_search->lower_right.Y = hits[k].y1;
++        texts_vec->push_back(text_search);
++    }
++
+     fz_drop_context(ctx_clone);
+-	return hit_count;
++    return hit_count;
++
++//    m_search_cookie->abort = false;
++
++//	fz_var(page);
++//	fz_var(sheet);
++//	fz_var(dev);
++//    fz_try(ctx_clone)
++//	{
++//        page = fz_load_page(ctx_clone, mu_doc, page_num);
++//        sheet = fz_new_stext_sheet(ctx_clone);
++//        text = fz_new_stext_page(ctx_clone);
++//        dev = fz_new_stext_device(ctx_clone, sheet, text);
++//        fz_run_page(ctx_clone, page, dev, &fz_identity, m_search_cookie);
++//        fz_drop_device(ctx_clone, dev);  /* Why does this need to be done here?  Seems odd */
++//		dev = NULL;
++//        hit_count = fz_search_stext_page(ctx_clone, text, needle, mu_hit_bbox, nelem(mu_hit_bbox));
++
++//		for (k = 0; k < hit_count; k++)
++//		{
++//			sh_text text_search(new text_search_t());
++//			text_search->upper_left.X = mu_hit_bbox[k].x0;
++//			text_search->upper_left.Y = mu_hit_bbox[k].y0;
++//			text_search->lower_right.X = mu_hit_bbox[k].x1;
++//			text_search->lower_right.Y = mu_hit_bbox[k].y1;
++//			texts_vec->push_back(text_search);
++//		}
++//	}
++//    fz_always(ctx_clone)
++//	{
++//        fz_drop_page(ctx_clone, page);
++//        fz_drop_device(ctx_clone, dev);
++//        fz_drop_stext_sheet(ctx_clone, sheet);
++//        fz_drop_stext_page(ctx_clone, text);
++//	}
++//    fz_catch(ctx_clone)
++//	{
++//        fz_drop_context(ctx_clone);
++//        return E_FAILURE;
++//	}
++//    fz_drop_context(ctx_clone);
++//	return hit_count;
+ }
+ 
+ /* Get the links and pack into a smart pointer structure */
+@@ -479,32 +531,54 @@ unsigned int muctx::GetLinks(int page_num, sh_vector_link links_vec)
+ 				link->lower_right.X = curr_rect.x1;
+ 				link->lower_right.Y = curr_rect.y1;
+ 
+-				switch (curr_link->dest.kind)
+-				{
+-				case FZ_LINK_GOTO:
+-
+-					link->type = LINK_GOTO;
+-					link->page_num = curr_link->dest.ld.gotor.page;
+-					break;
+-
+-				case FZ_LINK_URI:
+-				{
+-					int lenstr = strlen(curr_link->dest.ld.uri.uri);
+-					std::unique_ptr<char[]> uri(new char[lenstr + 1]);
++                if (fz_is_external_link(mu_ctx, curr_link->uri))
++                {
++                    int lenstr = strlen(curr_link->uri);
++                    std::unique_ptr<char[]> uri(new char[lenstr + 1]);
+ #ifdef _QT
+-                    strncpy(uri.get(), curr_link->dest.ld.uri.uri, lenstr + 1);
++                    strncpy(uri.get(), curr_link->uri, lenstr + 1);
+ #else
+-					strcpy_s(uri.get(), lenstr + 1, curr_link->dest.ld.uri.uri);
++                    strcpy_s(uri.get(), lenstr + 1, curr_link->uri);
+ #endif
+-					link->uri.swap(uri);
+-					link->type = LINK_URI;
+-					break;
+-				}
++                    link->uri.swap(uri);
++                    link->type = LINK_URI;
++                }
++                else
++                {
++                    float x, y;
++                    int page = fz_resolve_link(mu_ctx, mu_doc, curr_link->uri, &x, &y);
++                    link->type = LINK_GOTO;
++                    link->page_num = page;
++                }
++
++
++//				switch (curr_link->dest.kind)
++//				{
++//				case FZ_LINK_GOTO:
++
++//					link->type = LINK_GOTO;
++//					link->page_num = curr_link->dest.ld.gotor.page;
++//					break;
++
++//				case FZ_LINK_URI:
++//				{
++//					int lenstr = strlen(curr_link->dest.ld.uri.uri);
++//					std::unique_ptr<char[]> uri(new char[lenstr + 1]);
++//#ifdef _QT
++//                    strncpy(uri.get(), curr_link->dest.ld.uri.uri, lenstr + 1);
++//#else
++//					strcpy_s(uri.get(), lenstr + 1, curr_link->dest.ld.uri.uri);
++//#endif
++//					link->uri.swap(uri);
++//					link->type = LINK_URI;
++//					break;
++//				}
++
++//				default:
++//					link->type = NOT_SET;
++
++//				}
+ 
+-				default:
+-					link->type = NOT_SET;
+-
+-				}
+ 				links_vec->push_back(link);
+ 				curr_link = curr_link->next;
+ 				num_links += 1;
+@@ -616,7 +690,7 @@ fz_display_list * muctx::CreateDisplayList(int page_num, int *width, int *height
+ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *height,
+     fz_stext_page **text_out, int *length)
+ {
+-    fz_stext_sheet *sheet = NULL;
++//    fz_stext_sheet *sheet = NULL;
+     fz_stext_page *text = NULL;
+ 	fz_device *dev = NULL;
+ 	fz_device *textdev = NULL;
+@@ -636,25 +710,26 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
+ 	fz_var(textdev);
+ 	fz_var(page);
+ 	fz_var(dlist);
+-	fz_var(sheet);
++//	fz_var(sheet);
+ 	fz_var(text);
+ 
+ 	fz_try(mu_ctx)
+ 	{
+         page = fz_load_page(mu_ctx, mu_doc, page_num);
+-        sheet = fz_new_stext_sheet(mu_ctx);
+-        text = fz_new_stext_page(mu_ctx);
++//        sheet = fz_new_stext_sheet(mu_ctx);
++//        text = fz_new_stext_page(mu_ctx);
++        text = fz_new_stext_page_from_page(mu_ctx, page, NULL);
+ 
+ 		/* Create a new list */
+         dlist = fz_new_display_list(mu_ctx, NULL);
+ 		dev = fz_new_list_device(mu_ctx, dlist);
+ 
+ 		/* Deal with text device */
+-        textdev = fz_new_stext_device(mu_ctx, sheet, text);
++        textdev = fz_new_stext_device(mu_ctx, text, NULL);
+         fz_run_page(mu_ctx, page, textdev, &fz_identity, NULL);
+ 
+         fz_drop_device(mu_ctx, textdev);
+-        *length = text->len;
++//        *length = text->len;  //  TODO?????
+         textdev = NULL;
+ 		*text_out = text;
+ 
+@@ -669,7 +744,7 @@ fz_display_list * muctx::CreateDisplayListText(int page_num, int *width, int *he
+ 	{
+         fz_drop_device(mu_ctx, dev);
+ //        fz_drop_page(mu_ctx, page);
+-        fz_drop_stext_sheet(mu_ctx, sheet);
++//        fz_drop_stext_sheet(mu_ctx, sheet);
+ //        fz_drop_display_list(mu_ctx, dlist);
+ 	}
+ 	fz_catch(mu_ctx)
+@@ -718,9 +793,14 @@ status_t muctx::RenderPageMT(void *dlist, void *a_dlist, int page_width, int pag
+ 		ctm.e -= top_left.X;
+ 
+         fz_colorspace *colorspace = fz_device_bgr(ctx_clone);
+-        int stride = ((colorspace ? colorspace->n : 0) + 1) * bmp_width;
++        int ncs = fz_colorspace_n(ctx_clone, colorspace);
++        int stride = ((colorspace ? ncs : 0) + 1) * bmp_width;
+         pix = fz_new_pixmap_with_data(ctx_clone, colorspace,
+-                                        bmp_width, bmp_height, 1, stride, bmp_data);
++                                        bmp_width, bmp_height, NULL, 1, stride, bmp_data);
++
++//        pix = fz_new_pixmap_with_data(mu_ctx, fz_device_rgb(mu_ctx), &bbox, NULL, 1, &dummy);
++//        pixmap->stride = width * sizeof(int32_t);
++
+ 		fz_clear_pixmap_with_value(ctx_clone, pix, 255);
+         dev = fz_new_draw_device(ctx_clone, &fz_identity, pix);
+         fz_run_display_list(ctx_clone, display_list, dev, pctm, NULL, NULL);
+@@ -776,11 +856,17 @@ status_t muctx::RenderPage(int page_num, unsigned char *bmp_data, int bmp_width,
+ 			ctm.d = -ctm.d;
+ 		}
+ 
++//        fz_colorspace *colorspace = fz_device_bgr(mu_ctx);
++//        int stride = ((colorspace ? colorspace->n : 0) + 1) * bmp_width;
++//		pix = fz_new_pixmap_with_data(mu_ctx, fz_device_bgr(mu_ctx), bmp_width,
++//                                        bmp_height, 1, stride, bmp_data);
++
+         fz_colorspace *colorspace = fz_device_bgr(mu_ctx);
+-        int stride = ((colorspace ? colorspace->n : 0) + 1) * bmp_width;
++        int ncs = fz_colorspace_n(mu_ctx, colorspace);
++        int stride = ((colorspace ? ncs : 0) + 1) * bmp_width;
++        pix = fz_new_pixmap_with_data(mu_ctx, colorspace,
++                                        bmp_width, bmp_height, NULL, 1, stride, bmp_data);
+ 
+-		pix = fz_new_pixmap_with_data(mu_ctx, fz_device_bgr(mu_ctx), bmp_width, 
+-                                        bmp_height, 1, stride, bmp_data);
+ 		fz_clear_pixmap_with_value(mu_ctx, pix, 255);
+         dev = fz_new_draw_device(mu_ctx, &fz_identity, pix);
+ //		fz_run_page(mu_doc, page, dev, pctm, NULL);
+@@ -822,47 +908,51 @@ std::string muctx::GetText(int page_num, int type)
+ 	fz_output *out = NULL;
+ 	fz_device *dev = NULL;
+ 	fz_page *page = NULL;
+-    fz_stext_sheet *sheet = NULL;
++//    fz_stext_sheet *sheet = NULL;
+     fz_stext_page *text = NULL;
+ 	fz_buffer *buf = NULL;
+ 	std::string output;
+ 
+ 	fz_var(dev);
+ 	fz_var(page);
+-	fz_var(sheet);
++//	fz_var(sheet);
+ 	fz_var(text);
+ 	fz_var(buf);
+ 	fz_try(mu_ctx)
+ 	{
+         page = fz_load_page(mu_ctx, mu_doc, page_num);
+-        sheet = fz_new_stext_sheet(mu_ctx);
+-        text = fz_new_stext_page(mu_ctx);
+-        dev = fz_new_stext_device(mu_ctx, sheet, text);
++//        sheet = fz_new_stext_sheet(mu_ctx);
++        text = fz_new_stext_page(mu_ctx, NULL);
++        dev = fz_new_stext_device(mu_ctx, text, NULL);
+         fz_run_page(mu_ctx, page, dev, &fz_identity, NULL);
+         fz_drop_device(mu_ctx, dev);
+ 		dev = NULL;
+-		fz_analyze_text(mu_ctx, sheet, text);
++//		fz_analyze_text(mu_ctx, sheet, text);  //  TODO????
+ 		buf = fz_new_buffer(mu_ctx, 256);
+ 		out = fz_new_output_with_buffer(mu_ctx, buf);
+ 		if (type == HTML)
+ 		{
+-            fz_print_stext_page_html(mu_ctx, out, text);
++            fz_print_stext_page_as_html(mu_ctx, out, text);
+ 		}
+ 		else if (type == XML)
+ 		{
+-            fz_print_stext_page_xml(mu_ctx, out, text);
++            fz_print_stext_page_as_xml(mu_ctx, out, text);
+ 		}
+ 		else
+ 		{
+-            fz_print_stext_page(mu_ctx, out, text);
++            fz_print_stext_page_as_text(mu_ctx, out, text);
+ 		}
+-		output = std::string(((char*)buf->data));
++//		output = std::string(((char*)buf->data));
++
++        unsigned char *data;
++        int len = fz_buffer_storage(mu_ctx, buf, &data);
++        output = std::string((char*)data);
+ 	}
+ 	fz_always(mu_ctx)
+ 	{
+         fz_drop_device(mu_ctx, dev);
+         fz_drop_page(mu_ctx, page);
+-        fz_drop_stext_sheet(mu_ctx, sheet);
++//        fz_drop_stext_sheet(mu_ctx, sheet);
+         fz_drop_stext_page(mu_ctx, text);
+         fz_drop_buffer(mu_ctx, buf);
+ 	}
+@@ -919,12 +1009,14 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
+ 
+ 		if (type == SVG_OUT)
+ 		{
+-			file = fopen(filename, "wb");
+-			if (file == NULL)
+-                fz_throw(mu_ctx, FZ_ERROR_GENERIC, "cannot open file '%s'", filename);  //  TODO: localization
+-            out = fz_new_output_with_file_ptr(mu_ctx, file, 0);
+-
+-			dev = fz_new_svg_device(mu_ctx, out, tbounds.x1 - tbounds.x0, tbounds.y1 - tbounds.y0);
++//			file = fopen(filename, "wb");
++//			if (file == NULL)
++//                fz_throw(mu_ctx, FZ_ERROR_GENERIC, "cannot open file '%s'", filename);  //  TODO: localization
++//            out = fz_new_output_with_file_ptr(mu_ctx, file, 0);
++            out = fz_new_output_with_path(mu_ctx, filename, 0);
++
++            dev = fz_new_svg_device(mu_ctx, out, tbounds.x1 - tbounds.x0, tbounds.y1 - tbounds.y0,
++                                    FZ_SVG_TEXT_AS_PATH, 0);
+ 			if (dlist != NULL)
+                 fz_run_display_list(mu_ctx, dlist, dev, &ctm, &tbounds, NULL);
+ 			else
+@@ -940,7 +1032,7 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
+ 		}
+ 		else
+ 		{
+-            pix = fz_new_pixmap_with_bbox(mu_ctx, fz_device_rgb(mu_ctx), &ibounds, 1);
++            pix = fz_new_pixmap_with_bbox(mu_ctx, fz_device_rgb(mu_ctx), &ibounds, NULL, 1);
+             fz_set_pixmap_resolution(mu_ctx, pix, resolution, resolution);
+ 			fz_clear_pixmap_with_value(mu_ctx, pix, 255);
+             dev = fz_new_draw_device(mu_ctx, &fz_identity, pix);
+@@ -995,74 +1087,108 @@ status_t muctx::SavePage(char *filename, int page_num, int resolution, int type,
+ int muctx::GetTextBlock (void *page, int block_num,
+     double *top_x, double *top_y, double *height, double *width)
+ {
+-    fz_stext_page *text = (fz_stext_page*) page;
+-    fz_stext_block *block;
+-
+-    if (text->blocks[block_num].type != FZ_PAGE_BLOCK_TEXT)
+-        return 0;
+-    block = text->blocks[block_num].u.text;
+-
+-    *top_x = block->bbox.x0;
+-    *top_y = block->bbox.y0;
+-    *height = block->bbox.y1 - *top_y;
+-    *width = block->bbox.x1 - *top_x;
+-    return block->len;
++    return 0;
++    //  TODO?????
++
++//    fz_stext_page *text = (fz_stext_page*) page;
++//    fz_stext_block *block;
++
++//    int i = 0;
++//    for (block = page->first_block; block; block = block->next)
++//    {
++//        if (i==block_num)
++//        {
++//            if (block->type != FZ_STEXT_BLOCK_TEXT)
++//                return 0;
++
++//            block = (()block->))u.t;
++
++//            *top_x = block->bbox.x0;
++//            *top_y = block->bbox.y0;
++//            *height = block->bbox.y1 - *top_y;
++//            *width = block->bbox.x1 - *top_x;
++
++//            return block->
++
++//        }
++//    }
++
++//    return 0;
++
++////		if (block->type == FZ_STEXT_BLOCK_TEXT)
++////			++len;
++
++////    if (text->blocks[block_num].type != FZ_STEXT_BLOCK_TEXT)
++////        return 0;
++////    block = text->blocks[block_num].u.text;
++
++////    *top_x = block->bbox.x0;
++////    *top_y = block->bbox.y0;
++////    *height = block->bbox.y1 - *top_y;
++////    *width = block->bbox.x1 - *top_x;
++////    return block->len;
+ }
+ 
+ /* Information about a line of text */
+ int muctx::GetTextLine(void *page, int block_num, int line_num,
+     double *top_x, double *top_y, double *height, double *width)
+ {
+-    int len = 0;
+-    fz_stext_block *block;
+-    fz_stext_line line;
+-    fz_stext_span *span;
+-    fz_stext_page *text = (fz_stext_page*)page;
+-
+-    block = text->blocks[block_num].u.text;
+-    line = block->lines[line_num];
+-
+-    *top_x = line.bbox.x0;
+-    *top_y = line.bbox.y0;
+-    *height = line.bbox.y1 - *top_y;
+-    *width = line.bbox.x1 - *top_x;
+-
+-    for (span = line.first_span; span; span = span->next)
+-    {
+-        len += span->len;
+-    }
+-    return len;
++    return 0;
++    //  TODO?????
++
++//    int len = 0;
++//    fz_stext_block *block;
++//    fz_stext_line line;
++//    fz_stext_span *span;
++//    fz_stext_page *text = (fz_stext_page*)page;
++
++//    block = text->blocks[block_num].u.text;
++//    line = block->lines[line_num];
++
++//    *top_x = line.bbox.x0;
++//    *top_y = line.bbox.y0;
++//    *height = line.bbox.y1 - *top_y;
++//    *width = line.bbox.x1 - *top_x;
++
++//    for (span = line.first_span; span; span = span->next)
++//    {
++//        len += span->len;
++//    }
++//    return len;
+ }
+ 
+ /* Information down to the character level */
+ int muctx::GetTextCharacter(void *page, int block_num, int line_num,
+     int item_num, double *top_x, double *top_y, double *height, double *width)
+ {
+-    fz_stext_block *block;
+-    fz_stext_line line;
+-    fz_stext_span *span;
+-    fz_stext_page *text = (fz_stext_page*)page;
+-    fz_char_and_box cab;
+-    int index = item_num;
+-
+-    block = text->blocks[block_num].u.text;
+-    line = block->lines[line_num];
+-
+-    span = line.first_span;
+-    while (index >= span->len)
+-    {
+-        index = index - span->len;  /* Reset to start of next span */
+-        span = span->next;  /* Get next span */
+-    }
+-
+-    cab.c = span->text[index].c;
+-    fz_stext_char_bbox(mu_ctx, &(cab.bbox), span, index);
+-    *top_x = cab.bbox.x0;
+-    *top_y = cab.bbox.y0;
+-    *height = cab.bbox.y1 - *top_y;
+-    *width = cab.bbox.x1 - *top_x;
+-
+-    return cab.c;
++    return 0;
++    //  TODO?????
++
++//    fz_stext_block *block;
++//    fz_stext_line line;
++//    fz_stext_span *span;
++//    fz_stext_page *text = (fz_stext_page*)page;
++//    fz_char_and_box cab;
++//    int index = item_num;
++
++//    block = text->blocks[block_num].u.text;
++//    line = block->lines[line_num];
++
++//    span = line.first_span;
++//    while (index >= span->len)
++//    {
++//        index = index - span->len;  /* Reset to start of next span */
++//        span = span->next;  /* Get next span */
++//    }
++
++//    cab.c = span->text[index].c;
++//    fz_stext_char_bbox(mu_ctx, &(cab.bbox), span, index);
++//    *top_x = cab.bbox.x0;
++//    *top_y = cab.bbox.y0;
++//    *height = cab.bbox.y1 - *top_y;
++//    *width = cab.bbox.x1 - *top_x;
++
++//    return cab.c;
+ }
+ 
+ void muctx::freeText(fz_stext_page *text)
+@@ -1072,55 +1198,67 @@ void muctx::freeText(fz_stext_page *text)
+ 
+ int muctx::getNumSepsOnPage(int page_num)
+ {
+-    //  we assume that the page MUST be in the cache.
+-    fz_page *page = page_cache->FindPage(page_num);
+-    if (page==NULL)
+-        return 0;
++    return 0;
++    //TODO?????
+ 
+-    int numSeps = fz_count_separations_on_page(mu_ctx, page);
+-    return numSeps;
++//    //  we assume that the page MUST be in the cache.
++//    fz_page *page = page_cache->FindPage(page_num);
++//    if (page==NULL)
++//        return 0;
++
++//    int numSeps = fz_count_separations_on_page(mu_ctx, page);
++//    return numSeps;
+ }
+ 
+ status_t muctx::getSep(int page_num, int nsep, separation_t* separation)
+ {
+-    const char *name;
+-    unsigned int rgba=0;
+-    unsigned int cmyk=0;
+-    unsigned char abgr[4];
+-
+-    //  we assume that the page MUST be in the cache.
+-    fz_page *page = page_cache->FindPage(page_num);
+-    if (page==NULL)
+-        return E_FAILURE;
++    return E_FAILURE;
++    //  TODO ?????
+ 
+-    name = fz_get_separation_on_page(mu_ctx, page, nsep, (unsigned int *)(&abgr[0]), &cmyk);
++//    const char *name;
++//    unsigned int rgba=0;
++//    unsigned int cmyk=0;
++//    unsigned char abgr[4];
+ 
+-    separation->name = name;
+-    separation->cmyk = cmyk;
+-    separation->rgba = abgr[2] | abgr[1]<<8 | abgr[0]<<16 | abgr[3]<<24 ;
++//    //  we assume that the page MUST be in the cache.
++//    fz_page *page = page_cache->FindPage(page_num);
++//    if (page==NULL)
++//        return E_FAILURE;
+ 
+-    return S_ISOK;
++//    name = fz_get_separation_on_page(mu_ctx, page, nsep, (unsigned int *)(&abgr[0]), &cmyk);
++
++//    separation->name = name;
++//    separation->cmyk = cmyk;
++//    separation->rgba = abgr[2] | abgr[1]<<8 | abgr[0]<<16 | abgr[3]<<24 ;
++
++//    return S_ISOK;
+ }
+ 
+ status_t muctx::controlSep (int page_num, int nsep, bool disable)
+ {
+-    //  we assume that the page MUST be in the cache.
+-    fz_page *page = page_cache->FindPage(page_num);
+-    if (page==NULL)
+-        return E_FAILURE;
++    return E_FAILURE;
++    //  TODO ?????
+ 
+-    fz_control_separation_on_page (mu_ctx, page, nsep, disable);
++//    //  we assume that the page MUST be in the cache.
++//    fz_page *page = page_cache->FindPage(page_num);
++//    if (page==NULL)
++//        return E_FAILURE;
+ 
+-    return S_ISOK;
++//    fz_control_separation_on_page (mu_ctx, page, nsep, disable);
++
++//    return S_ISOK;
+ }
+ 
+ bool muctx::sepDisabled(int page_num, int nsep)
+ {
+-    //  we assume that the page MUST be in the cache.
+-    fz_page *page = page_cache->FindPage(page_num);
+-    if (page==NULL)
+-        return false;
++    return true;
++    //  TODO ?????
++
++//    //  we assume that the page MUST be in the cache.
++//    fz_page *page = page_cache->FindPage(page_num);
++//    if (page==NULL)
++//        return false;
+ 
+-    int result = fz_separation_disabled_on_page (mu_ctx, page, nsep);
+-    return (result != 0);
++//    int result = fz_separation_disabled_on_page (mu_ctx, page, nsep);
++//    return (result != 0);
+ }
