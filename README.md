@@ -7,6 +7,6 @@ This repo is clone here for backup purposes, now that both GSView 5.0 (Formerly 
 This repo is said to be (Not sure) source for GSView 6.0, whereas not verified.
 
 ### copyright
-The repo is licensed under its original author, the Github version is for backup only. Consult the original author if you want to use it for commercial purposes.
+The repo is licensed under its original author's license (unknown, you may verify it yourself), the Github version is for backup only. Consult the original author if you want to use it for commercial purposes.
 
 Enjoy!
